@@ -57,28 +57,6 @@ export default async function Home() {
     },
   ];
 
-  const samplePack = {
-    id: "omega-zman-pack",
-    name: "MYPACK",
-    products: [
-      {
-        name: "Omega 3 1000",
-        description: "120 softgels",
-        image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=400&fit=crop&crop=center",
-      },
-      {
-        name: "ZMAN",
-        description: "90 caps",
-        image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center",
-      },
-    ],
-    price: 20.99,
-    originalPrice: 29.98,
-    discount: 30,
-    normalImage: "/images/pack-normal.png",
-    hoverImage: "/images/pack-hover.png",
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -104,7 +82,7 @@ export default async function Home() {
           ))}
         </div>
         <div className="grid gap-8">
-          <PackCard {...samplePack} />
+          <PackCard />
         </div>
       </div>
     </div>
