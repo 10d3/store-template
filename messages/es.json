@@ -1,0 +1,14 @@
+{
+  "product": {
+    "addToCart": "Añadir al Carrito",
+    "discount": "DESCUENTO",
+    "hoverImageAlt": "vista al pasar el ratón"
+  },
+  "common": {
+    "currency": "EUR"
+  },
+  "home": {
+    "title": "Tienda Premium de Suplementos",
+    "subtitle": "Descubre nuestra colección de suplementos de alta calidad diseñados para ayudarte a alcanzar tus objetivos de fitness."
+  }
+}

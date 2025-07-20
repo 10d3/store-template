@@ -1,0 +1,14 @@
+{
+  "product": {
+    "addToCart": "Add to Cart",
+    "discount": "OFF",
+    "hoverImageAlt": "hover view"
+  },
+  "common": {
+    "currency": "EUR"
+  },
+  "home": {
+    "title": "Premium Supplements Store",
+    "subtitle": "Discover our collection of high-quality supplements designed to help you achieve your fitness goals."
+  }
+}
