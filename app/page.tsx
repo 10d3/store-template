@@ -81,7 +81,8 @@ export default async function Home() {
             />
           ))}
         </div>
-        <div className="grid gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 pt-10">
+          <PackCard />
           <PackCard />
         </div>
       </div>
