@@ -56,6 +56,34 @@ export default async function Home() {
       },
     },
   ];
+  const test = [
+    {
+      id: "1",
+      name: "PROZIS Creatine Creapure - Orange Flavor with Sweeteners",
+      price: 2449,
+      originalPrice: 3499,
+      discount: 30,
+      image:
+        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center",
+      hoverMedia: {
+        type: "image" as const,
+        src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center&sat=-100",
+      },
+    },
+    {
+      id: "2",
+      name: "Whey Protein Isolate - Vanilla Flavor",
+      price: 4599,
+      originalPrice: 5999,
+      discount: 25,
+      image:
+        "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&h=400&fit=crop&crop=center",
+      hoverMedia: {
+        type: "image" as const,
+        src: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400&h=400&fit=crop&crop=center&brightness=1.2",
+      },
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -82,8 +110,8 @@ export default async function Home() {
           ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 pt-10">
-          <PackCard />
-          <PackCard />
+          <PackCard products={test}/>
+          <PackCard products={test}/>
         </div>
       </div>
     </div>
