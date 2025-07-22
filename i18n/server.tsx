@@ -2,6 +2,7 @@
 import { IntlMessageFormat } from "intl-messageformat";
 import type { IntlNamespaceKeys, NamespacedKeys, FlattenedKeys } from "./types";
 import { cookies } from "next/headers";
+import { getNestedValue } from "@/lib/utils";
 
 export const getLocale = async () => {
   const cookiesStore = await cookies();
@@ -16,11 +17,6 @@ export const getMessages = async () =>
       default: En;
     }
   ).default;
-
-// Helper function to get nested value from object using dot notation
-export const getNestedValue = (obj: any, path: string): string => {
-  return path.split(".").reduce((current, key) => current?.[key], obj) || "";
-};
 
 export const getTranslations = async <TNamespaceKey extends IntlNamespaceKeys>(
   namespaceKey: TNamespaceKey

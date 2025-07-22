@@ -1,7 +1,7 @@
 "use client";
-import { invariant } from "@/lib/utils";
+import { getNestedValue, invariant } from "@/lib/utils";
 import { type ReactNode, createContext, use } from "react";
-import { getMessagesInternal, getNestedValue } from "./server";
+import { getMessagesInternal } from "./server";
 import type { IntlNamespaceKeys, FlattenedKeys } from "./types";
 import { IntlMessageFormat } from "intl-messageformat";
 
