@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IntlMessageFormat } from "intl-messageformat";
 import type { IntlNamespaceKeys, NamespacedKeys, FlattenedKeys } from "./types";
-import { cookies } from "next/headers";
+// import { cookies } from "next/headers";
 import { getNestedValue } from "@/lib/utils";
 
-export const getLocale = async () => {
-  const cookiesStore = await cookies();
-  return cookiesStore.get("NEXT_LOCALE")?.value || "en";
-};
+export const getLocale = async () => "en"
 
 type En = typeof import("../messages/en.json");
 
