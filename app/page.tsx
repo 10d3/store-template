@@ -1,9 +1,11 @@
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
-import { getTranslations } from "next-intl/server";
+import { getTranslations } from "@/i18n/server";
+// import { getTranslations } from "next-intl/server";
 
 export default async function Home() {
-  const t = await getTranslations();
+  const t = await getTranslations("test");
+  console.log("translations", t("message"));
   const sampleProducts = [
     {
       id: "1",
@@ -90,10 +92,10 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            {t("home.title")}
+            {/* {t("home.title")} */}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {t("home.subtitle")}
+            {/* {t("home.subtitle")} */}
           </p>
         </div>
 

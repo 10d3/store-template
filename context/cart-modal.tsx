@@ -1,3 +1,4 @@
+'use client'
 import { invariant } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { createContext, ReactNode, use, useEffect, useState } from "react";

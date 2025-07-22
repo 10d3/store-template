@@ -10,5 +10,8 @@
   "home": {
     "title": "Magasin Premium de Suppléments",
     "subtitle": "Découvrez notre collection de suppléments de haute qualité conçus pour vous aider à atteindre vos objectifs de fitness."
+  },
+   "test":{
+    "message": "This is a test message"
   }
 }

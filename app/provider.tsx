@@ -1,10 +1,15 @@
 import { CartModalProvider } from "@/context/cart-modal";
-import { NextIntlClientProvider } from "next-intl";
+import { IntlClientProvider } from "@/i18n/client";
+import { getMessages, getLocale} from "@/i18n/server";
+// import { NextIntlClientProvider } from "next-intl";
 
-export default function Provider({ children }: { children: React.ReactNode }) {
+export default async function Provider({ children }: { children: React.ReactNode }) {
+  const messages = await getMessages();
+  const locale = await getLocale()
+
   return (
-    <NextIntlClientProvider>
+    <IntlClientProvider messages={messages} locale={locale}>
       <CartModalProvider>{children}</CartModalProvider>
-    </NextIntlClientProvider>
+    </IntlClientProvider>
   );
 }

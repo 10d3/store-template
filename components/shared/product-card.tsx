@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getTranslations } from "@/i18n/server";
 
 interface ProductCardProps {
   id: string;
@@ -35,20 +36,22 @@ export function ProductCard({
   onAddToCart,
   ...props
 }: ProductCardProps) {
-  const t = useTranslations();
+  // const t = useTranslations("home");
   const [isHovered, setIsHovered] = React.useState(false);
   const [mediaLoaded, setMediaLoaded] = React.useState(false);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: t("common.currency"),
+      currency: "USD",
     }).format(price);
   };
 
   const handleAddToCart = () => {
     onAddToCart?.(id);
   };
+
+  // console.log("translations", t)
 
   return (
     <Card
@@ -66,7 +69,7 @@ export function ProductCard({
           variant="destructive"
           className="absolute top-3 right-3 z-20 bg-red-500 text-white font-semibold px-2 py-1 text-xs rounded-full"
         >
-          {discount}% {t("product.discount")}
+          {/* {discount}% {t("discount")} */}
         </Badge>
       )}
 
@@ -108,7 +111,7 @@ export function ProductCard({
               ) : (
                 <Image
                   src={hoverMedia.src || "/placeholder.svg"}
-                  alt={`${name} - ${t("product.hoverImageAlt")}`}
+                  alt={`${name}`}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -149,7 +152,7 @@ export function ProductCard({
               className="w-full bg-white text-black hover:bg-gray-100 transition-colors duration-200 font-medium"
               size="sm"
             >
-              {t("product.addToCart")}
+              {/* {t("product.addToCart")} */}
             </Button>
           </div>
 

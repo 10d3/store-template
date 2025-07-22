@@ -4,10 +4,11 @@ import Image from "next/image";
 import * as React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { useTranslations } from "next-intl";
+// import { useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useCartStore } from "@/lib/store";
+import { useTranslations } from "@/i18n/client";
 
 interface PackProduct {
   id: string;
@@ -40,7 +41,8 @@ export default function PackCard({
   className,
   onAddToCart,
 }: PackCardProps) {
-  const t = useTranslations();
+  const t = useTranslations("product");
+  const currency = useTranslations("common");
   const [isHovered, setIsHovered] = React.useState(false);
   const [hoveredProductId, setHoveredProductId] = React.useState<string | null>(
     null
@@ -50,7 +52,7 @@ export default function PackCard({
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: t("common.currency"),
+      currency: currency("currency"),
     }).format(price / 100); // Assuming price is in cents
   };
 
@@ -139,7 +141,7 @@ export default function PackCard({
           variant="destructive"
           className="absolute top-3 right-3 z-30 bg-red-500 text-white font-semibold px-3 py-1 text-xs rounded-lg shadow-lg"
         >
-          {maxDiscount}% {t("product.discount")}
+          {maxDiscount}% {t("discount")}
         </Badge>
       )}
 
@@ -201,7 +203,7 @@ export default function PackCard({
                   ) : (
                     <Image
                       src={product.hoverMedia.src || "/placeholder.svg"}
-                      alt={`${product.name} - hover`}
+                      alt={`${product.name} - hover ${t("hoverImageAlt")}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

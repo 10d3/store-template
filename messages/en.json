@@ -10,5 +10,8 @@
   "home": {
     "title": "Premium Supplements Store",
     "subtitle": "Discover our collection of high-quality supplements designed to help you achieve your fitness goals."
+  },
+  "test":{
+    "message": "This is a test message"
   }
 }

@@ -10,5 +10,8 @@
   "home": {
     "title": "Tienda Premium de Suplementos",
     "subtitle": "Descubre nuestra colección de suplementos de alta calidad diseñados para ayudarte a alcanzar tus objetivos de fitness."
+  },
+   "test":{
+    "message": "This is a test message"
   }
 }
