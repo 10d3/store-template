@@ -4,7 +4,6 @@ import Image from "next/image";
 import * as React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
-// import { useTranslations } from "next-intl";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useCartStore } from "@/lib/store";
