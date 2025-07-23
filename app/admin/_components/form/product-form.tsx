@@ -42,7 +42,7 @@ export function ProductForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
       id: initialData?.id || "",
-      name: initialData?.name || "",
+      name: initialData?.name as string,
       description: initialData?.description || "",
       price: initialData?.default_price?.unit_amount || 1000,
       currency: initialData?.default_price?.currency || "usd",

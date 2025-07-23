@@ -1,7 +1,7 @@
 export interface StripeProduct {
   id: string
   name: string
-  description?: string
+  description?: string | null
   images?: string[]
   metadata?: Record<string, string>
   default_price?: {
@@ -14,10 +14,11 @@ export interface StripeProduct {
 
 export interface StripeCoupon {
   id: string
-  name?: string
-  percent_off?: number
-  amount_off?: number
-  currency?: string
+  name?: string | null
+  percent_off?: number | null
+  amount_off?: number | null
+  currency?: string | null
   duration: string
   valid: boolean
+  metadata?: Record<string, string>
 }

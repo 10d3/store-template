@@ -1,24 +1,24 @@
 "use client"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   createProduct,
   updateProduct,
   archiveProduct,
   createCoupon,
+  createPresetCoupon,
   createPack,
   listProducts,
   listCoupons,
 } from "@/lib/product/crud"
 import { toast } from "sonner"
-import { type StripeProduct } from "@/types/product"
-import { type ProductFormData } from "@/lib/product/product.schema"
-import { ProductList } from "./_components/product-list"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductForm } from "./_components/form/product-form"
-import { PackForm } from "./_components/form/pack-form"
-import { CouponForm } from "./_components/form/coupon-form"
-import { CouponList } from "./_components/coupon-list"
+import { StripeProduct } from "@/types/product"
+import { ProductFormData } from "@/lib/product/product.schema"
+import { UnifiedProductList } from "./_components/product-list"
+import { EnhancedPackForm } from "./_components/form/pack-form"
+import { EnhancedCouponForm } from "./_components/form/coupon-form"
 
 export default function AdminPage() {
   const queryClient = useQueryClient()
@@ -85,6 +85,18 @@ export default function AdminPage() {
     },
   })
 
+  const { mutate: handleCreatePresetCoupon, isPending: creatingPresetCoupon } = useMutation({
+    mutationFn: createPresetCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["coupons"] })
+      toast.success("Preset coupon created successfully")
+    },
+    onError: (error) => {
+      toast.error("Failed to create preset coupon")
+      console.error(error)
+    },
+  })
+
   const { mutate: handleCreatePack, isPending: creatingPack } = useMutation({
     mutationFn: createPack,
     onSuccess: () => {
@@ -116,14 +128,14 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">E-commerce Admin</h1>
-        <p className="text-muted-foreground">Manage your products, coupons, and product packs</p>
+        <h1 className="text-3xl font-bold tracking-tight">Store Admin Dashboard</h1>
+        <p className="text-muted-foreground">Manage your products, packs, and promotional coupons</p>
       </div>
 
       <Tabs defaultValue="products" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="packs">Packs</TabsTrigger>
+          <TabsTrigger value="packs">Product Packs</TabsTrigger>
           <TabsTrigger value="coupons">Coupons</TabsTrigger>
         </TabsList>
 
@@ -143,8 +155,9 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
-            <ProductList
+            <UnifiedProductList
               products={products}
+              coupons={coupons}
               onEdit={onEditProduct}
               onArchive={handleArchiveProduct}
               isLoading={productsLoading}
@@ -154,9 +167,10 @@ export default function AdminPage() {
 
         <TabsContent value="packs" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <PackForm onSubmit={handleCreatePack} isLoading={creatingPack} />
-            <ProductList
-              products={products.filter((p) => p.metadata?.type === "bundle")}
+            <EnhancedPackForm products={products} onSubmit={handleCreatePack} isLoading={creatingPack} />
+            <UnifiedProductList
+              products={products}
+              coupons={coupons}
               onEdit={onEditProduct}
               onArchive={handleArchiveProduct}
               isLoading={productsLoading}
@@ -166,8 +180,18 @@ export default function AdminPage() {
 
         <TabsContent value="coupons" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <CouponForm onSubmit={handleCreateCoupon} isLoading={creatingCoupon} />
-            <CouponList coupons={coupons} />
+            <EnhancedCouponForm
+              onSubmit={handleCreateCoupon}
+              onPresetSubmit={handleCreatePresetCoupon}
+              isLoading={creatingCoupon || creatingPresetCoupon}
+            />
+            <UnifiedProductList
+              products={products}
+              coupons={coupons}
+              onEdit={onEditProduct}
+              onArchive={handleArchiveProduct}
+              isLoading={couponsLoading}
+            />
           </div>
         </TabsContent>
       </Tabs>
