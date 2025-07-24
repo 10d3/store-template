@@ -15,7 +15,13 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+// import {
+//   type PackFormData,
+//   packSchema,
+//   type StripeProduct,
+// } from "@/types/admin";
 import { Package, ShoppingCart } from "lucide-react";
+// import { StripeProduct } from "@/types/product";
 import { PackFormData, packSchema } from "@/lib/product/product.schema";
 import { StripeProduct } from "@/types/product";
 
@@ -33,8 +39,6 @@ export function EnhancedPackForm({
   const form = useForm<PackFormData>({
     resolver: zodResolver(packSchema),
     defaultValues: {
-      name: "",
-      description: "",
       productIds: [],
       packPrice: 0,
       discount: 0,
@@ -53,7 +57,10 @@ export function EnhancedPackForm({
   const calculateSuggestedPrice = () => {
     const selected = products.filter((p) => selectedProducts.includes(p.id));
     const total = selected.reduce((sum, product) => {
-      return sum + (product.default_price?.unit_amount || 0);
+      if (product.default_price && typeof product.default_price === 'object' && product.default_price.unit_amount !== null) {
+        return sum + product.default_price.unit_amount;
+      }
+      return sum;
     }, 0);
     return total;
   };
@@ -123,7 +130,7 @@ export function EnhancedPackForm({
                       </p>
                     ) : (
                       products
-                        .filter((p) => p.metadata?.type !== "bundle") // Exclude existing packs
+                        .filter((p) => !p.metadata || p.metadata.type !== "bundle") // Exclude existing packs
                         .map((product) => (
                           <FormField
                             key={product.id}
@@ -158,7 +165,7 @@ export function EnhancedPackForm({
                                     <FormLabel className="text-sm font-normal cursor-pointer">
                                       {product.name}
                                     </FormLabel>
-                                    {product.default_price && (
+                                    {product.default_price && typeof product.default_price === 'object' && product.default_price.unit_amount !== null && (
                                       <p className="text-xs text-muted-foreground">
                                         {formatPrice(
                                           product.default_price.unit_amount,

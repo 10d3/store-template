@@ -30,11 +30,12 @@ export function UnifiedProductList({
     setArchivingId(null);
   };
 
-  const formatPrice = (amount: number, currency: string) => {
+  const formatPrice = (price: { unit_amount: number | null; currency: string } | string | null | undefined) => {
+    if (!price || typeof price === 'string' || price === null || price.unit_amount === null) return "N/A";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: currency.toUpperCase(),
-    }).format(amount / 100);
+      currency: price.currency.toUpperCase(),
+    }).format(price.unit_amount / 100);
   };
 
   const formatDiscount = (coupon: StripeCoupon) => {
@@ -50,8 +51,8 @@ export function UnifiedProductList({
     return "Special offer";
   };
 
-  const regularProducts = products.filter((p) => p.metadata?.type !== "bundle");
-  const packProducts = products.filter((p) => p.metadata?.type === "bundle");
+  const regularProducts = products.filter((p) => p.metadata && p.metadata.type !== "bundle");
+  const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
 
   return (
     <Card>
@@ -98,10 +99,7 @@ export function UnifiedProductList({
                     )}
                     {product.default_price && (
                       <p className="text-sm font-medium">
-                        {formatPrice(
-                          product.default_price.unit_amount,
-                          product.default_price.currency
-                        )}
+                        {formatPrice(product.default_price)}
                       </p>
                     )}
                   </div>
@@ -143,7 +141,7 @@ export function UnifiedProductList({
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-medium truncate">{pack.name}</h3>
                       <Badge variant="secondary">Pack</Badge>
-                      {pack.metadata?.discount &&
+                      {pack.metadata && pack.metadata.discount &&
                         Number.parseInt(pack.metadata.discount) > 0 && (
                           <Badge variant="destructive">
                             {pack.metadata.discount}% off
@@ -155,7 +153,7 @@ export function UnifiedProductList({
                         {pack.description}
                       </p>
                     )}
-                    {pack.metadata?.contents && (
+                    {pack.metadata && pack.metadata.contents && (
                       <p className="text-xs text-muted-foreground">
                         Contains: {pack.metadata.contents.split(",").length}{" "}
                         items
@@ -163,10 +161,7 @@ export function UnifiedProductList({
                     )}
                     {pack.default_price && (
                       <p className="text-sm font-medium">
-                        {formatPrice(
-                          pack.default_price.unit_amount,
-                          pack.default_price.currency
-                        )}
+                        {formatPrice(pack.default_price)}
                       </p>
                     )}
                   </div>
@@ -212,14 +207,17 @@ export function UnifiedProductList({
                       <Badge variant={coupon.valid ? "default" : "secondary"}>
                         {coupon.valid ? "Active" : "Inactive"}
                       </Badge>
-                      {coupon.metadata?.type && (
+                      {coupon.metadata && coupon.metadata.type && (
                         <Badge variant="outline">{coupon.metadata.type}</Badge>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
+                      {formatDiscount(coupon)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
                       Duration: {coupon.duration}
                     </p>
-                    {coupon.metadata?.description && (
+                    {coupon.metadata && coupon.metadata.description && (
                       <p className="text-xs text-muted-foreground">
                         {coupon.metadata.description}
                       </p>

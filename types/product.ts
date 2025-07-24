@@ -3,12 +3,12 @@ export interface StripeProduct {
   name: string
   description?: string | null
   images?: string[]
-  metadata?: Record<string, string>
+  metadata: Record<string, string>
   default_price?: {
     id: string
-    unit_amount: number
+    unit_amount: number | null
     currency: string
-  }
+  } | string | null
   active: boolean
 }
 
@@ -20,5 +20,5 @@ export interface StripeCoupon {
   currency?: string | null
   duration: string
   valid: boolean
-  metadata?: Record<string, string>
+  metadata: Record<string, string> | null
 }

@@ -7,8 +7,8 @@ export const productSchema = z.object({
   id: z.string().optional(),
   description: z.string().optional(),
   images: z.array(z.string()).optional(),
-  metadata: z.record(z.string(),z.string()).optional(),
-})
+  metadata: z.record(z.string(), z.string()).optional(),
+});
 
 export const couponSchema = z.object({
   id: z.string().optional(),

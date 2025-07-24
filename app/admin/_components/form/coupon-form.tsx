@@ -42,7 +42,6 @@ export function EnhancedCouponForm({
   const form = useForm<CouponFormData>({
     resolver: zodResolver(couponSchema),
     defaultValues: {
-      name: "",
       duration: "once",
       currency: "usd",
     },

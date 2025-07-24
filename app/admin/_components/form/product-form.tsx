@@ -44,8 +44,12 @@ export function ProductForm({
       id: initialData?.id || "",
       name: initialData?.name as string,
       description: initialData?.description || "",
-      price: initialData?.default_price?.unit_amount || 1000,
-      currency: initialData?.default_price?.currency || "usd",
+      price: initialData?.default_price && typeof initialData.default_price === 'object' && initialData.default_price.unit_amount !== null
+        ? initialData.default_price.unit_amount 
+        : 1000,
+      currency: initialData?.default_price && typeof initialData.default_price === 'object' && initialData.default_price.currency 
+        ? initialData.default_price.currency 
+        : "usd",
       images: initialData?.images || [],
       metadata: initialData?.metadata || {},
     },

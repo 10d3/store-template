@@ -1,6 +1,7 @@
 "use server"
 import Stripe from "stripe"
 import { CouponFormData, PackFormData, ProductFormData } from "./product.schema"
+// import type { ProductFormData, CouponFormData, PackFormData } from "@/types/product"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
@@ -55,7 +56,6 @@ export async function createPresetCoupon(preset: "4for3" | "15off3") {
       },
       // Note: The actual "cheapest free" logic would be handled in checkout
       amount_off: 0, // Placeholder - actual discount calculated server-side
-      currency: "usd",
     })
   }
 
@@ -70,8 +70,6 @@ export async function createPresetCoupon(preset: "4for3" | "15off3") {
       },
     })
   }
-
-  throw new Error(`Unknown preset: ${preset}`)
 }
 
 // Update pack creation to use productIds directly
