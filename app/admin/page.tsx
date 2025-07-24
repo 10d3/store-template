@@ -7,15 +7,17 @@ import {
   updateProduct,
   archiveProduct,
   createCoupon,
+  updateCoupon,
   createPresetCoupon,
   createPack,
+  updatePack,
   listProducts,
   listCoupons,
 } from "@/lib/product/crud"
 import { toast } from "sonner"
 import { ProductForm } from "./_components/form/product-form"
-import { StripeProduct } from "@/types/product"
-import { ProductFormData } from "@/lib/product/product.schema"
+import { StripeProduct, StripeCoupon } from "@/types/product"
+import { ProductFormData, PackFormData, CouponFormData } from "@/lib/product/product.schema"
 import { UnifiedProductList } from "./_components/product-list"
 import { EnhancedPackForm } from "./_components/form/pack-form"
 import { EnhancedCouponForm } from "./_components/form/coupon-form"
@@ -24,6 +26,8 @@ import { EnhancedCouponForm } from "./_components/form/coupon-form"
 export default function AdminPage() {
   const queryClient = useQueryClient()
   const [editingProduct, setEditingProduct] = useState<StripeProduct | null>(null)
+  const [editingPack, setEditingPack] = useState<StripeProduct | null>(null)
+  const [editingCoupon, setEditingCoupon] = useState<StripeCoupon | null>(null)
 
   // Queries
   const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -35,6 +39,9 @@ export default function AdminPage() {
     queryKey: ["coupons"],
     queryFn: listCoupons,
   })
+
+  console.log("coupons", coupons)
+  console.log("products", products)
 
   // Mutations
   const { mutate: handleCreateProduct, isPending: creatingProduct } = useMutation({
@@ -86,6 +93,19 @@ export default function AdminPage() {
     },
   })
 
+  const { mutate: handleUpdateCoupon, isPending: updatingCoupon } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CouponFormData }) => updateCoupon(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["coupons"] })
+      setEditingCoupon(null)
+      toast.success("Coupon updated successfully")
+    },
+    onError: (error) => {
+      toast.error("Failed to update coupon")
+      console.error(error)
+    },
+  })
+
   const { mutate: handleCreatePresetCoupon, isPending: creatingPresetCoupon } = useMutation({
     mutationFn: createPresetCoupon,
     onSuccess: () => {
@@ -110,6 +130,19 @@ export default function AdminPage() {
     },
   })
 
+  const { mutate: handleUpdatePack, isPending: updatingPack } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: PackFormData }) => updatePack(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      setEditingPack(null)
+      toast.success("Pack updated successfully")
+    },
+    onError: (error) => {
+      toast.error("Failed to update pack")
+      console.error(error)
+    },
+  })
+
   const onProductSubmit = (data: ProductFormData) => {
     if (editingProduct) {
       handleUpdateProduct({ id: editingProduct.id, data })
@@ -118,12 +151,44 @@ export default function AdminPage() {
     }
   }
 
+  const onPackSubmit = (data: PackFormData) => {
+    if (editingPack) {
+      handleUpdatePack({ id: editingPack.id, data })
+    } else {
+      handleCreatePack(data)
+    }
+  }
+
+  const onCouponSubmit = (data: CouponFormData) => {
+    if (editingCoupon) {
+      handleUpdateCoupon({ id: editingCoupon.id, data })
+    } else {
+      handleCreateCoupon(data)
+    }
+  }
+
   const onEditProduct = (product: StripeProduct) => {
     setEditingProduct(product)
+    setEditingPack(null) // Clear pack editing when editing product
+    setEditingCoupon(null) // Clear coupon editing when editing product
+  }
+
+  const onEditPack = (pack: StripeProduct) => {
+    setEditingPack(pack)
+    setEditingProduct(null) // Clear product editing when editing pack
+    setEditingCoupon(null) // Clear coupon editing when editing pack
+  }
+
+  const onEditCoupon = (coupon: StripeCoupon) => {
+    setEditingCoupon(coupon)
+    setEditingProduct(null) // Clear product editing when editing coupon
+    setEditingPack(null) // Clear pack editing when editing coupon
   }
 
   const onCancelEdit = () => {
     setEditingProduct(null)
+    setEditingPack(null)
+    setEditingCoupon(null)
   }
 
   return (
@@ -159,7 +224,11 @@ export default function AdminPage() {
             <UnifiedProductList
               products={products}
               coupons={coupons}
-              onEdit={onEditProduct}
+              onEdit={(item) => {
+                if ('default_price' in item) {
+                  onEditProduct(item as StripeProduct);
+                }
+              }}
               onArchive={handleArchiveProduct}
               isLoading={productsLoading}
             />
@@ -168,11 +237,29 @@ export default function AdminPage() {
 
         <TabsContent value="packs" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <EnhancedPackForm products={products} onSubmit={handleCreatePack} isLoading={creatingPack} />
+            <div>
+              <EnhancedPackForm 
+                products={products} 
+                onSubmit={onPackSubmit} 
+                initialData={editingPack || undefined}
+                isLoading={creatingPack || updatingPack} 
+              />
+              {editingPack && (
+                <div className="mt-4">
+                  <button onClick={onCancelEdit} className="text-sm text-muted-foreground hover:text-foreground">
+                    Cancel editing
+                  </button>
+                </div>
+              )}
+            </div>
             <UnifiedProductList
               products={products}
               coupons={coupons}
-              onEdit={onEditProduct}
+              onEdit={(item) => {
+                if ('default_price' in item) {
+                  onEditPack(item as StripeProduct);
+                }
+              }}
               onArchive={handleArchiveProduct}
               isLoading={productsLoading}
             />
@@ -181,18 +268,32 @@ export default function AdminPage() {
 
         <TabsContent value="coupons" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <EnhancedCouponForm
-              onSubmit={handleCreateCoupon}
-              onPresetSubmit={handleCreatePresetCoupon}
-              isLoading={creatingCoupon || creatingPresetCoupon}
-            />
+            <div>
+              <EnhancedCouponForm
+                onSubmit={onCouponSubmit}
+                onPresetSubmit={handleCreatePresetCoupon}
+                initialData={editingCoupon || undefined}
+                isLoading={creatingCoupon || updatingCoupon || creatingPresetCoupon}
+              />
+              {editingCoupon && (
+                <div className="mt-4">
+                  <button onClick={onCancelEdit} className="text-sm text-muted-foreground hover:text-foreground">
+                    Cancel editing
+                  </button>
+                </div>
+              )}
+            </div>
             <UnifiedProductList
-              products={products}
-              coupons={coupons}
-              onEdit={onEditProduct}
-              onArchive={handleArchiveProduct}
-              isLoading={couponsLoading}
-            />
+               products={products}
+               coupons={coupons}
+               onEdit={(item) => {
+                 if ('percent_off' in item || 'amount_off' in item) {
+                   onEditCoupon(item as StripeCoupon);
+                 }
+               }}
+               onArchive={handleArchiveProduct}
+               isLoading={couponsLoading}
+             />
           </div>
         </TabsContent>
       </Tabs>

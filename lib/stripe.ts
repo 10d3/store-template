@@ -5,7 +5,5 @@ export const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 })
 
 export function getStripeClient() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2025-06-30.basil",
-  });
+  return stripeClient
 }

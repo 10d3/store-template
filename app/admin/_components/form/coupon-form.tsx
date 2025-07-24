@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -23,21 +23,25 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Percent, Gift, Zap } from "lucide-react";
-import { CouponFormData, couponSchema } from "@/lib/product/product.schema";
+import { Percent, Gift, Zap, Edit } from "lucide-react";
+import { couponSchema, CouponFormData } from "@/lib/product/product.schema";
+import { StripeCoupon } from "@/types/product";
 
 interface EnhancedCouponFormProps {
   onSubmit: (data: CouponFormData) => void;
   onPresetSubmit: (preset: "4for3" | "15off3") => void;
+  initialData?: StripeCoupon;
   isLoading?: boolean;
 }
 
 export function EnhancedCouponForm({
   onSubmit,
   onPresetSubmit,
+  initialData,
   isLoading,
 }: EnhancedCouponFormProps) {
   const [couponType, setCouponType] = useState<"preset" | "custom">("preset");
+  const isEditing = !!initialData;
 
   const form = useForm<CouponFormData>({
     resolver: zodResolver(couponSchema),
@@ -47,6 +51,33 @@ export function EnhancedCouponForm({
     },
   });
 
+  // Reset form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      const resetValues: Partial<CouponFormData> = {
+        name: initialData.name || "",
+        percent_off: initialData.percent_off || undefined,
+        amount_off: initialData.amount_off || undefined,
+        currency: initialData.currency || "usd",
+        duration: initialData.duration as "once" | "repeating" | "forever" || "once",
+      };
+      
+      // Only include id if it exists
+      if (initialData.id) {
+        resetValues.id = initialData.id;
+      }
+      
+      form.reset(resetValues);
+      setCouponType("custom"); // Switch to custom when editing
+    } else {
+      form.reset({
+        duration: "once",
+        currency: "usd",
+      });
+      setCouponType("preset");
+    }
+  }, [initialData, form]);
+
   const handlePresetCoupon = (preset: "4for3" | "15off3") => {
     onPresetSubmit(preset);
   };
@@ -55,35 +86,48 @@ export function EnhancedCouponForm({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Percent className="h-5 w-5" />
-          Create Coupon
+          {isEditing ? (
+            <>
+              <Edit className="h-5 w-5" />
+              Edit Coupon
+            </>
+          ) : (
+            <>
+              <Percent className="h-5 w-5" />
+              Create Coupon
+            </>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Coupon Type Selection */}
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Coupon Type</Label>
-          <RadioGroup
-            value={couponType}
-            onValueChange={(value) =>
-              setCouponType(value as "preset" | "custom")
-            }
-            className="flex flex-col space-y-2"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="preset" id="preset" />
-              <Label htmlFor="preset">Quick Presets</Label>
+        {/* Coupon Type Selection - Hide when editing */}
+        {!isEditing && (
+          <>
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Coupon Type</Label>
+              <RadioGroup
+                value={couponType}
+                onValueChange={(value) =>
+                  setCouponType(value as "preset" | "custom")
+                }
+                className="flex flex-col space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="preset" id="preset" />
+                  <Label htmlFor="preset">Quick Presets</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="custom" id="custom" />
+                  <Label htmlFor="custom">Custom Coupon</Label>
+                </div>
+              </RadioGroup>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="custom" id="custom" />
-              <Label htmlFor="custom">Custom Coupon</Label>
-            </div>
-          </RadioGroup>
-        </div>
 
-        <Separator />
+            <Separator />
+          </>
+        )}
 
-        {couponType === "preset" ? (
+        {couponType === "preset" && !isEditing ? (
           /* Preset Coupons */
           <div className="space-y-3">
             <h3 className="font-medium">Quick Coupon Presets</h3>
@@ -189,7 +233,10 @@ export function EnhancedCouponForm({
               />
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Custom Coupon"}
+                {isLoading 
+                  ? (isEditing ? "Updating..." : "Creating...") 
+                  : (isEditing ? "Update Coupon" : "Create Custom Coupon")
+                }
               </Button>
             </form>
           </Form>

@@ -10,7 +10,7 @@ import { Edit, Archive, Package, ShoppingBag, Percent } from "lucide-react";
 interface UnifiedProductListProps {
   products: StripeProduct[];
   coupons: StripeCoupon[];
-  onEdit: (product: StripeProduct) => void;
+  onEdit: (item: StripeProduct | StripeCoupon) => void;
   onArchive: (id: string) => void;
   isLoading?: boolean;
 }
@@ -53,6 +53,7 @@ export function UnifiedProductList({
 
   const regularProducts = products.filter((p) => p.metadata && p.metadata.type !== "bundle");
   const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
+  console.log("packProducts", packProducts)
 
   return (
     <Card>
@@ -197,7 +198,7 @@ export function UnifiedProductList({
               coupons.map((coupon) => (
                 <div
                   key={coupon.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -223,7 +224,15 @@ export function UnifiedProductList({
                       </p>
                     )}
                   </div>
-                  <div className="ml-4">
+                  <div className="flex items-center gap-2 ml-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(coupon)}
+                      disabled={isLoading}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     <Badge variant="outline">{formatDiscount(coupon)}</Badge>
                   </div>
                 </div>

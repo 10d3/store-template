@@ -20,6 +20,7 @@ export const couponSchema = z.object({
 })
 
 export const packSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   productIds: z.array(z.string()).min(1, "At least one product required"),
   packPrice: z.number().min(0, "Pack price must be positive"),

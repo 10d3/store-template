@@ -1,6 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +21,7 @@ import { Badge } from "@/components/ui/badge";
 //   packSchema,
 //   type StripeProduct,
 // } from "@/types/admin";
-import { Package, ShoppingCart } from "lucide-react";
+import { Package, ShoppingCart, Edit } from "lucide-react";
 // import { StripeProduct } from "@/types/product";
 import { PackFormData, packSchema } from "@/lib/product/product.schema";
 import { StripeProduct } from "@/types/product";
@@ -28,24 +29,68 @@ import { StripeProduct } from "@/types/product";
 interface EnhancedPackFormProps {
   products: StripeProduct[];
   onSubmit: (data: PackFormData) => void;
+  initialData?: StripeProduct;
   isLoading?: boolean;
 }
 
 export function EnhancedPackForm({
   products,
   onSubmit,
+  initialData,
   isLoading,
 }: EnhancedPackFormProps) {
   const form = useForm<PackFormData>({
     resolver: zodResolver(packSchema),
     defaultValues: {
+      name: "",
+      description: "",
       productIds: [],
       packPrice: 0,
       discount: 0,
     },
   });
 
+  // Reset form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      const productIds = initialData.metadata?.contents
+        ? initialData.metadata.contents.split(",").filter(Boolean)
+        : [];
+
+      const resetValues: Partial<PackFormData> = {
+        name: initialData.name,
+        description: initialData.description || "",
+        productIds,
+        packPrice:
+          initialData.default_price &&
+          typeof initialData.default_price === "object" &&
+          initialData.default_price.unit_amount !== null
+            ? initialData.default_price.unit_amount
+            : 0,
+        discount: initialData.metadata?.discount
+          ? Number.parseInt(initialData.metadata.discount)
+          : 0,
+      };
+
+      // Only include id if it exists
+      if (initialData.id) {
+        resetValues.id = initialData.id;
+      }
+
+      form.reset(resetValues);
+    } else {
+      form.reset({
+        name: "",
+        description: "",
+        productIds: [],
+        packPrice: 0,
+        discount: 0,
+      });
+    }
+  }, [initialData, form]);
+
   const selectedProducts = form.watch("productIds");
+  const isEditing = !!initialData;
 
   const formatPrice = (amount: number, currency: string) => {
     return new Intl.NumberFormat("en-US", {
@@ -57,7 +102,11 @@ export function EnhancedPackForm({
   const calculateSuggestedPrice = () => {
     const selected = products.filter((p) => selectedProducts.includes(p.id));
     const total = selected.reduce((sum, product) => {
-      if (product.default_price && typeof product.default_price === 'object' && product.default_price.unit_amount !== null) {
+      if (
+        product.default_price &&
+        typeof product.default_price === "object" &&
+        product.default_price.unit_amount !== null
+      ) {
         return sum + product.default_price.unit_amount;
       }
       return sum;
@@ -71,8 +120,12 @@ export function EnhancedPackForm({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Package className="h-5 w-5" />
-          Create Product Pack
+          {isEditing ? (
+            <Edit className="h-5 w-5" />
+          ) : (
+            <Package className="h-5 w-5" />
+          )}
+          {isEditing ? "Edit Product Pack" : "Create Product Pack"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -130,7 +183,9 @@ export function EnhancedPackForm({
                       </p>
                     ) : (
                       products
-                        .filter((p) => !p.metadata || p.metadata.type !== "bundle") // Exclude existing packs
+                        .filter(
+                          (p) => !p.metadata || p.metadata.type !== "bundle"
+                        ) // Exclude existing packs
                         .map((product) => (
                           <FormField
                             key={product.id}
@@ -165,14 +220,18 @@ export function EnhancedPackForm({
                                     <FormLabel className="text-sm font-normal cursor-pointer">
                                       {product.name}
                                     </FormLabel>
-                                    {product.default_price && typeof product.default_price === 'object' && product.default_price.unit_amount !== null && (
-                                      <p className="text-xs text-muted-foreground">
-                                        {formatPrice(
-                                          product.default_price.unit_amount,
-                                          product.default_price.currency
-                                        )}
-                                      </p>
-                                    )}
+                                    {product.default_price &&
+                                      typeof product.default_price ===
+                                        "object" &&
+                                      product.default_price.unit_amount !==
+                                        null && (
+                                        <p className="text-xs text-muted-foreground">
+                                          {formatPrice(
+                                            product.default_price.unit_amount,
+                                            product.default_price.currency
+                                          )}
+                                        </p>
+                                      )}
                                   </div>
                                 </FormItem>
                               );
@@ -251,12 +310,41 @@ export function EnhancedPackForm({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="discount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount Percentage (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="10"
+                      min="0"
+                      max="100"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(Number.parseInt(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button
               type="submit"
               className="w-full"
               disabled={isLoading || selectedProducts.length === 0}
             >
-              {isLoading ? "Creating Pack..." : "Create Pack"}
+              {isLoading
+                ? isEditing
+                  ? "Updating Pack..."
+                  : "Creating Pack..."
+                : isEditing
+                ? "Update Pack"
+                : "Create Pack"}
             </Button>
           </form>
         </Form>
