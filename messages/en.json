@@ -2,16 +2,48 @@
   "product": {
     "addToCart": "Add to Cart",
     "discount": "OFF",
-    "hoverImageAlt": "hover view"
+    "hoverImageAlt": "hover view",
+    "price": "Price",
+    "originalPrice": "Original Price",
+    "save": "Save",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "checkout": "Checkout",
+    "total": "Total",
+    "remove": "Remove",
+    "quantity": "Quantity"
   },
   "common": {
-    "currency": "EUR"
+    "currency": "USD",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "noResults": "No results found"
   },
   "home": {
-    "title": "Premium Supplements Store",
-    "subtitle": "Discover our collection of high-quality supplements designed to help you achieve your fitness goals."
+    "title": "Our Products",
+    "subtitle": "Discover our premium supplements and exclusive bundle deals",
+    "individualProducts": "Individual Products",
+    "bundleDeals": "Bundle Deals",
+    "noProductsTitle": "No Products Available",
+    "noProductsSubtitle": "Please check back later or visit our admin panel to add products.",
+    "addedToCart": "Added to cart",
+    "addedBundleToCart": "Added bundle to cart",
+    "error": {
+      "title": "Something went wrong",
+      "subtitle": "We couldn't load the products. Please try again."
+    }
   },
-  "test":{
+  "pack": {
+    "bundlePack": "BUNDLE PACK",
+    "save": "Save",
+    "addBundle": "Add Bundle"
+  },
+  "test": {
     "message": "This is a test message"
   }
 }

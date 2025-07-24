@@ -104,3 +104,83 @@ This document defines the rules the AI must follow when building or modifying th
   Support MDX or Markdown for content-driven pages like FAQs or blog.
 
 ---
+
+# Storefront Metadata Cheat-Sheet  
+*(copy-paste keys exactly as shown)*
+
+---
+
+## 1. Product-level (`Product.metadata`)
+| Key                | Example value              | Purpose / UI label                                |
+|--------------------|----------------------------|---------------------------------------------------|
+| `category`         | `"coffee"`                 | Navigation & filters                              |
+| `tags`             | `"organic,fair-trade"`     | Search / marketing tags (comma-separated)         |
+| `seo_title`        | `"Colombia Coffee 250 g"`  | `<title>` override                                |
+| `seo_description`  | `"Single-origin beans..."` | `<meta name="description">`                       |
+| `pack_size`        | `3`                        | Number of units inside this SKU                   |
+| `bundle_type`      | `"fixed"` or `"build_your_own"` | Shows picker or not                            |
+| `contents`         | `"price_1abc,price_2def"`  | Price IDs inside a virtual bundle (comma list)    |
+| `variant_group`    | `"color"` or `"size"`      | Filters variants for swatches                     |
+| `weight_grams`     | `250`                      | Shipping calculator                               |
+| `digital`          | `"true"`                   | Skips shipping / inventory                        |
+| `subscription_only`| `"true"`                   | Hide from one-time cart                           |
+| `gift_card`        | `"true"`                   | Skip inventory checks                             |
+
+---
+
+## 2. Price-level (`Price.metadata`)
+| Key                   | Example value | Purpose / UI label                     |
+|-----------------------|---------------|----------------------------------------|
+| `discount_group`      | `"coffee"`    | Coupon targeting group                 |
+| `tier`                | `3`           | Quantity-tier trigger (3, 6, etc.)     |
+| `discount_percent`    | `15`          | Auto-apply 15 % when tier reached      |
+| `max_per_customer`    | `5`           | Purchase limit                         |
+| `sku`                 | `"COF-001"`   | Internal barcode / ERP code            |
+| `color`, `size`, etc. | `"black"`     | Variant descriptors                    |
+
+---
+
+## 3. Coupon-level (`Coupon.metadata`)
+| Key                    | Example value       | Purpose / UI label                         |
+|------------------------|---------------------|--------------------------------------------|
+| `campaign`             | `"SUMMER25"`        | Attribution / analytics tag                |
+| `tier_qty`             | `3`                 | Minimum quantity for discount to trigger   |
+| `tier_type`            | `"percent"` or `"cheapest_free"` | Rule hint (percent vs free item) |
+| `applies_to_group`     | `"coffee"`          | Only valid for matching products           |
+| `max_uses_per_customer`| `1`                 | Soft limit (checked client-side)           |
+
+---
+
+## 4. Checkout / Order-level (`Checkout Session.metadata`)
+| Key                    | Example value        | Purpose / UI label                     |
+|------------------------|----------------------|----------------------------------------|
+| `order_type`           | `"bundle"`           | Fulfillment routing                    |
+| `campaign`             | `"SUMMER25"`         | Mirrors coupon tag for analytics       |
+| `gift_note`            | `"Happy birthday!"`  | Printed on packing slip                |
+| `gift_recipient_email` | `"mom@mail.com"`     | Digital gift delivery                  |
+
+---
+
+## 5. Shipping / Customs extras
+| Key                 | Example value | Purpose / UI label                    |
+|---------------------|---------------|---------------------------------------|
+| `customs_hs_code`   | `"090111"`    | International shipping code           |
+| `country_of_origin` | `"CO"`        | ISO-2 customs field                   |
+| `fragile`           | `"true"`      | Packing instruction                   |
+
+---
+
+### Usage in admin UI labels
+- **Product form**  
+  - Label: “SEO Title” → map to `seo_title`  
+  - Label: “Pack Size (units)” → map to `pack_size`  
+
+- **Pack builder**  
+  - Label: “Contents (Price IDs)” → map to `contents`  
+
+- **Coupon builder**  
+  - Label: “Campaign tag” → map to `campaign`  
+  - Label: “Minimum quantity” → map to `tier_qty`  
+
+> Always use **lowercase snake_case**.  
+> These keys keep the storefront, checkout, and analytics in sync without any extra code.
