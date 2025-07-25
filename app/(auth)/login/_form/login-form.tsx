@@ -10,10 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient, signIn } from "@/lib/auth-client";
-// import { login } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
@@ -27,7 +25,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     register,
@@ -44,13 +41,10 @@ export function LoginForm({
         name: data.email,
         callbackURL: "/",
       });
-    } catch (error) {
-      console.error("Error signing in:", error);
-    } finally {
       setIsLoading(false);
-      router.push(
-        `/login/verify-request?email=${encodeURIComponent(data.email)}`
-      );
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error signing in:", error);
     }
   };
 
