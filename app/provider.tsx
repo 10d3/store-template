@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/shared/theme-provider";
 import { TanstackProvider } from "@/components/tanstack-provider";
 import { CartModalProvider } from "@/context/cart-modal";
 import { IntlClientProvider } from "@/i18n/client";
@@ -13,10 +14,17 @@ export default async function Provider({
   const locale = await getLocale();
 
   return (
-    <IntlClientProvider messages={messages} locale={locale}>
-      <TanstackProvider>
-        <CartModalProvider>{children}</CartModalProvider>
-      </TanstackProvider>
-    </IntlClientProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <IntlClientProvider messages={messages} locale={locale}>
+        <TanstackProvider>
+          <CartModalProvider>{children}</CartModalProvider>
+        </TanstackProvider>
+      </IntlClientProvider>
+    </ThemeProvider>
   );
 }
