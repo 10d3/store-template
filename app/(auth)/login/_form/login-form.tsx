@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
 // import { login } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -37,11 +38,11 @@ export function LoginForm({
     // const email = data.email;
     setIsLoading(true);
     try {
-    //   await signIn("resend", {
-    //     email,
-    //     redirect: true,
-    //     callbackUrl: `/`,
-    //   });
+      //   await signIn("resend", {
+      //     email,
+      //     redirect: true,
+      //     callbackUrl: `/`,
+      //   });
     } catch (error) {
       console.error("Error signing in:", error);
     } finally {
@@ -104,7 +105,9 @@ export function LoginForm({
             <Button
               variant="outline"
               className="w-full hover:cursor-pointer"
-              onClick={() => signIn.social({provider: "google", callbackURL:"/"})}
+              onClick={() =>
+                signIn.social({ provider: "google", callbackURL: "/" })
+              }
             >
               Login with Google
             </Button>
@@ -112,8 +115,9 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary  ">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our{" "}
+        <Link href="#">Terms of Service</Link> and{" "}
+        <Link href="#">Privacy Policy</Link>.
       </div>
     </div>
   );

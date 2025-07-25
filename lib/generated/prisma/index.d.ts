@@ -2455,6 +2455,10 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     stripeCustomerId: string | null
+    role: string | null
+    banned: boolean | null
+    banReason: string | null
+    banExpires: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -2466,6 +2470,10 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     stripeCustomerId: string | null
+    role: string | null
+    banned: boolean | null
+    banReason: string | null
+    banExpires: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2477,6 +2485,10 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     stripeCustomerId: number
+    role: number
+    banned: number
+    banReason: number
+    banExpires: number
     _all: number
   }
 
@@ -2490,6 +2502,10 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     stripeCustomerId?: true
+    role?: true
+    banned?: true
+    banReason?: true
+    banExpires?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2501,6 +2517,10 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     stripeCustomerId?: true
+    role?: true
+    banned?: true
+    banReason?: true
+    banExpires?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2512,6 +2532,10 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     stripeCustomerId?: true
+    role?: true
+    banned?: true
+    banReason?: true
+    banExpires?: true
     _all?: true
   }
 
@@ -2596,6 +2620,10 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     stripeCustomerId: string | null
+    role: string | null
+    banned: boolean | null
+    banReason: string | null
+    banExpires: Date | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -2624,6 +2652,10 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     stripeCustomerId?: boolean
+    role?: boolean
+    banned?: boolean
+    banReason?: boolean
+    banExpires?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     orders?: boolean | User$ordersArgs<ExtArgs>
@@ -2639,6 +2671,10 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     stripeCustomerId?: boolean
+    role?: boolean
+    banned?: boolean
+    banReason?: boolean
+    banExpires?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2650,6 +2686,10 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     stripeCustomerId?: boolean
+    role?: boolean
+    banned?: boolean
+    banReason?: boolean
+    banExpires?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2661,9 +2701,13 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     stripeCustomerId?: boolean
+    role?: boolean
+    banned?: boolean
+    banReason?: boolean
+    banExpires?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "stripeCustomerId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "stripeCustomerId" | "role" | "banned" | "banReason" | "banExpires", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -2689,6 +2733,10 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       stripeCustomerId: string | null
+      role: string | null
+      banned: boolean | null
+      banReason: string | null
+      banExpires: Date | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -3123,6 +3171,10 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly stripeCustomerId: FieldRef<"User", 'String'>
+    readonly role: FieldRef<"User", 'String'>
+    readonly banned: FieldRef<"User", 'Boolean'>
+    readonly banReason: FieldRef<"User", 'String'>
+    readonly banExpires: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -3620,6 +3672,7 @@ export namespace Prisma {
     ipAddress: string | null
     userAgent: string | null
     userId: string | null
+    impersonatedBy: string | null
   }
 
   export type SessionMaxAggregateOutputType = {
@@ -3631,6 +3684,7 @@ export namespace Prisma {
     ipAddress: string | null
     userAgent: string | null
     userId: string | null
+    impersonatedBy: string | null
   }
 
   export type SessionCountAggregateOutputType = {
@@ -3642,6 +3696,7 @@ export namespace Prisma {
     ipAddress: number
     userAgent: number
     userId: number
+    impersonatedBy: number
     _all: number
   }
 
@@ -3655,6 +3710,7 @@ export namespace Prisma {
     ipAddress?: true
     userAgent?: true
     userId?: true
+    impersonatedBy?: true
   }
 
   export type SessionMaxAggregateInputType = {
@@ -3666,6 +3722,7 @@ export namespace Prisma {
     ipAddress?: true
     userAgent?: true
     userId?: true
+    impersonatedBy?: true
   }
 
   export type SessionCountAggregateInputType = {
@@ -3677,6 +3734,7 @@ export namespace Prisma {
     ipAddress?: true
     userAgent?: true
     userId?: true
+    impersonatedBy?: true
     _all?: true
   }
 
@@ -3761,6 +3819,7 @@ export namespace Prisma {
     ipAddress: string | null
     userAgent: string | null
     userId: string
+    impersonatedBy: string | null
     _count: SessionCountAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
@@ -3789,6 +3848,7 @@ export namespace Prisma {
     ipAddress?: boolean
     userAgent?: boolean
     userId?: boolean
+    impersonatedBy?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
@@ -3801,6 +3861,7 @@ export namespace Prisma {
     ipAddress?: boolean
     userAgent?: boolean
     userId?: boolean
+    impersonatedBy?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
@@ -3813,6 +3874,7 @@ export namespace Prisma {
     ipAddress?: boolean
     userAgent?: boolean
     userId?: boolean
+    impersonatedBy?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
@@ -3825,9 +3887,10 @@ export namespace Prisma {
     ipAddress?: boolean
     userAgent?: boolean
     userId?: boolean
+    impersonatedBy?: boolean
   }
 
-  export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "expiresAt" | "token" | "createdAt" | "updatedAt" | "ipAddress" | "userAgent" | "userId", ExtArgs["result"]["session"]>
+  export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "expiresAt" | "token" | "createdAt" | "updatedAt" | "ipAddress" | "userAgent" | "userId" | "impersonatedBy", ExtArgs["result"]["session"]>
   export type SessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -3852,6 +3915,7 @@ export namespace Prisma {
       ipAddress: string | null
       userAgent: string | null
       userId: string
+      impersonatedBy: string | null
     }, ExtArgs["result"]["session"]>
     composites: {}
   }
@@ -4284,6 +4348,7 @@ export namespace Prisma {
     readonly ipAddress: FieldRef<"Session", 'String'>
     readonly userAgent: FieldRef<"Session", 'String'>
     readonly userId: FieldRef<"Session", 'String'>
+    readonly impersonatedBy: FieldRef<"Session", 'String'>
   }
     
 
@@ -6905,7 +6970,11 @@ export namespace Prisma {
     image: 'image',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    stripeCustomerId: 'stripeCustomerId'
+    stripeCustomerId: 'stripeCustomerId',
+    role: 'role',
+    banned: 'banned',
+    banReason: 'banReason',
+    banExpires: 'banExpires'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -6919,7 +6988,8 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     ipAddress: 'ipAddress',
     userAgent: 'userAgent',
-    userId: 'userId'
+    userId: 'userId',
+    impersonatedBy: 'impersonatedBy'
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -7178,6 +7248,10 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     stripeCustomerId?: StringNullableFilter<"User"> | string | null
+    role?: StringNullableFilter<"User"> | string | null
+    banned?: BoolNullableFilter<"User"> | boolean | null
+    banReason?: StringNullableFilter<"User"> | string | null
+    banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     orders?: OrderListRelationFilter
@@ -7192,6 +7266,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     stripeCustomerId?: SortOrderInput | SortOrder
+    role?: SortOrderInput | SortOrder
+    banned?: SortOrderInput | SortOrder
+    banReason?: SortOrderInput | SortOrder
+    banExpires?: SortOrderInput | SortOrder
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
@@ -7209,6 +7287,10 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     stripeCustomerId?: StringNullableFilter<"User"> | string | null
+    role?: StringNullableFilter<"User"> | string | null
+    banned?: BoolNullableFilter<"User"> | boolean | null
+    banReason?: StringNullableFilter<"User"> | string | null
+    banExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     orders?: OrderListRelationFilter
@@ -7223,6 +7305,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     stripeCustomerId?: SortOrderInput | SortOrder
+    role?: SortOrderInput | SortOrder
+    banned?: SortOrderInput | SortOrder
+    banReason?: SortOrderInput | SortOrder
+    banExpires?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -7240,6 +7326,10 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     stripeCustomerId?: StringNullableWithAggregatesFilter<"User"> | string | null
+    role?: StringNullableWithAggregatesFilter<"User"> | string | null
+    banned?: BoolNullableWithAggregatesFilter<"User"> | boolean | null
+    banReason?: StringNullableWithAggregatesFilter<"User"> | string | null
+    banExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
   export type SessionWhereInput = {
@@ -7254,6 +7344,7 @@ export namespace Prisma {
     ipAddress?: StringNullableFilter<"Session"> | string | null
     userAgent?: StringNullableFilter<"Session"> | string | null
     userId?: StringFilter<"Session"> | string
+    impersonatedBy?: StringNullableFilter<"Session"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -7266,6 +7357,7 @@ export namespace Prisma {
     ipAddress?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     userId?: SortOrder
+    impersonatedBy?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
 
@@ -7281,6 +7373,7 @@ export namespace Prisma {
     ipAddress?: StringNullableFilter<"Session"> | string | null
     userAgent?: StringNullableFilter<"Session"> | string | null
     userId?: StringFilter<"Session"> | string
+    impersonatedBy?: StringNullableFilter<"Session"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "token">
 
@@ -7293,6 +7386,7 @@ export namespace Prisma {
     ipAddress?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     userId?: SortOrder
+    impersonatedBy?: SortOrderInput | SortOrder
     _count?: SessionCountOrderByAggregateInput
     _max?: SessionMaxOrderByAggregateInput
     _min?: SessionMinOrderByAggregateInput
@@ -7310,6 +7404,7 @@ export namespace Prisma {
     ipAddress?: StringNullableWithAggregatesFilter<"Session"> | string | null
     userAgent?: StringNullableWithAggregatesFilter<"Session"> | string | null
     userId?: StringWithAggregatesFilter<"Session"> | string
+    impersonatedBy?: StringNullableWithAggregatesFilter<"Session"> | string | null
   }
 
   export type AccountWhereInput = {
@@ -7556,6 +7651,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
@@ -7570,6 +7669,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
@@ -7584,6 +7687,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
@@ -7598,6 +7705,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
@@ -7612,6 +7723,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -7623,6 +7738,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -7634,6 +7753,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionCreateInput = {
@@ -7644,6 +7767,7 @@ export namespace Prisma {
     updatedAt: Date | string
     ipAddress?: string | null
     userAgent?: string | null
+    impersonatedBy?: string | null
     user: UserCreateNestedOneWithoutSessionsInput
   }
 
@@ -7656,6 +7780,7 @@ export namespace Prisma {
     ipAddress?: string | null
     userAgent?: string | null
     userId: string
+    impersonatedBy?: string | null
   }
 
   export type SessionUpdateInput = {
@@ -7666,6 +7791,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutSessionsNestedInput
   }
 
@@ -7678,6 +7804,7 @@ export namespace Prisma {
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionCreateManyInput = {
@@ -7689,6 +7816,7 @@ export namespace Prisma {
     ipAddress?: string | null
     userAgent?: string | null
     userId: string
+    impersonatedBy?: string | null
   }
 
   export type SessionUpdateManyMutationInput = {
@@ -7699,6 +7827,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionUncheckedUpdateManyInput = {
@@ -7710,6 +7839,7 @@ export namespace Prisma {
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     userId?: StringFieldUpdateOperationsInput | string
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AccountCreateInput = {
@@ -8157,6 +8287,22 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type BoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type SessionListRelationFilter = {
     every?: SessionWhereInput
     some?: SessionWhereInput
@@ -8196,6 +8342,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     stripeCustomerId?: SortOrder
+    role?: SortOrder
+    banned?: SortOrder
+    banReason?: SortOrder
+    banExpires?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -8207,6 +8357,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     stripeCustomerId?: SortOrder
+    role?: SortOrder
+    banned?: SortOrder
+    banReason?: SortOrder
+    banExpires?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -8218,6 +8372,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     stripeCustomerId?: SortOrder
+    role?: SortOrder
+    banned?: SortOrder
+    banReason?: SortOrder
+    banExpires?: SortOrder
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -8226,6 +8384,28 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type SessionCountOrderByAggregateInput = {
@@ -8237,6 +8417,7 @@ export namespace Prisma {
     ipAddress?: SortOrder
     userAgent?: SortOrder
     userId?: SortOrder
+    impersonatedBy?: SortOrder
   }
 
   export type SessionMaxOrderByAggregateInput = {
@@ -8248,6 +8429,7 @@ export namespace Prisma {
     ipAddress?: SortOrder
     userAgent?: SortOrder
     userId?: SortOrder
+    impersonatedBy?: SortOrder
   }
 
   export type SessionMinOrderByAggregateInput = {
@@ -8259,17 +8441,7 @@ export namespace Prisma {
     ipAddress?: SortOrder
     userAgent?: SortOrder
     userId?: SortOrder
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+    impersonatedBy?: SortOrder
   }
 
   export type AccountCountOrderByAggregateInput = {
@@ -8318,20 +8490,6 @@ export namespace Prisma {
     password?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type VerificationCountOrderByAggregateInput = {
@@ -8441,6 +8599,14 @@ export namespace Prisma {
     set?: boolean
   }
 
+  export type NullableBoolFieldUpdateOperationsInput = {
+    set?: boolean | null
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type SessionUpdateManyWithoutUserNestedInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -8543,10 +8709,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
@@ -8744,12 +8906,9 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
+  export type NestedBoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -8761,6 +8920,22 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -8786,6 +8961,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
   }
@@ -8799,6 +8978,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
   }
@@ -8828,6 +9011,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
   }
@@ -8841,6 +9028,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -8853,6 +9044,7 @@ export namespace Prisma {
     updatedAt: Date | string
     ipAddress?: string | null
     userAgent?: string | null
+    impersonatedBy?: string | null
   }
 
   export type SessionUncheckedCreateWithoutUserInput = {
@@ -8863,6 +9055,7 @@ export namespace Prisma {
     updatedAt: Date | string
     ipAddress?: string | null
     userAgent?: string | null
+    impersonatedBy?: string | null
   }
 
   export type SessionCreateOrConnectWithoutUserInput = {
@@ -8975,6 +9168,7 @@ export namespace Prisma {
     ipAddress?: StringNullableFilter<"Session"> | string | null
     userAgent?: StringNullableFilter<"Session"> | string | null
     userId?: StringFilter<"Session"> | string
+    impersonatedBy?: StringNullableFilter<"Session"> | string | null
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -9052,6 +9246,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
   }
@@ -9065,6 +9263,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
   }
@@ -9094,6 +9296,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
   }
@@ -9107,6 +9313,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -9120,6 +9330,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     orders?: OrderCreateNestedManyWithoutUserInput
   }
@@ -9133,6 +9347,10 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     stripeCustomerId?: string | null
+    role?: string | null
+    banned?: boolean | null
+    banReason?: string | null
+    banExpires?: Date | string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
   }
@@ -9162,6 +9380,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     orders?: OrderUpdateManyWithoutUserNestedInput
   }
@@ -9175,6 +9397,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: NullableStringFieldUpdateOperationsInput | string | null
+    banned?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    banReason?: NullableStringFieldUpdateOperationsInput | string | null
+    banExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -9187,6 +9413,7 @@ export namespace Prisma {
     updatedAt: Date | string
     ipAddress?: string | null
     userAgent?: string | null
+    impersonatedBy?: string | null
   }
 
   export type AccountCreateManyUserInput = {
@@ -9223,6 +9450,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionUncheckedUpdateWithoutUserInput = {
@@ -9233,6 +9461,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SessionUncheckedUpdateManyWithoutUserInput = {
@@ -9243,6 +9472,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    impersonatedBy?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AccountUpdateWithoutUserInput = {

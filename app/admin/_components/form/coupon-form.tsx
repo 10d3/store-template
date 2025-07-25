@@ -59,14 +59,15 @@ export function EnhancedCouponForm({
         percent_off: initialData.percent_off || undefined,
         amount_off: initialData.amount_off || undefined,
         currency: initialData.currency || "usd",
-        duration: initialData.duration as "once" | "repeating" | "forever" || "once",
+        duration:
+          (initialData.duration as "once" | "repeating" | "forever") || "once",
       };
-      
+
       // Only include id if it exists
       if (initialData.id) {
         resetValues.id = initialData.id;
       }
-      
+
       form.reset(resetValues);
       setCouponType("custom"); // Switch to custom when editing
     } else {
@@ -233,10 +234,13 @@ export function EnhancedCouponForm({
               />
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading 
-                  ? (isEditing ? "Updating..." : "Creating...") 
-                  : (isEditing ? "Update Coupon" : "Create Custom Coupon")
-                }
+                {isLoading
+                  ? isEditing
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEditing
+                  ? "Update Coupon"
+                  : "Create Custom Coupon"}
               </Button>
             </form>
           </Form>
