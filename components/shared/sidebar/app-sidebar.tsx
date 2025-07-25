@@ -1,22 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Camera,
-  BarChart3,
-  LayoutDashboard,
-  Database,
-  Bot,
-  FileText,
-  FileType,
-  Folder,
-  HelpCircle,
-  List,
-  FileBarChart,
-  Search,
-  Settings,
-  Users,
-} from "lucide-react";
+import { BarChart3, LayoutDashboard, Folder, List, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -43,106 +28,24 @@ const data = {
       icon: LayoutDashboard,
     },
     {
-      title: "Lifecycle",
+      title: "Product",
       url: "#",
       icon: List,
     },
     {
-      title: "Analytics",
+      title: "Bundle",
       url: "#",
       icon: BarChart3,
     },
     {
-      title: "Projects",
+      title: "Coupon",
       url: "#",
       icon: Folder,
     },
     {
-      title: "Team",
+      title: "Order",
       url: "#",
       icon: Users,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: Camera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileText,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: Bot,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircle,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: Database,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: FileBarChart,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: FileType,
     },
   ],
 };
@@ -158,7 +61,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#" className="">
-                <Image src="/favicon.png" width={1000} height={1000} alt={""} className="!size-8" />
+                <Image
+                  src="/favicon.png"
+                  width={1000}
+                  height={1000}
+                  alt={""}
+                  className="!size-8"
+                />
                 <span className="text-base font-semibold">{`Vitanou`}</span>
               </a>
             </SidebarMenuButton>
@@ -167,7 +76,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@/lib/auth-client";
+import { authClient, signIn } from "@/lib/auth-client";
 // import { login } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -39,11 +39,11 @@ export function LoginForm({
     // const email = data.email;
     setIsLoading(true);
     try {
-      //   await signIn("resend", {
-      //     email,
-      //     redirect: true,
-      //     callbackUrl: `/`,
-      //   });
+      await authClient.signIn.magicLink({
+        email: data.email,
+        name: data.email,
+        callbackURL: "/",
+      });
     } catch (error) {
       console.error("Error signing in:", error);
     } finally {
@@ -53,8 +53,6 @@ export function LoginForm({
       );
     }
   };
-
-  // const [_state, action] = useActionState(login, {});
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
