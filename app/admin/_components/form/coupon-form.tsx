@@ -26,6 +26,8 @@ import { Separator } from "@/components/ui/separator";
 import { Percent, Gift, Zap, Edit } from "lucide-react";
 import { couponSchema, CouponFormData } from "@/lib/product/product.schema";
 import { StripeCoupon } from "@/types/product";
+import { MetadataFormSection } from "@/components/shared/metadata-form-section";
+import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface EnhancedCouponFormProps {
   onSubmit: (data: CouponFormData) => void;
@@ -61,6 +63,7 @@ export function EnhancedCouponForm({
         currency: initialData.currency || "usd",
         duration:
           (initialData.duration as "once" | "repeating" | "forever") || "once",
+        metadata: transformMetadataFromStripe(initialData.metadata || {}, "coupon"),
       };
 
       // Only include id if it exists
@@ -74,6 +77,7 @@ export function EnhancedCouponForm({
       form.reset({
         duration: "once",
         currency: "usd",
+        metadata: {},
       });
       setCouponType("preset");
     }
@@ -231,6 +235,13 @@ export function EnhancedCouponForm({
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              {/* Structured Metadata Section */}
+              <MetadataFormSection 
+                type="coupon"
+                title="Coupon Metadata"
+                description="Configure coupon-specific metadata for tracking, analytics, and business logic."
               />
 
               <Button type="submit" className="w-full" disabled={isLoading}>

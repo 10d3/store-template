@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,8 +25,10 @@ import {
   type ProductFormData,
   productSchema,
 } from "@/lib/product/product.schema";
-import { Plus, Edit, X, PlusCircle } from "lucide-react";
+import { Plus, Edit } from "lucide-react";
 import { type StripeProduct } from "@/types/product";
+import { MetadataFormSection } from "@/components/shared/metadata-form-section";
+import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
@@ -39,10 +41,6 @@ export function ProductForm({
   initialData,
   isLoading,
 }: ProductFormProps) {
-  const [metadataEntries, setMetadataEntries] = useState<
-    Array<{ key: string; value: string }>
-  >([]);
-
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -55,61 +53,6 @@ export function ProductForm({
       metadata: {},
     },
   });
-
-  // Convert metadata object to array for editing
-  const convertMetadataToEntries = (
-    metadata: Record<string, string> | undefined
-  ) => {
-    if (!metadata) return [];
-    return Object.entries(metadata).map(([key, value]) => ({ key, value }));
-  };
-
-  // Convert metadata entries array back to object
-  const convertEntriesToMetadata = (
-    entries: Array<{ key: string; value: string }>
-  ) => {
-    const metadata: Record<string, string> = {};
-    entries.forEach(({ key, value }) => {
-      if (key.trim() && value.trim()) {
-        metadata[key.trim()] = value.trim();
-      }
-    });
-    return metadata;
-  };
-
-  // Add new metadata entry
-  const addMetadataEntry = () => {
-    setMetadataEntries([...metadataEntries, { key: "", value: "" }]);
-  };
-
-  // Remove metadata entry
-  const removeMetadataEntry = (index: number) => {
-    const newEntries = metadataEntries.filter((_, i) => i !== index);
-    setMetadataEntries(newEntries);
-    // Update form with new metadata
-    const metadata = convertEntriesToMetadata(newEntries);
-    form.setValue("metadata", metadata);
-  };
-
-  // Update metadata entry
-  const updateMetadataEntry = (
-    index: number,
-    field: "key" | "value",
-    newValue: string
-  ) => {
-    const newEntries = [...metadataEntries];
-    newEntries[index][field] = newValue;
-    setMetadataEntries(newEntries);
-    // Update form with new metadata
-    const metadata = convertEntriesToMetadata(newEntries);
-    form.setValue("metadata", metadata);
-  };
-
-  // Custom submit handler to ensure metadata is properly formatted
-  const handleSubmit = (data: ProductFormData) => {
-    const metadata = convertEntriesToMetadata(metadataEntries);
-    onSubmit({ ...data, metadata });
-  };
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -131,12 +74,12 @@ export function ProductForm({
             ? initialData.default_price.currency
             : "usd",
         images: initialData.images || [],
-        metadata: initialData.metadata || {},
+        metadata: initialData.metadata 
+          ? transformMetadataFromStripe(initialData.metadata, "product")
+          : {},
       };
 
       form.reset(formData);
-      // Initialize metadata entries
-      setMetadataEntries(convertMetadataToEntries(initialData.metadata));
     } else {
       form.reset({
         id: "",
@@ -147,7 +90,6 @@ export function ProductForm({
         images: [],
         metadata: {},
       });
-      setMetadataEntries([]);
     }
   }, [initialData, form]);
 
@@ -168,8 +110,8 @@ export function ProductForm({
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
           >
             <FormField
               control={form.control}
@@ -252,67 +194,12 @@ export function ProductForm({
               />
             </div>
 
-            {/* Metadata Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <FormLabel className="text-base font-medium">
-                  Metadata
-                </FormLabel>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addMetadataEntry}
-                  className="flex items-center gap-2"
-                >
-                  <PlusCircle className="h-4 w-4" />
-                  Add Metadata
-                </Button>
-              </div>
-
-              {metadataEntries.length > 0 && (
-                <div className="space-y-3 border rounded-md p-4">
-                  {metadataEntries.map((entry, index) => (
-                    <div key={index} className="flex gap-2 items-start">
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Key"
-                          value={entry.key}
-                          onChange={(e) =>
-                            updateMetadataEntry(index, "key", e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Value"
-                          value={entry.value}
-                          onChange={(e) =>
-                            updateMetadataEntry(index, "value", e.target.value)
-                          }
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeMetadataEntry(index)}
-                        className="px-2"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {metadataEntries.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No metadata entries. Click &quot;Add Metadata&quot; to add
-                  custom key-value pairs.
-                </p>
-              )}
-            </div>
+            {/* Structured Metadata Section */}
+            <MetadataFormSection 
+              type="product"
+              title="Product Metadata"
+              description="Configure product-specific metadata for SEO, categorization, and business logic."
+            />
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading

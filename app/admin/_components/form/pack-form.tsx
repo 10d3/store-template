@@ -16,15 +16,11 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-// import {
-//   type PackFormData,
-//   packSchema,
-//   type StripeProduct,
-// } from "@/types/admin";
 import { Package, ShoppingCart, Edit } from "lucide-react";
-// import { StripeProduct } from "@/types/product";
-import { PackFormData, packSchema } from "@/lib/product/product.schema";
+import { packSchema, PackFormData } from "@/lib/product/product.schema";
 import { StripeProduct } from "@/types/product";
+import { MetadataFormSection } from "@/components/shared/metadata-form-section";
+import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface EnhancedPackFormProps {
   products: StripeProduct[];
@@ -70,6 +66,7 @@ export function EnhancedPackForm({
         discount: initialData.metadata?.discount
           ? Number.parseInt(initialData.metadata.discount)
           : 0,
+        metadata: transformMetadataFromStripe(initialData.metadata || {}, "product"),
       };
 
       // Only include id if it exists
@@ -85,6 +82,7 @@ export function EnhancedPackForm({
         productIds: [],
         packPrice: 0,
         discount: 0,
+        metadata: {},
       });
     }
   }, [initialData, form]);
@@ -331,6 +329,13 @@ export function EnhancedPackForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            {/* Structured Metadata Section */}
+            <MetadataFormSection 
+              type="product"
+              title="Pack Metadata"
+              description="Configure pack-specific metadata for bundling, analytics, and business logic."
             />
 
             <Button
