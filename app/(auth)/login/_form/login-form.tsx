@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
 
 type Inputs = {
   email: string;
@@ -109,6 +110,7 @@ export function LoginForm({
                 signIn.social({ provider: "google", callbackURL: "/" })
               }
             >
+              <FcGoogle className="mr-1" size={16} />
               Login with Google
             </Button>
           </div>
