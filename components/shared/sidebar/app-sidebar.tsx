@@ -14,6 +14,7 @@ import {
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import Image from "next/image";
+import Link from "next/link";
 
 const data = {
   user: {
@@ -24,27 +25,27 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/admin",
       icon: LayoutDashboard,
     },
     {
       title: "Product",
-      url: "#",
+      url: "/admin/product",
       icon: List,
     },
     {
       title: "Bundle",
-      url: "#",
+      url: "/admin/bundle",
       icon: BarChart3,
     },
     {
       title: "Coupon",
-      url: "#",
+      url: "/admin/coupon",
       icon: Folder,
     },
     {
       title: "Order",
-      url: "#",
+      url: "/admin/order",
       icon: Users,
     },
   ],
@@ -60,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#" className="">
+              <Link href="#" className="">
                 <Image
                   src="/favicon.png"
                   width={1000}
@@ -69,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="!size-8"
                 />
                 <span className="text-base font-semibold">{`Vitanou`}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
