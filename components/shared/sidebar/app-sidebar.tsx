@@ -158,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#" className="">
-                <Image src="/favicon.png" width={1000} height={1000} alt={""} className="!size-5" />
+                <Image src="/favicon.png" width={1000} height={1000} alt={""} className="!size-8" />
                 <span className="text-base font-semibold">{`Vitanou`}</span>
               </a>
             </SidebarMenuButton>
