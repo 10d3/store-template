@@ -2,8 +2,27 @@ import { AppSidebar } from "@/components/shared/sidebar/app-sidebar";
 import { BreadcrumbNav } from "@/components/shared/sidebar/breadcrumb-nav";
 import { Separator } from "@/components/ui/separator";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (session.user.role !== "admin") {
+    redirect("/");
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar variant="floating" />
