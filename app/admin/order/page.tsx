@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { OrderTable } from "@/components/admin/order/order-table";
 
@@ -11,7 +11,7 @@ export default function OrderPage() {
           Manage and track all orders from your Stripe account
         </p>
       </div>
-      
+
       <OrderTable />
     </div>
   );

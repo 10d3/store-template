@@ -2,15 +2,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 // import { useToast } from "@/hooks/use-toast";
-import { Search, Filter, RefreshCw, Eye, Ban, RotateCcw, DollarSign, Mail } from "lucide-react";
+import {
+  Search,
+  Filter,
+  RefreshCw,
+  Eye,
+  Ban,
+  RotateCcw,
+  DollarSign,
+  Mail,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface Order {
@@ -54,18 +82,21 @@ export function OrderList({ title, description }: OrderListProps) {
     limit: 10,
     totalCount: 0,
     totalPages: 0,
-    hasMore: false
+    hasMore: false,
   });
 
-
-  const fetchOrders = async (page = 1, status = statusFilter, search = searchTerm) => {
+  const fetchOrders = async (
+    page = 1,
+    status = statusFilter,
+    search = searchTerm
+  ) => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
         page: page.toString(),
         limit: pagination.limit.toString(),
         ...(status !== "all" && { status }),
-        ...(search && { search })
+        ...(search && { search }),
       });
 
       const response = await fetch(`/api/orders?${params}`);
@@ -76,7 +107,7 @@ export function OrderList({ title, description }: OrderListProps) {
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      toast.error("Error fetching orders")
+      toast.error("Error fetching orders");
     } finally {
       setLoading(false);
     }
@@ -87,18 +118,18 @@ export function OrderList({ title, description }: OrderListProps) {
   }, []);
 
   const handleSearch = () => {
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchOrders(1, statusFilter, searchTerm);
   };
 
   const handleStatusFilter = (status: string) => {
     setStatusFilter(status);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchOrders(1, status, searchTerm);
   };
 
   const handlePageChange = (newPage: number) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
+    setPagination((prev) => ({ ...prev, page: newPage }));
     fetchOrders(newPage, statusFilter, searchTerm);
   };
 
@@ -116,8 +147,8 @@ export function OrderList({ title, description }: OrderListProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: actionDialog.action,
-          reason: actionReason
-        })
+          reason: actionReason,
+        }),
       });
 
       if (!response.ok) {
@@ -126,16 +157,15 @@ export function OrderList({ title, description }: OrderListProps) {
       }
 
       const result = await response.json();
-      
+
       toast.success(result.message);
 
       // Refresh orders list
       fetchOrders(pagination.page, statusFilter, searchTerm);
-      
+
       // Close dialog
       setActionDialog({ open: false, action: "", order: null });
       setActionReason("");
-
     } catch (error: any) {
       console.error("Error processing order action:", error);
       toast.error("Error processing order action");
@@ -280,10 +310,18 @@ export function OrderList({ title, description }: OrderListProps) {
                 <SelectContent>
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="succeeded">Succeeded</SelectItem>
-                  <SelectItem value="requires_capture">Requires Capture</SelectItem>
-                  <SelectItem value="requires_payment_method">Requires Payment</SelectItem>
-                  <SelectItem value="requires_confirmation">Requires Confirmation</SelectItem>
-                  <SelectItem value="requires_action">Requires Action</SelectItem>
+                  <SelectItem value="requires_capture">
+                    Requires Capture
+                  </SelectItem>
+                  <SelectItem value="requires_payment_method">
+                    Requires Payment
+                  </SelectItem>
+                  <SelectItem value="requires_confirmation">
+                    Requires Confirmation
+                  </SelectItem>
+                  <SelectItem value="requires_action">
+                    Requires Action
+                  </SelectItem>
                   <SelectItem value="processing">Processing</SelectItem>
                   <SelectItem value="canceled">Canceled</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
@@ -353,7 +391,8 @@ export function OrderList({ title, description }: OrderListProps) {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="font-semibold">
-                          {order.currency.toUpperCase()} {order.amount.toFixed(2)}
+                          {order.currency.toUpperCase()}{" "}
+                          {order.amount.toFixed(2)}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {order.paymentMethod}
@@ -396,7 +435,10 @@ export function OrderList({ title, description }: OrderListProps) {
 
       {/* Order Details Dialog */}
       {selectedOrder && (
-        <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
+        <Dialog
+          open={!!selectedOrder}
+          onOpenChange={() => setSelectedOrder(null)}
+        >
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Order Details</DialogTitle>
@@ -417,7 +459,8 @@ export function OrderList({ title, description }: OrderListProps) {
                 <div>
                   <label className="text-sm font-medium">Amount</label>
                   <div className="font-semibold">
-                    {selectedOrder.currency.toUpperCase()} {selectedOrder.amount.toFixed(2)}
+                    {selectedOrder.currency.toUpperCase()}{" "}
+                    {selectedOrder.amount.toFixed(2)}
                   </div>
                 </div>
                 <div>
@@ -447,13 +490,22 @@ export function OrderList({ title, description }: OrderListProps) {
 
               {selectedOrder.shippingAddress && (
                 <div>
-                  <label className="text-sm font-medium">Shipping Address</label>
+                  <label className="text-sm font-medium">
+                    Shipping Address
+                  </label>
                   <div className="text-sm">
-                    {selectedOrder.shippingAddress.line1}<br />
+                    {selectedOrder.shippingAddress.line1}
+                    <br />
                     {selectedOrder.shippingAddress.line2 && (
-                      <>{selectedOrder.shippingAddress.line2}<br /></>
+                      <>
+                        {selectedOrder.shippingAddress.line2}
+                        <br />
+                      </>
                     )}
-                    {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postal_code}<br />
+                    {selectedOrder.shippingAddress.city},{" "}
+                    {selectedOrder.shippingAddress.state}{" "}
+                    {selectedOrder.shippingAddress.postal_code}
+                    <br />
                     {selectedOrder.shippingAddress.country}
                   </div>
                 </div>
@@ -465,10 +517,16 @@ export function OrderList({ title, description }: OrderListProps) {
                   <div className="space-y-2">
                     {selectedOrder.refunds.map((refund: any, index: number) => (
                       <div key={index} className="text-sm border rounded p-2">
-                        <div>Amount: {refund.currency.toUpperCase()} {(refund.amount / 100).toFixed(2)}</div>
+                        <div>
+                          Amount: {refund.currency.toUpperCase()}{" "}
+                          {(refund.amount / 100).toFixed(2)}
+                        </div>
                         <div>Reason: {refund.reason}</div>
                         <div>Status: {refund.status}</div>
-                        <div>Created: {new Date(refund.created * 1000).toLocaleString()}</div>
+                        <div>
+                          Created:{" "}
+                          {new Date(refund.created * 1000).toLocaleString()}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -496,15 +554,23 @@ export function OrderList({ title, description }: OrderListProps) {
       )}
 
       {/* Action Confirmation Dialog */}
-      <Dialog open={actionDialog.open} onOpenChange={(open) => !open && setActionDialog({ open: false, action: "", order: null })}>
+      <Dialog
+        open={actionDialog.open}
+        onOpenChange={(open) =>
+          !open && setActionDialog({ open: false, action: "", order: null })
+        }
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Confirm {actionDialog.action.charAt(0).toUpperCase() + actionDialog.action.slice(1)}
+              Confirm{" "}
+              {actionDialog.action.charAt(0).toUpperCase() +
+                actionDialog.action.slice(1)}
             </DialogTitle>
             <DialogDescription>
               Are you sure you want to {actionDialog.action} this order?
-              {actionDialog.action === "refund" && " This action cannot be undone."}
+              {actionDialog.action === "refund" &&
+                " This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -521,19 +587,27 @@ export function OrderList({ title, description }: OrderListProps) {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setActionDialog({ open: false, action: "", order: null })}
+              onClick={() =>
+                setActionDialog({ open: false, action: "", order: null })
+              }
             >
               Cancel
             </Button>
             <Button
               onClick={executeOrderAction}
               disabled={processing}
-              variant={actionDialog.action === "refund" || actionDialog.action === "cancel" ? "destructive" : "default"}
+              variant={
+                actionDialog.action === "refund" ||
+                actionDialog.action === "cancel"
+                  ? "destructive"
+                  : "default"
+              }
             >
               {processing ? (
                 <RefreshCw className="h-4 w-4 animate-spin mr-2" />
               ) : null}
-              {actionDialog.action.charAt(0).toUpperCase() + actionDialog.action.slice(1)}
+              {actionDialog.action.charAt(0).toUpperCase() +
+                actionDialog.action.slice(1)}
             </Button>
           </DialogFooter>
         </DialogContent>

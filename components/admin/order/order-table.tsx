@@ -34,8 +34,6 @@ import {
   DollarSign,
   X,
   Search,
-  ChevronLeft,
-  ChevronRight,
   Package,
   Truck,
   CheckCircle,
@@ -51,6 +49,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
 
 interface Order {
   id: string;
@@ -74,12 +82,15 @@ interface OrderTableProps {
 }
 
 export function OrderTable({ className }: OrderTableProps) {
+  const [mounted, setMounted] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
-  const [statusChangeOrder, setStatusChangeOrder] = useState<Order | null>(null);
+  const [statusChangeOrder, setStatusChangeOrder] = useState<Order | null>(
+    null
+  );
   const [newStatus, setNewStatus] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
@@ -89,6 +100,11 @@ export function OrderTable({ className }: OrderTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+
+  // Ensure component is mounted before rendering dynamic content
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchOrders = async () => {
     try {
@@ -152,9 +168,9 @@ export function OrderTable({ className }: OrderTableProps) {
       const response = await fetch(`/api/orders/${statusChangeOrder.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "update_status", 
-          fulfillmentStatus: newStatus 
+        body: JSON.stringify({
+          action: "update_status",
+          fulfillmentStatus: newStatus,
         }),
       });
 
@@ -217,41 +233,41 @@ export function OrderTable({ className }: OrderTableProps) {
     if (!status) return null;
 
     const statusConfig = {
-      pending: { 
-        variant: "secondary" as const, 
-        label: "Pending", 
+      pending: {
+        variant: "secondary" as const,
+        label: "Pending",
         icon: Clock,
-        color: "text-yellow-600"
+        color: "text-yellow-600",
       },
-      processing: { 
-        variant: "secondary" as const, 
-        label: "Processing", 
+      processing: {
+        variant: "secondary" as const,
+        label: "Processing",
         icon: Package,
-        color: "text-blue-600"
+        color: "text-blue-600",
       },
-      shipped: { 
-        variant: "default" as const, 
-        label: "Shipped", 
+      shipped: {
+        variant: "default" as const,
+        label: "Shipped",
         icon: Truck,
-        color: "text-purple-600"
+        color: "text-purple-600",
       },
-      delivered: { 
-        variant: "default" as const, 
-        label: "Delivered", 
+      delivered: {
+        variant: "default" as const,
+        label: "Delivered",
         icon: CheckCircle,
-        color: "text-green-600"
+        color: "text-green-600",
       },
-      cancelled: { 
-        variant: "destructive" as const, 
-        label: "Cancelled", 
+      cancelled: {
+        variant: "destructive" as const,
+        label: "Cancelled",
         icon: X,
-        color: "text-red-600"
+        color: "text-red-600",
       },
-      returned: { 
-        variant: "outline" as const, 
-        label: "Returned", 
+      returned: {
+        variant: "outline" as const,
+        label: "Returned",
         icon: RefreshCw,
-        color: "text-orange-600"
+        color: "text-orange-600",
       },
     };
 
@@ -259,7 +275,7 @@ export function OrderTable({ className }: OrderTableProps) {
       variant: "outline" as const,
       label: status,
       icon: AlertCircle,
-      color: "text-gray-600"
+      color: "text-gray-600",
     };
 
     const IconComponent = config.icon;
@@ -276,17 +292,19 @@ export function OrderTable({ className }: OrderTableProps) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency.toUpperCase(),
-    }).format(amount);
+    }).format(amount / 100); // Convert from cents to dollars
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const date = new Date(dateString);
+    // Use a consistent format that works the same on server and client
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${month}/${day}/${year} ${hours}:${minutes}`;
   };
 
   return (
@@ -397,14 +415,17 @@ export function OrderTable({ className }: OrderTableProps) {
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
                       {getFulfillmentStatusBadge(order.fulfillmentStatus) || (
-                        <Badge variant="outline" className="flex items-center gap-1">
+                        <Badge
+                          variant="outline"
+                          className="flex items-center gap-1"
+                        >
                           <Clock className="h-3 w-3" />
                           Pending
                         </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {formatDate(order.created)}
+                      {mounted ? formatDate(order.created) : order.created.split('T')[0]}
                     </TableCell>
                     <TableCell className="capitalize">
                       {order.paymentMethod}
@@ -477,34 +498,78 @@ export function OrderTable({ className }: OrderTableProps) {
             </TableBody>
           </Table>
 
-          {/* Pagination */}
+          {/* Enhanced Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center justify-between mt-6">
               <div className="text-sm text-gray-500">
-                Page {currentPage} of {totalPages}
+                Showing page {currentPage} of {totalPages} ({orders.length}{" "}
+                orders)
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(1, prev - 1))
-                  }
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                  disabled={!hasMore}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
+                      className={cn(
+                        currentPage === 1 && "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(pageNum)}
+                          isActive={currentPage === pageNum}
+                          className="cursor-pointer"
+                        >
+                          {pageNum}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+
+                  {totalPages > 5 && currentPage < totalPages - 2 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="cursor-pointer"
+                        >
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      className={cn(
+                        !hasMore && "pointer-events-none opacity-50"
+                      )}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </CardContent>
@@ -571,7 +636,7 @@ export function OrderTable({ className }: OrderTableProps) {
                     </div>
                     <div>
                       <span className="font-medium">Created:</span>{" "}
-                      {formatDate(selectedOrder.created)}
+                      {mounted ? formatDate(selectedOrder.created) : selectedOrder.created.split('T')[0]}
                     </div>
                     <div>
                       <span className="font-medium">Description:</span>{" "}
@@ -636,7 +701,7 @@ export function OrderTable({ className }: OrderTableProps) {
                           <div>
                             <div className="font-medium">Charge</div>
                             <div className="text-sm text-gray-500">
-                              {formatDate(charge.created)}
+                              {mounted ? formatDate(charge.created) : charge.created.split('T')[0]}
                             </div>
                           </div>
                           <div className="text-green-600 font-medium">
@@ -656,7 +721,7 @@ export function OrderTable({ className }: OrderTableProps) {
                           <div>
                             <div className="font-medium">Refund</div>
                             <div className="text-sm text-gray-500">
-                              {formatDate(refund.created)} • {refund.reason}
+                              {mounted ? formatDate(refund.created) : refund.created.split('T')[0]} • {refund.reason}
                             </div>
                           </div>
                           <div className="text-red-600 font-medium">
@@ -683,7 +748,8 @@ export function OrderTable({ className }: OrderTableProps) {
           <DialogHeader>
             <DialogTitle>Change Order Status</DialogTitle>
             <DialogDescription>
-              Update the fulfillment status for order {statusChangeOrder?.id?.slice(-8)}
+              Update the fulfillment status for order{" "}
+              {statusChangeOrder?.id?.slice(-8)}
             </DialogDescription>
           </DialogHeader>
 
@@ -693,7 +759,10 @@ export function OrderTable({ className }: OrderTableProps) {
                 Current Status
               </label>
               <div className="flex items-center gap-2">
-                {statusChangeOrder && getFulfillmentStatusBadge(statusChangeOrder.fulfillmentStatus) || (
+                {(statusChangeOrder &&
+                  getFulfillmentStatusBadge(
+                    statusChangeOrder.fulfillmentStatus
+                  )) || (
                   <Badge variant="outline" className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     Pending

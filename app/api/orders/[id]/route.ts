@@ -6,11 +6,13 @@ import Stripe from "stripe";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  let orderId: string | undefined;
   try {
     const { action, reason, fulfillmentStatus } = await request.json();
-    const orderId = params.id;
+    const { id } = await params;
+    orderId = id;
     const stripe = getStripeClient();
 
     let result;
@@ -114,7 +116,7 @@ export async function PATCH(
     });
 
   } catch (error: any) {
-    console.error(`Error processing order ${params.id}:`, error);
+    console.error(`Error processing order ${orderId || 'unknown'}:`, error);
     
     if (error.type === "StripeCardError") {
       return NextResponse.json(
@@ -133,10 +135,12 @@ export async function PATCH(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  let orderId: string | undefined;
   try {
-    const orderId = params.id;
+    const { id } = await params;
+    orderId = id;
     const stripe = getStripeClient();
 
     // Get the payment intent with expanded data
