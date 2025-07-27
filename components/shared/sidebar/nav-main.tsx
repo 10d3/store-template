@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 // import { Circle, Mail } from "lucide-react";
 
 export function NavMain({
@@ -22,6 +22,11 @@ export function NavMain({
   }[];
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isActive = (url: string) => {
+    return pathname === url;
+  };
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -50,7 +55,10 @@ export function NavMain({
               onClick={() => router.push(item.url)}
               key={item.title}
             >
-              <SidebarMenuButton tooltip={item.title}>
+              <SidebarMenuButton
+                className={`${isActive(item.url) && "bg-primary/10 text-primary font-medium"}`}
+                tooltip={item.title}
+              >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
               </SidebarMenuButton>
