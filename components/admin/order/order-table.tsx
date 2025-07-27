@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -39,6 +40,7 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -93,6 +95,14 @@ export function OrderTable({ className }: OrderTableProps) {
   );
   const [newStatus, setNewStatus] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Tracking email state
+  const [showTrackingDialog, setShowTrackingDialog] = useState(false);
+  const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingUrl, setTrackingUrl] = useState("");
+  const [carrier, setCarrier] = useState("");
+  const [sendingTrackingEmail, setSendingTrackingEmail] = useState(false);
 
   // Filters and pagination
   const [searchTerm, setSearchTerm] = useState("");
@@ -206,6 +216,54 @@ export function OrderTable({ className }: OrderTableProps) {
     } catch (error) {
       console.error("Error fetching order details:", error);
       toast.error("Failed to fetch order details");
+    }
+  };
+
+  const openTrackingDialog = (order: Order) => {
+    setTrackingOrder(order);
+    setTrackingNumber("");
+    setTrackingUrl("");
+    setCarrier("");
+    setShowTrackingDialog(true);
+  };
+
+  const handleSendTrackingEmail = async () => {
+    if (!trackingOrder || !trackingNumber.trim()) {
+      toast.error("Please enter a tracking number");
+      return;
+    }
+
+    try {
+      setSendingTrackingEmail(true);
+      const response = await fetch(`/api/orders/${trackingOrder.id}/tracking`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          trackingNumber: trackingNumber.trim(),
+          trackingUrl: trackingUrl.trim() || undefined,
+          carrier: carrier.trim() || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send tracking email");
+      }
+
+      toast.success("Tracking email sent successfully!");
+      setShowTrackingDialog(false);
+      setTrackingOrder(null);
+      setTrackingNumber("");
+      setTrackingUrl("");
+      setCarrier("");
+      
+      // Refresh orders to show updated tracking info
+      fetchOrders();
+    } catch (error) {
+      console.error("Error sending tracking email:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to send tracking email");
+    } finally {
+      setSendingTrackingEmail(false);
     }
   };
 
@@ -457,6 +515,12 @@ export function OrderTable({ className }: OrderTableProps) {
                           >
                             <Package className="mr-2 h-4 w-4" />
                             Change Status
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => openTrackingDialog(order)}
+                          >
+                            <Mail className="mr-2 h-4 w-4" />
+                            Send Tracking Email
                           </DropdownMenuItem>
                           {order.status === "requires_capture" && (
                             <DropdownMenuItem
@@ -842,6 +906,91 @@ export function OrderTable({ className }: OrderTableProps) {
                   </>
                 ) : (
                   "Update Status"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tracking Email Dialog */}
+      <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send Tracking Email</DialogTitle>
+            <DialogDescription>
+              Send tracking information to customer for order{" "}
+              {trackingOrder?.id?.slice(-8)}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="trackingNumber" className="text-sm font-medium">
+                Tracking Number *
+              </Label>
+              <Input
+                id="trackingNumber"
+                placeholder="Enter tracking number"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="carrier" className="text-sm font-medium">
+                Carrier (Optional)
+              </Label>
+              <Input
+                id="carrier"
+                placeholder="e.g., UPS, FedEx, DHL"
+                value={carrier}
+                onChange={(e) => setCarrier(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="trackingUrl" className="text-sm font-medium">
+                Tracking URL (Optional)
+              </Label>
+              <Input
+                id="trackingUrl"
+                placeholder="https://tracking.carrier.com/..."
+                value={trackingUrl}
+                onChange={(e) => setTrackingUrl(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowTrackingDialog(false);
+                  setTrackingOrder(null);
+                  setTrackingNumber("");
+                  setTrackingUrl("");
+                  setCarrier("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSendTrackingEmail}
+                disabled={!trackingNumber.trim() || sendingTrackingEmail}
+              >
+                {sendingTrackingEmail ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send Email
+                  </>
                 )}
               </Button>
             </div>

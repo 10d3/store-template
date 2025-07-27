@@ -11,6 +11,9 @@ interface OrderEmailData {
   orderStatus: string;
   orderItems?: any[];
   refundAmount?: number;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  carrier?: string;
 }
 
 export async function sendOrderStatusEmail(data: OrderEmailData) {
@@ -46,6 +49,11 @@ export async function sendOrderStatusEmail(data: OrderEmailData) {
         htmlContent = generateDisputeEmail(data);
         break;
 
+      case "shipped":
+        subject = `Your Order Has Shipped - Order #${orderId}`;
+        htmlContent = generateTrackingEmail(data);
+        break;
+
       default:
         subject = `Order Update - Order #${orderId}`;
         htmlContent = generateGenericOrderUpdateEmail(data);
@@ -67,6 +75,42 @@ export async function sendOrderStatusEmail(data: OrderEmailData) {
     return { success: true, emailId: emailData?.id };
   } catch (error) {
     console.error("Error in sendOrderStatusEmail:", error);
+    throw error;
+  }
+}
+
+export async function sendTrackingEmail(data: {
+  customerEmail: string;
+  customerName?: string;
+  orderId: string;
+  orderTotal: number;
+  trackingNumber: string;
+  trackingUrl?: string;
+  carrier?: string;
+  orderItems?: any[];
+}) {
+  try {
+    const emailData: OrderEmailData = {
+      ...data,
+      orderStatus: "shipped"
+    };
+
+    const { data: result, error } = await resend.emails.send({
+      from: "Store Ricardo <orders@storerecardo.com>",
+      to: [data.customerEmail],
+      subject: `Your Order Has Shipped - Order #${data.orderId}`,
+      html: generateTrackingEmail(emailData),
+    });
+
+    if (error) {
+      console.error("Error sending tracking email:", error);
+      throw new Error(`Failed to send tracking email: ${error.message}`);
+    }
+
+    console.log("Tracking email sent successfully:", result?.id);
+    return { success: true, emailId: result?.id };
+  } catch (error) {
+    console.error("Error in sendTrackingEmail:", error);
     throw error;
   }
 }
@@ -333,6 +377,82 @@ function generateDisputeEmail(data: OrderEmailData): string {
         <p>Our customer support team will be in touch with you shortly to help resolve this dispute.</p>
         
         <p>If you have any immediate questions, please contact our customer support team.</p>
+      </div>
+      
+      <div class="footer">
+        <p>Store Ricardo | orders@storerecardo.com</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateTrackingEmail(data: OrderEmailData): string {
+  const { customerName, orderId, orderTotal, trackingNumber, trackingUrl, carrier, orderItems } = data;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your Order Has Shipped</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .order-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .tracking-info { background: #ecfdf5; border: 2px solid #10b981; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+        .tracking-number { font-weight: bold; font-size: 20px; color: #10b981; margin: 10px 0; }
+        .track-button { display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 15px 0; }
+        .item { border-bottom: 1px solid #e5e7eb; padding: 10px 0; }
+        .footer { text-align: center; margin-top: 30px; color: #6b7280; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>📦 Your Order Has Shipped!</h1>
+        <p>Your package is on its way</p>
+      </div>
+      
+      <div class="content">
+        <p>Hi ${customerName || "Valued Customer"},</p>
+        
+        <p>Great news! Your order has been shipped and is on its way to you.</p>
+        
+        <div class="tracking-info">
+          <h3>📍 Tracking Information</h3>
+          <div class="tracking-number">${trackingNumber || "N/A"}</div>
+          <p><strong>Carrier:</strong> ${carrier || "Standard Shipping"}</p>
+          ${trackingUrl ? `
+            <a href="${trackingUrl}" class="track-button" target="_blank">
+              Track Your Package
+            </a>
+          ` : ''}
+          <p><small>You can use this tracking number to monitor your package's progress</small></p>
+        </div>
+        
+        <div class="order-details">
+          <h3>Order Details</h3>
+          <p><strong>Order ID:</strong> #${orderId}</p>
+          <p><strong>Order Total:</strong> $${orderTotal.toFixed(2)}</p>
+          
+          ${orderItems && orderItems.length > 0 ? `
+            <h4>Items Shipped:</h4>
+            ${orderItems.map(item => `
+              <div class="item">
+                <strong>${item.name || "Product"}</strong><br>
+                Quantity: ${item.quantity || 1}
+              </div>
+            `).join("")}
+          ` : ""}
+        </div>
+        
+        <p><strong>Estimated Delivery:</strong> Please check the tracking link above for the most up-to-date delivery estimate.</p>
+        
+        <p>If you have any questions about your shipment, please don't hesitate to contact our customer support team.</p>
+        
+        <p>Thank you for choosing Store Ricardo!</p>
       </div>
       
       <div class="footer">
