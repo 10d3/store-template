@@ -1,7 +1,7 @@
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
 // import { getTranslations } from "@/i18n/server";
-import { listProducts } from "@/lib/product/crud";
+import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
 import type { StripeProduct } from "@/types/product";
 
 export default async function Home() {
@@ -60,51 +60,83 @@ export default async function Home() {
   });
 
   // Transform packs to component format
-  const transformedPacks = packs.map((pack) => {
-    const packProducts = [];
+  const transformedPacks = await Promise.all(
+    packs.map(async (pack) => {
+      const packProducts = [];
 
-    // If pack has contents metadata, parse it
-    if (pack.metadata?.contents) {
-      const contentIds = pack.metadata.contents.split(",");
-      // For now, create sample products - in a real app you'd fetch these by price IDs
-      contentIds.forEach((priceId, index) => {
-        packProducts.push({
-          id: `${pack.id}_${index}`,
-          name: `Product ${index + 1}`,
-          price: Math.floor(Math.random() * 5000) + 1000, // Random price for demo
-          image: pack.images?.[index] || "/placeholder.svg",
-          stripePriceId: priceId.trim(),
-        });
-      });
-    } else {
-      // Default pack content if no metadata
-      const defaultPrice =
-        typeof pack.default_price === "object" && pack.default_price
-          ? pack.default_price
-          : null;
+      // If pack has contents metadata, fetch actual products
+      if (pack.metadata?.contents) {
+        const contentIds = pack.metadata.contents.split(",");
+        try {
+          const contentProducts = await getProductsByProductIds(contentIds);
 
-      packProducts.push({
-        id: `${pack.id}_1`,
-        name: pack.name,
-        price: defaultPrice?.unit_amount || 0,
-        image: pack.images?.[0] || "/placeholder.svg",
-        stripePriceId:
-          defaultPrice?.id ||
-          (typeof pack.default_price === "string"
+          contentProducts.forEach((contentProduct, index) => {
+            const defaultPrice =
+              typeof contentProduct.default_price === "object" &&
+              contentProduct.default_price
+                ? contentProduct.default_price
+                : null;
+
+            packProducts.push({
+              id: `${pack.id}_${contentProduct.id}`,
+              name: contentProduct.name, // Use actual product name
+              price: defaultPrice?.unit_amount || 0,
+              image:
+                contentProduct.images?.[0] ||
+                pack.images?.[index] ||
+                "/placeholder.svg",
+              hoverMedia: contentProduct.images?.[1]
+                ? {
+                    type: "image" as const,
+                    src: contentProduct.images[1],
+                  }
+                : undefined,
+              stripePriceId: defaultPrice?.id || contentIds[index]?.trim(),
+            });
+          });
+        } catch (error) {
+          console.error("Failed to fetch pack contents:", error);
+          // Fallback to placeholder names if fetching fails
+          contentIds.forEach((productId, index) => {
+            packProducts.push({
+              id: `${pack.id}_${index}`,
+              name: `Product ${index + 1}`,
+              price: Math.floor(Math.random() * 5000) + 1000,
+              image: pack.images?.[index] || "/placeholder.svg",
+              stripePriceId: productId.trim(),
+            });
+          });
+        }
+      } else {
+        // Default pack content if no metadata
+        const defaultPrice =
+          typeof pack.default_price === "object" && pack.default_price
             ? pack.default_price
-            : undefined),
-      });
-    }
+            : null;
 
-    return {
-      id: pack.id,
-      name: pack.name, // Use the pack name directly
-      products: packProducts,
-      bundleDiscount: pack.metadata?.discount
-        ? parseInt(pack.metadata.discount)
-        : 0,
-    };
-  });
+        packProducts.push({
+          id: `${pack.id}_1`,
+          name: pack.name,
+          price: defaultPrice?.unit_amount || 0,
+          image: pack.images?.[0] || "/placeholder.svg",
+          stripePriceId:
+            defaultPrice?.id ||
+            (typeof pack.default_price === "string"
+              ? pack.default_price
+              : undefined),
+        });
+      }
+
+      return {
+        id: pack.id,
+        name: pack.name, // Use the pack name directly
+        products: packProducts,
+        bundleDiscount: pack.metadata?.discount
+          ? parseInt(pack.metadata.discount)
+          : 0,
+      };
+    })
+  );
 
   return (
     <div className="min-h-screen py-12">
@@ -126,7 +158,13 @@ export default async function Home() {
               {transformedProducts.map((product) => (
                 <ProductCard
                   key={product.id}
-                  {...product}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  originalPrice={product.originalPrice}
+                  discount={product.discount}
+                  image={product.image}
+                  hoverMedia={product.hoverMedia}
                   className="hover:scale-105 transition-transform duration-200"
                 />
               ))}
@@ -144,7 +182,10 @@ export default async function Home() {
               {transformedPacks.map((pack) => (
                 <PackCard
                   key={pack.id}
-                  {...pack}
+                  id={pack.id}
+                  name={pack.name}
+                  products={pack.products}
+                  bundleDiscount={pack.bundleDiscount}
                   className="hover:scale-105 transition-transform duration-200"
                 />
               ))}

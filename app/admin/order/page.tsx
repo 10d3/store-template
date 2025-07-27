@@ -1,7 +1,18 @@
-import React from 'react'
+"use client";
 
-export default function page() {
+import { OrderTable } from "@/components/admin/order/order-table";
+
+export default function OrderPage() {
   return (
-    <div>page</div>
-  )
+    <div className="container mx-auto py-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Order Management</h1>
+        <p className="text-muted-foreground">
+          Manage and track all orders from your Stripe account
+        </p>
+      </div>
+      
+      <OrderTable />
+    </div>
+  );
 }

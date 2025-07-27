@@ -400,3 +400,94 @@ export async function listCoupons(): Promise<StripeCoupon[]> {
     });
   }
 }
+
+export async function getProductsByPriceIds(
+  priceIds: string[]
+): Promise<StripeProduct[]> {
+  try {
+    const products: StripeProduct[] = [];
+
+    // Fetch each price and its associated product
+    for (const priceId of priceIds) {
+      try {
+        const price = await stripe.prices.retrieve(priceId.trim(), {
+          expand: ["product"],
+        });
+
+        if (price.product && typeof price.product === "object") {
+          const transformedProduct = transformProduct(
+            price.product as Stripe.Product
+          );
+          // Set the default_price to the specific price we fetched
+          transformedProduct.default_price = {
+            id: price.id,
+            unit_amount: price.unit_amount,
+            currency: price.currency,
+          };
+          products.push(transformedProduct);
+        }
+      } catch (priceError) {
+        console.warn(`Failed to fetch price ${priceId}:`, priceError);
+        // Continue with other prices even if one fails
+      }
+    }
+
+    return products;
+  } catch (error) {
+    if (error instanceof Stripe.errors.StripeError) {
+      throw new ProductCrudError(
+        `Stripe error: ${error.message}`,
+        "STRIPE_ERROR",
+        { stripeError: error }
+      );
+    }
+    throw new ProductCrudError(
+      "Failed to get products by price IDs",
+      "UNKNOWN_ERROR",
+      {
+        originalError: error,
+      }
+    );
+  }
+}
+
+export async function getProductsByProductIds(
+  productIds: string[]
+): Promise<StripeProduct[]> {
+  try {
+    const products: StripeProduct[] = [];
+
+    // Fetch each product by its ID
+    for (const productId of productIds) {
+      try {
+        const product = await stripe.products.retrieve(productId.trim(), {
+          expand: ["default_price"],
+        });
+
+        if (product) {
+          products.push(transformProduct(product));
+        }
+      } catch (productError) {
+        console.warn(`Failed to fetch product ${productId}:`, productError);
+        // Continue with other products even if one fails
+      }
+    }
+
+    return products;
+  } catch (error) {
+    if (error instanceof Stripe.errors.StripeError) {
+      throw new ProductCrudError(
+        `Stripe error: ${error.message}`,
+        "STRIPE_ERROR",
+        { stripeError: error }
+      );
+    }
+    throw new ProductCrudError(
+      "Failed to get products by product IDs",
+      "UNKNOWN_ERROR",
+      {
+        originalError: error,
+      }
+    );
+  }
+}

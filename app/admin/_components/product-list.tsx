@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,9 @@ interface UnifiedProductListProps {
   onEdit: (item: StripeProduct | StripeCoupon) => void;
   onArchive: (id: string) => void;
   isLoading?: boolean;
+  title?: string;
+  description?: string;
+  showTabs?: boolean;
 }
 
 export function UnifiedProductList({
@@ -21,6 +25,9 @@ export function UnifiedProductList({
   onEdit,
   onArchive,
   isLoading,
+  title = "Store Inventory",
+  description,
+  showTabs = true,
 }: UnifiedProductListProps) {
   const [archivingId, setArchivingId] = useState<string | null>(null);
 
@@ -58,7 +65,10 @@ export function UnifiedProductList({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Store Inventory</CardTitle>
+        <CardTitle>{title}</CardTitle>
+        {description && (
+          <p className="text-sm text-muted-foreground">{description}</p>
+        )}
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="products" className="w-full">
