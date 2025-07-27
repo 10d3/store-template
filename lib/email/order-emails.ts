@@ -17,12 +17,8 @@ export async function sendOrderStatusEmail(data: OrderEmailData) {
   try {
     const {
       customerEmail,
-      customerName,
       orderId,
       orderStatus,
-      orderTotal,
-      orderItems,
-      refundAmount,
     } = data;
 
     let subject = "";
