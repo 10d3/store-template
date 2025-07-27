@@ -15,13 +15,9 @@ import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "@/lib/auth-client";
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+const sidebarData = {
   navMain: [
     {
       title: "Dashboard",
@@ -52,8 +48,14 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const session = useSession();
+  const user = {
+    name: session.data?.user.name as string,
+    email: session.data?.user.email as string,
+    avatar: session.data?.user.image as string,
+  };
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -76,10 +78,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={sidebarData.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

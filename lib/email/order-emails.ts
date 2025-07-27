@@ -15,11 +15,7 @@ interface OrderEmailData {
 
 export async function sendOrderStatusEmail(data: OrderEmailData) {
   try {
-    const {
-      customerEmail,
-      orderId,
-      orderStatus,
-    } = data;
+    const { customerEmail, orderId, orderStatus } = data;
 
     let subject = "";
     let htmlContent = "";
