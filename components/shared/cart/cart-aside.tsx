@@ -3,7 +3,7 @@ import { useCartModal } from "@/context/cart-modal";
 import useMediaQuery from "@/hook/useMediaquery";
 import { useTranslations } from "@/i18n/client";
 
-export default function CartDialog({
+export default function CartAsideDrawer({
   children,
 }: {
   children: React.ReactNode;
