@@ -1,6 +1,6 @@
 // "use client";
 
-import { OrderTable } from "@/components/admin/order/order-table";
+import { OrderTable } from "@/app/admin/_components/order-table";
 
 export default function OrderPage() {
   return (
