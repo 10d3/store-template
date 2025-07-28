@@ -3,6 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { Menu, Search, ShoppingBag, User } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,11 +24,13 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useSession } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/store";
+import { NavUserMenu } from "./nav-user-menu";
+import Image from "next/image";
 
 const categories = [
   {
@@ -59,6 +67,13 @@ const categories = [
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  const session = useSession();
+  const user = {
+    name: session.data?.user.name as string,
+    email: session.data?.user.email as string,
+    avatar: session.data?.user.image as string,
+  };
   const { cart } = useCartStore();
 
   return (
@@ -67,15 +82,8 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">
-                  S
-                </span>
-              </div>
-              <span className="font-bold text-xl hidden sm:inline-block">
-                STORE
-              </span>
+            <Link href="/" className="flex items-center space-x-2 size-32">
+              <Image src={"/logo.png"} alt="logo" width={1000} height={1000} />
             </Link>
           </div>
 
@@ -163,12 +171,16 @@ export default function Navbar() {
             </Button>
 
             {/* Login Button */}
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/login">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Login</span>
-              </Link>
-            </Button>
+            {session.data?.user ? (
+              <NavUserMenu user={user} />
+            ) : (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/login">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Login</span>
+                </Link>
+              </Button>
+            )}
 
             {/* Shopping Cart */}
             <Button variant="ghost" size="icon" asChild className="relative">
@@ -191,59 +203,73 @@ export default function Navbar() {
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col space-y-4 mt-6">
-                  <Link
-                    href="/"
-                    className="text-lg font-medium hover:text-primary transition-colors"
-                  >
-                    Home
-                  </Link>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Shop</h3>
-                    <div className="pl-4 space-y-2">
-                      {categories.map((category) => (
-                        <Link
-                          key={category.title}
-                          href={category.href}
-                          className="block text-sm text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          {category.title}
-                        </Link>
-                      ))}
-                    </div>
+              <SheetContent side="right" className="w-[320px] sm:w-[380px] p-0">
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="px-6 py-4 border-b bg-muted/20">
+                    <SheetTitle className="text-xl font-semibold">
+                      Menu
+                    </SheetTitle>
                   </div>
-                  <Link
-                    href="/collections"
-                    className="text-lg font-medium hover:text-primary transition-colors"
-                  >
-                    Collections
-                  </Link>
-                  <Link
-                    href="/about"
-                    className="text-lg font-medium hover:text-primary transition-colors"
-                  >
-                    About
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="text-lg font-medium hover:text-primary transition-colors"
-                  >
-                    Contact
-                  </Link>
-                  <div className="pt-4 border-t">
-                    <Link
-                      href="/login"
-                      className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
-                    >
-                      <User className="h-5 w-5" />
-                      <span>Login</span>
-                    </Link>
+
+                  {/* Navigation Content */}
+                  <div className="flex-1 overflow-y-auto px-6 py-6">
+                    <nav className="space-y-1">
+                      {/* Home */}
+                      <Link
+                        href="/"
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                      >
+                        Home
+                      </Link>
+
+                      {/* Shop with Collapsible Submenu */}
+                      <Collapsible>
+                        <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200 group">
+                          <span>Shop</span>
+                          <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-1">
+                          <div className="ml-3 pl-3 border-l-2 border-muted space-y-1">
+                            {categories.map((category) => (
+                              <Link
+                                key={category.title}
+                                href={category.href}
+                                className="block px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-md transition-all duration-200"
+                              >
+                                {category.title}
+                              </Link>
+                            ))}
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
+
+                      {/* Collections */}
+                      <Link
+                        href="/collections"
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                      >
+                        Collections
+                      </Link>
+
+                      {/* About */}
+                      <Link
+                        href="/about"
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                      >
+                        About
+                      </Link>
+
+                      {/* Contact */}
+                      <Link
+                        href="/contact"
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                      >
+                        Contact
+                      </Link>
+                    </nav>
                   </div>
-                </nav>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
