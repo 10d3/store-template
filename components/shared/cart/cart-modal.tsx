@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import { CartAsideContainer } from "./cart-aside-container";
 import { useCartStore } from "@/lib/store";
