@@ -137,12 +137,6 @@ export default function CarouselComponent({
 
     // Preload the next video after current one ends
     preloadNextVideo(index);
-
-    // Add your custom logic here:
-    // - Track analytics
-    // - Show completion UI
-    // - Save progress
-    // etc.
   };
 
   const items = [
