@@ -45,5 +45,9 @@
   },
   "test": {
     "message": "This is a test message"
+  },
+  "carousel": {
+    "imageAlt": "Carousel image",
+    "videoAlt": "Carousel video thumbnail"
   }
 }

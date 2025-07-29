@@ -12,6 +12,10 @@
     "subtitle": "Descubre nuestra colección de suplementos de alta calidad diseñados para ayudarte a alcanzar tus objetivos de fitness."
   },
    "test":{
-    "message": "This is a test message"
+    "message": "Este es un mensaje de prueba"
+  },
+  "carousel": {
+    "imageAlt": "Imagen del carrusel",
+    "videoAlt": "Miniatura de video del carrusel"
   }
 }

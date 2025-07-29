@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { cn } from "@/lib/utils";
 import React, { useRef, useEffect } from "react";
 
 interface VideoPlayerProps {
@@ -17,6 +18,7 @@ interface VideoPlayerProps {
   onCanPlay?: () => void;
   isPreloaded?: boolean;
   shouldRestart?: boolean;
+  className?: string
 }
 
 const VideoPlayer = ({
@@ -31,6 +33,7 @@ const VideoPlayer = ({
   onCanPlay,
   isPreloaded = false,
   shouldRestart = false,
+  className
 }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -115,6 +118,7 @@ const VideoPlayer = ({
       muted={true}
       preload="auto" // Ensure videos preload metadata
       style={{ cursor: "pointer" }} // Show it's clickable
+      className={cn("w-full h-full", className)}
     >
       <source src={src} type="video/mp4" />
       Votre navigateur ne supporte pas la vidéo.
