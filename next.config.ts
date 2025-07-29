@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         protocol:"https",
         hostname:"files.stripe.com",
         pathname:"**"
+      },
+      {
+        protocol:"https",
+        hostname:"6ay8a7s9vf.ufs.sh",
+        pathname:"**"
       }
     ],
   },

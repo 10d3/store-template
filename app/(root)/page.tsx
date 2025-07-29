@@ -1,3 +1,4 @@
+import CarouselComponent from "@/components/shared/caroussel";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
 // import { getTranslations } from "@/i18n/server";
@@ -147,6 +148,8 @@ export default async function Home() {
             Discover our premium products and exclusive bundle deals
           </p>
         </div>
+
+        <CarouselComponent />
 
         {/* Products Section */}
         {transformedProducts.length > 0 && (
