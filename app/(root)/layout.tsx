@@ -12,7 +12,7 @@ export default function Rootlayout({
   return (
     <>
       <Navbar />
-      <main className="flex-1 flex-col mt-4">
+      <main className="flex-1 flex-col mt-4 px-14">
         {children}
         <CartModal />
       </main>

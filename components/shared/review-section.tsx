@@ -145,7 +145,7 @@ const videoReviews: VideoReview[] = [
   },
 ];
 
-export default function VideoReviewMasonry() {
+export function VideoReviewMasonry() {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
 
   const renderStars = (rating: number) => {
@@ -283,3 +283,5 @@ export default function VideoReviewMasonry() {
     </div>
   );
 }
+
+export default VideoReviewMasonry;
