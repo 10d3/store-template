@@ -2,7 +2,6 @@ import VideoReviewMasonry from "@/components/shared/review-section";
 // import { getProduct } from "@/lib/product/crud";
 import Image from "next/image";
 import React from "react";
-// import VideoReviewMasonry from "@/components/shared/review-section";
 
 interface MediaItem {
   id: string;

@@ -127,19 +127,19 @@ export function ProductCard({
           {/* Product Title - Show on hover */}
           <div
             className={cn(
-              "absolute top-4 left-4 right-4 transition-all duration-300 ease-in-out z-10",
-              isHovered
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2"
+              "absolute bottom-4 left-4 transition-all duration-300 ease-in-out z-10"
+              // isHovered
+              //   ? "opacity-100 translate-y-0"
+              //   : "opacity-0 -translate-y-2"
             )}
           >
-            <h3 className="font-medium text-sm text-white line-clamp-2 leading-tight drop-shadow-lg">
+            <h2 className=" font-semibold text-white line-clamp-2 leading-tight drop-shadow-lg">
               {name}
-            </h3>
+            </h2>
           </div>
 
           {/* Quick Add Button - appears on hover */}
-          <div
+          {/* <div
             className={cn(
               "absolute inset-x-4 bottom-16 transition-all duration-300 ease-in-out z-10",
               isHovered
@@ -152,12 +152,12 @@ export function ProductCard({
               className="w-full bg-white text-black hover:bg-gray-100 transition-colors duration-200 font-medium"
               size="sm"
             >
-              {/* {t("product.addToCart")} */}
+              test
             </Button>
-          </div>
+          </div> */}
 
           {/* Price - Always visible at bottom */}
-          <div className="absolute bottom-4 left-4 right-4 z-10">
+          <div className="absolute bottom-4 right-4 z-10">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-lg text-white drop-shadow-lg">
                 {formatPrice(price)}

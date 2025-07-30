@@ -196,7 +196,7 @@ export function VideoReviewMasonry() {
 
       {/* Main Gallery */}
       <div className="pb-16">
-        <div className="max-w-7xl mx-auto">
+        <div className=" mx-auto">
           {/* Hardcoded Masonry Grid */}
           <div className="grid grid-cols-4 gap-4 h-auto" style={{ gridAutoRows: "200px" }}>
             {videoReviews.map((review, index) => (
