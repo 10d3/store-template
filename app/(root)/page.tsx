@@ -1,6 +1,7 @@
 import CarouselComponent from "@/components/shared/caroussel";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
+import VideoReviewMasonry from "@/components/shared/review-section";
 // import { getTranslations } from "@/i18n/server";
 import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
 import type { StripeProduct } from "@/types/product";
@@ -150,6 +151,7 @@ export default async function Home() {
         </div>
 
         <CarouselComponent />
+        <VideoReviewMasonry />
 
         {/* Products Section */}
         {transformedProducts.length > 0 && (
