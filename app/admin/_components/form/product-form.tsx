@@ -74,7 +74,7 @@ export function ProductForm({
             ? initialData.default_price.currency
             : "usd",
         images: initialData.images || [],
-        metadata: initialData.metadata 
+        metadata: initialData.metadata
           ? transformMetadataFromStripe(initialData.metadata, "product")
           : {},
       };
@@ -109,10 +109,7 @@ export function ProductForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="name"
@@ -195,7 +192,7 @@ export function ProductForm({
             </div>
 
             {/* Structured Metadata Section */}
-            <MetadataFormSection 
+            <MetadataFormSection
               type="product"
               title="Product Metadata"
               description="Configure product-specific metadata for SEO, categorization, and business logic."
@@ -205,8 +202,8 @@ export function ProductForm({
               {isLoading
                 ? "Processing..."
                 : isEditing
-                ? "Update Product"
-                : "Create Product"}
+                  ? "Update Product"
+                  : "Create Product"}
             </Button>
           </form>
         </Form>

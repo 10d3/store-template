@@ -1,3 +1,4 @@
+import { getProduct } from "@/lib/product/crud";
 import React from "react";
 
 export default async function page({
@@ -13,5 +14,14 @@ export default async function page({
 
   console.log(params.slug, searchParams);
 
-  return <div>page</div>;
+  const variants = await getProduct(params.slug);
+  const selectedVariant = (variants)
+  console.log(selectedVariant)
+
+  return (
+    <main className="flex flex-col gap-2 w-full">
+      <div className="w-full md:w-4/6 h-1/2 md:h-full"></div>
+      <div className="w-full md:w-2/6 h-1/2 md:h-full"></div>
+    </main>
+  );
 }

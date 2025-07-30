@@ -383,6 +383,26 @@ export async function listProducts(): Promise<StripeProduct[]> {
   }
 }
 
+export async function getProduct(slug: string) {
+  try {
+    const product = await stripe.products.retrieve(slug, {
+      expand: ["default_price"],
+    });
+    return transformProduct(product);
+  } catch (error) {
+    if (error instanceof Stripe.errors.StripeError) {
+      throw new ProductCrudError(
+        `Stripe error: ${error.message}`,
+        "STRIPE_ERROR",
+        { stripeError: error }
+      );
+    }
+    throw new ProductCrudError("Failed to get product", "UNKNOWN_ERROR", {
+      originalError: error,
+    });
+  }
+}
+
 export async function listCoupons(): Promise<StripeCoupon[]> {
   try {
     const coupons = await stripe.coupons.list({ limit: 100 });
