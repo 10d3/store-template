@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Play, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -147,20 +147,6 @@ const videoReviews: VideoReview[] = [
 
 export default function VideoReviewMasonry() {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
-
-  useEffect(() => {
-    const updateWidth = () => {
-      const container = document.getElementById("masonry-container");
-      if (container) {
-        setContainerWidth(container.offsetWidth);
-      }
-    };
-
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []);
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -175,38 +161,29 @@ export default function VideoReviewMasonry() {
     setPlayingVideo(playingVideo === videoId ? null : videoId);
   };
 
-  // Dynamic grid configuration based on container width
-  const getGridConfig = () => {
-    if (containerWidth < 640) return { cols: 2, baseSize: 140 };
-    if (containerWidth < 1024) return { cols: 3, baseSize: 160 };
-    if (containerWidth < 1280) return { cols: 4, baseSize: 180 };
-    if (containerWidth < 1536) return { cols: 5, baseSize: 200 };
-    return { cols: 6, baseSize: 220 };
-  };
-
-  const { cols, baseSize } = getGridConfig();
-
-  const getSizeClasses = (size: string) => {
-    switch (size) {
-      case "small":
-        return "col-span-1 row-span-1";
-      case "medium":
-        return "col-span-1 row-span-2";
-      case "large":
-        return `col-span-${Math.min(2, cols)} row-span-2`;
-      case "wide":
-        return `col-span-${Math.min(2, cols)} row-span-1`;
-      case "tall":
-        return "col-span-1 row-span-3";
-      default:
-        return "col-span-1 row-span-1";
-    }
+  // Hardcoded grid positioning for specific items
+  const getGridPosition = (index: number) => {
+    const positions = [
+      "col-span-2 row-span-2", // First item - large
+      "col-span-2 row-span-1", // Second item - wide
+      "col-span-1 row-span-1", // Third item - small
+      "col-span-1 row-span-1", // Fourth item - small
+      "col-span-1 row-span-2", // Fifth item - tall
+      "col-span-1 row-span-1", // Sixth item - small
+      "col-span-2 row-span-1", // Seventh item - wide
+      "col-span-1 row-span-1", // Eighth item - small
+      "col-span-1 row-span-2", // Ninth item - tall
+      "col-span-1 row-span-1", // Tenth item - small
+      "col-span-2 row-span-1", // Eleventh item - wide
+      "col-span-1 row-span-1", // Twelfth item - small
+    ];
+    return positions[index] || "col-span-1 row-span-1";
   };
 
   return (
     <div className="min-h-screen w-full">
       {/* Header Section */}
-      <div className="pt-16 pb-12 px-6">
+      {/* <div className="pt-16 pb-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-light mb-4 tracking-tight">
             Customer Stories
@@ -215,23 +192,17 @@ export default function VideoReviewMasonry() {
             Authentic experiences shared by our community through their own lens
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Gallery */}
-      <div className="px-6 pb-16">
-        <div className="max-w-7xl mx-auto" id="masonry-container">
-          {/* Dynamic Masonry Grid */}
-          <div
-            className="grid gap-4 md:gap-6"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, 1fr)`,
-              gridAutoRows: `${baseSize}px`,
-            }}
-          >
-            {videoReviews.map((review) => (
+      <div className="pb-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Hardcoded Masonry Grid */}
+          <div className="grid grid-cols-4 gap-4 h-auto" style={{ gridAutoRows: "200px" }}>
+            {videoReviews.map((review, index) => (
               <Card
                 key={review.id}
-                className={`group overflow-hidden border-0 bg-white shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer p-0 ${getSizeClasses(review.size)}`}
+                className={`group overflow-hidden border-0 bg-white shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer p-0 ${getGridPosition(index)}`}
                 onClick={() => handlePlayVideo(review.id)}
               >
                 <CardContent className="p-0 h-full relative">
