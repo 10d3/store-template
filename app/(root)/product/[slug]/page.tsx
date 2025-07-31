@@ -1,4 +1,13 @@
 import VideoReviewMasonry from "@/components/shared/review-section";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 // import { getProduct } from "@/lib/product/crud";
 import Image from "next/image";
 import React from "react";
@@ -23,7 +32,7 @@ export default async function page(props: {
 
   // const variants = await getProduct(params.slug);
   // const selectedVariant = variants;
-  // console.log(selectedVariant);
+  // console.log(variants);
 
   const mediaItems: MediaItem[] = [
     {
@@ -70,7 +79,7 @@ export default async function page(props: {
   };
 
   return (
-    <main className="flex flex-col gap-2 w-full">
+    <main className="flex flex-row gap-8 w-full">
       <div className="w-full md:w-4/7 h-1/2 md:h-full">
         <div
           className="grid grid-cols-4 gap-4 h-auto"
@@ -128,7 +137,26 @@ export default async function page(props: {
           <VideoReviewMasonry />
         </div>
       </div>
-      <div className="w-full md:w-3/7 h-1/2 md:h-full"></div>
+      <div className="w-full md:w-3/7 h-1/2 md:h-full">
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>{params.slug}</CardTitle>
+              <CardDescription>This is a product description.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* placeholder for zustand quantity button management */}
+            </CardContent>
+            <CardFooter>{/*placeholder for variants*/}</CardFooter>
+          </Card>
+        </div>
+        <div>
+          <div>{/*placeholder for pack maker if available*/}</div>
+          <ScrollArea>
+            {/*placeholder for pack that this product is part of*/}
+          </ScrollArea>
+        </div>
+      </div>
     </main>
   );
 }

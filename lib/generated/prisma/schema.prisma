@@ -8,6 +8,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Review {
+  id          String   @id
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String
+  rating      Int
+  comment     String?
+  otherRating Json?
+  createdAt   DateTime
+  updatedAt   DateTime
+}
+
 model Order {
   id              String   @id
   userId          String
@@ -34,6 +46,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
+  reviews       Review[]
 
   stripeCustomerId String?
 
