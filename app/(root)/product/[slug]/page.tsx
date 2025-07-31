@@ -12,18 +12,14 @@ interface MediaItem {
   title?: string;
 }
 
-export default async function page({
-  props,
-}: {
-  props: {
-    params: Promise<{ slug: string }>;
-    searchParams: Promise<{ variant?: string; image?: string }>;
-  };
+export default async function page(props: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ variant?: string; image?: string }>;
 }) {
-  // const params = await props.params;
-  // const searchParams = await props.searchParams;
+  const params = await props.params;
+  const searchParams = await props.searchParams;
 
-  // console.log(params.slug, searchParams);
+  console.log(params.slug, searchParams);
 
   // const variants = await getProduct(params.slug);
   // const selectedVariant = variants;
@@ -75,7 +71,7 @@ export default async function page({
 
   return (
     <main className="flex flex-col gap-2 w-full">
-      <div className="w-full md:w-3/6 h-1/2 md:h-full">
+      <div className="w-full md:w-4/7 h-1/2 md:h-full">
         <div
           className="grid grid-cols-4 gap-4 h-auto"
           style={{ gridAutoRows: "200px" }}
@@ -132,7 +128,7 @@ export default async function page({
           <VideoReviewMasonry />
         </div>
       </div>
-      <div className="w-full md:w-2/6 h-1/2 md:h-full"></div>
+      <div className="w-full md:w-3/7 h-1/2 md:h-full"></div>
     </main>
   );
 }

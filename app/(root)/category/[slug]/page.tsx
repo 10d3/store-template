@@ -1,9 +1,7 @@
 import React from "react";
 
-export default async function page({
-  props,
-}: {
-  props: { params: Promise<{ slug: string }> };
+export default async function page(props: {
+  params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
   console.log(params.slug);
