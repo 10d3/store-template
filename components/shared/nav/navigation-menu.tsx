@@ -74,7 +74,7 @@ export default function Navbar() {
     email: session.data?.user.email as string,
     avatar: session.data?.user.image as string,
   };
-  const { cart } = useCartStore();
+  const { getItemCount } = useCartStore();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -186,9 +186,9 @@ export default function Navbar() {
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href="/cart">
                 <ShoppingBag className="h-5 w-5" />
-                {cart.length > 0 && (
+                {getItemCount() > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                    {cart.length}
+                    {getItemCount()}
                   </span>
                 )}
                 <span className="sr-only">Shopping cart</span>

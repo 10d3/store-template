@@ -368,6 +368,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
       expand: ["data.default_price"],
       limit: 100,
     });
+    console.log(products.data[0])
     return products.data.map(transformProduct);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -385,10 +386,11 @@ export async function listProducts(): Promise<StripeProduct[]> {
 
 export async function getProduct(slug: string) {
   try {
-    const product = await stripe.products.retrieve(slug, {
-      expand: ["default_price"],
-    });
-    return transformProduct(product);
+    const products = await listProducts();
+    const variants = products.filter(
+      (product) => product.name === slug
+    );
+    return variants;
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
       throw new ProductCrudError(

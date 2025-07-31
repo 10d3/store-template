@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface CartItem {
-  id: number;
+  id: string;
   variantId?: string;                  // e.g. "42-red-XL"
   sku?: string;                        // optional human sku
   name: string;
@@ -29,8 +29,8 @@ interface CartStore {
   addOrUpdateItem: (
     item: Omit<CartItem, "quantity"> & { quantity?: number }
   ) => void;
-  setQuantity: (id: number, variantId?: string, quantity?: number) => void;
-  removeItem: (id: number, variantId?: string) => void;
+  setQuantity: (id: string, variantId?: string, quantity?: number) => void;
+  removeItem: (id: string, variantId?: string) => void;
   clearCart: () => void;
 
   addBundle: (items: CartItem[]) => void;                // pre-defined bundle
@@ -122,7 +122,7 @@ export const useCartStore = create<CartStore>()(
       addVirtualBundle: (stripePriceId, qty) => {
         /* You can map the Price ID to a known virtual bundle item */
         const virtualItem: CartItem = {
-          id: -1,                                // virtual placeholder
+          id: "test",                                // virtual placeholder
           name: "Mystery Coffee 3-Pack",
           image: "/images/mystery.png",
           price: 2400,                           // fetch from Stripe

@@ -1,3 +1,5 @@
+import CarousselVariants from "@/components/shared/caroussel-variants";
+import QuantityManagement from "@/components/shared/quantity-management";
 import VideoReviewMasonry from "@/components/shared/review-section";
 import {
   Card,
@@ -8,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-// import { getProduct } from "@/lib/product/crud";
+import { getProduct } from "@/lib/product/crud";
 import Image from "next/image";
 import React from "react";
 
@@ -30,9 +32,9 @@ export default async function page(props: {
 
   console.log(params.slug, searchParams);
 
-  // const variants = await getProduct(params.slug);
-  // const selectedVariant = variants;
-  // console.log(variants);
+  const variants = await getProduct(params.slug);
+  const selectedVariant = variants[0];
+  console.log(selectedVariant);
 
   const mediaItems: MediaItem[] = [
     {
@@ -145,9 +147,11 @@ export default async function page(props: {
               <CardDescription>This is a product description.</CardDescription>
             </CardHeader>
             <CardContent>
-              {/* placeholder for zustand quantity button management */}
+              <QuantityManagement product={selectedVariant} />
             </CardContent>
-            <CardFooter>{/*placeholder for variants*/}</CardFooter>
+            <CardFooter>
+              <CarousselVariants products={variants} />
+            </CardFooter>
           </Card>
         </div>
         <div>
