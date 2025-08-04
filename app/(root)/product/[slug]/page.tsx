@@ -81,7 +81,7 @@ export default async function page(props: {
   };
 
   return (
-    <main className="flex flex-row gap-8 w-full">
+    <main className="flex flex-col-reverse md:flex-row gap-8 w-full">
       <div className="w-full md:w-4/7 h-1/2 md:h-full">
         <div
           className="grid grid-cols-4 gap-4 h-auto"
@@ -136,20 +136,22 @@ export default async function page(props: {
         </div>
         <div>description</div>
         <div>
-          <VideoReviewMasonry />
+          <ScrollArea>
+            <VideoReviewMasonry />
+          </ScrollArea>
         </div>
       </div>
-      <div className="w-full md:w-3/7 h-1/2 md:h-full">
+      <div className="w-full md:w-3/7 h-1/2 md:h-full gap-4 flex flex-col">
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>{params.slug}</CardTitle>
-              <CardDescription>This is a product description.</CardDescription>
+              <CardTitle className="text-4xl font-bold">{params.slug}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">This is a product description.</CardDescription>
             </CardHeader>
             <CardContent>
               <QuantityManagement product={selectedVariant} />
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-4">
               <CarousselVariants products={variants} />
             </CardFooter>
           </Card>
