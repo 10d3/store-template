@@ -15,15 +15,25 @@ export default function QuantityManagement({
   console.log(product);
   const { getItemCount, addOrUpdateItem, setQuantity } =
     useCartStore();
+
+  // Extract price from default_price
+  const getPrice = () => {
+    if (typeof product.default_price === 'object' && product.default_price?.unit_amount) {
+      return product.default_price.unit_amount;
+    }
+    return 0; // fallback if no price available
+  };
+
   return (
     <div className="flex flex-row items-center gap-2">
       <Button
         className="rounded-full cursor-pointer"
+        variant="ghost"
         onClick={() => addOrUpdateItem({
           id: product.id,
           name: product.name,
           image: product?.images?.[0] as string,
-          price: product.default_price as unknown,
+          price: getPrice(),
           quantity: -1,
           maxQuantity: 10,
           variantId: product.id,
@@ -32,8 +42,7 @@ export default function QuantityManagement({
         <Minus />
       </Button>
       <Input
-        type="number"
-        className="w-1/10"
+        className="w-1/10 rounded-full text-center"
         placeholder={getItemCount().toString()}
         value={getItemCount()}
         onChange={(e) =>
@@ -42,12 +51,13 @@ export default function QuantityManagement({
       />
       <Button
         className="rounded-full cursor-pointer"
+        variant="ghost"
         onClick={() =>
           addOrUpdateItem({
             id: product.id,
             name: product.name,
             image: product?.images?.[0] as string,
-            price: product.default_price as unknown,
+            price: getPrice(),
             quantity: 1,
             maxQuantity: 10,
             variantId: product.id,

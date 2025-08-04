@@ -1,6 +1,10 @@
+import AddToCartButton from "@/components/shared/add-to-cart-button";
 import CarousselVariants from "@/components/shared/caroussel-variants";
 import QuantityManagement from "@/components/shared/quantity-management";
 import VideoReviewMasonry from "@/components/shared/review-section";
+import SelectVariant from "@/components/shared/select-variant";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getProduct } from "@/lib/product/crud";
+import { Heart, Share2, Star } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
@@ -33,8 +38,10 @@ export default async function page(props: {
   console.log(params.slug, searchParams);
 
   const variants = await getProduct(params.slug);
-  const selectedVariant = variants[0];
-  console.log(selectedVariant);
+  const selectedVariants = variants.filter((variant) =>
+    variant.metadata?.variants?.includes(searchParams.variant as string)
+  );
+  const selectedVariant = selectedVariants[0];
 
   const mediaItems: MediaItem[] = [
     {
@@ -143,18 +150,67 @@ export default async function page(props: {
       </div>
       <div className="w-full md:w-3/7 h-1/2 md:h-full gap-4 flex flex-col">
         <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-4xl font-bold">{params.slug}</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground">This is a product description.</CardDescription>
+          <Card className="border-0 shadow-xl bg-card">
+            <CardHeader className="pb-6">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <Badge variant="secondary" className="w-fit">
+                    New Arrival
+                  </Badge>
+                  <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
+                    {params.slug
+                      .replace(/-/g, " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </CardTitle>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                        <Heart className="w-5 h-5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="rounded-full">
+                        <Share2 className="w-5 h-5" />
+                      </Button>
+                </div>
+              </div>
+              <CardDescription className="text-base leading-relaxed">
+                Premium quality product designed for the modern lifestyle.
+                Crafted with precision and attention to detail.
+              </CardDescription>
+              <div className="flex items-center gap-4 pt-2">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
+                    />
+                  ))}
+                </div>
+                  <span className="text-sm text-muted-foreground">156 reviews</span>
+              </div>
             </CardHeader>
-            <CardContent>
-              <QuantityManagement product={selectedVariant} />
+
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4">
+                {selectedVariants.length > 1 && (
+                  <div className="flex-1">
+                    <SelectVariant variants={selectedVariants} />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <QuantityManagement product={selectedVariant} />
+                </div>
+              </div>
             </CardContent>
-            <CardFooter className="mt-4">
-              <CarousselVariants products={variants} />
+
+            <CardFooter className="pt-0 pb-0">
+              <div className="w-full space-y-4">
+                <CarousselVariants products={variants} />
+              </div>
             </CardFooter>
           </Card>
+        </div>
+        <div>
+          <AddToCartButton product={selectedVariant} />
         </div>
         <div>
           <div>{/*placeholder for pack maker if available*/}</div>

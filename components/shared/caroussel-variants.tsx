@@ -31,8 +31,14 @@ export default function CarousselVariants({
   return (
     <Carousel className="w-full" setApi={setApi}>
       <CarouselContent className="grid grid-cols-3 gap-4 h-auto">
-        {products.map((product) => (
-          <CarouselItem key={product.id}>
+        {products.map((product, index) => (
+          <CarouselItem
+            key={product.id}
+            onClick={() => {
+              api?.scrollTo(index);
+            }}
+            className="cursor-pointer"
+          >
             <div className="group overflow-hidden rounded-lg">
               <div className="relative w-full h-full">
                 <Image
@@ -49,6 +55,7 @@ export default function CarousselVariants({
       </CarouselContent>
       <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
         <Button
+        variant={"ghost"}
           className="cursor-pointer rounded-full"
           onClick={() => api?.scrollTo(current - 1)}
         >
@@ -57,6 +64,7 @@ export default function CarousselVariants({
       </div>
       <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
         <Button
+        variant={"ghost"}
           className="cursor-pointer rounded-full"
           onClick={() => api?.scrollTo(current + 1)}
         >

@@ -42,6 +42,7 @@ interface CartStore {
   getSubTotal: () => number;            // before coupon
   getTotalPrice: () => number;          // after coupon
   getTotalUniqueItems: () => number;
+  isAddingToCart: boolean;
 
   loadServerCart: (items: CartItem[]) => void;
 }
@@ -53,10 +54,11 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       cart: [],
       coupon: null,
-
+      isAddingToCart: false,
       addOrUpdateItem: (incoming) => {
         const { id, variantId = "", quantity = 1 } = incoming;
         set((s) => {
+          s.isAddingToCart = true;
           const idx = s.cart.findIndex(
             (i) => i.id === id && i.variantId === variantId
           );
@@ -75,6 +77,12 @@ export const useCartStore = create<CartStore>()(
           }
           return { cart };
         });
+        setTimeout(() => {
+          set((s) => {
+            s.isAddingToCart = false;
+            return { isAddingToCart: false };
+          });
+        }, 1000);
       },
 
       setQuantity: (id, variantId = "", qty) => {
