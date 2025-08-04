@@ -8,7 +8,7 @@ import {
   CarouselItem,
 } from "../ui/carousel";
 import { Button } from "../ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function CarousselVariants({
   products,
@@ -39,12 +39,12 @@ export default function CarousselVariants({
       </CarouselContent>
       <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
         <Button onClick={() => api?.scrollTo(current - 1)}>
-          <ArrowLeft />
+          <ChevronLeft />
         </Button>
       </div>
       <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
         <Button onClick={() => api?.scrollTo(current + 1)}>
-          <ArrowRight />
+          <ChevronRight />
         </Button>
       </div>
     </Carousel>

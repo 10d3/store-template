@@ -1,7 +1,7 @@
 "use client"
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { useCartModal } from "@/context/cart-modal";
-import useMediaQuery from "@/hook/useMediaquery";
+import useMediaQuery from "@/hooks/useMediaquery";
 import { useTranslations } from "@/i18n/client";
 
 export default function CartAsideDrawer({
