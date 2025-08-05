@@ -76,10 +76,10 @@ export default async function page(props: {
 
   const getGridPosition = (index: number) => {
     const positions = [
-      "col-span-2 row-span-3", // First item - large
-      "col-span-2 row-span-2", // Second item - wide
-      "col-span-1 row-span-1", // Third item - small
-      "col-span-1 row-span-1", // Fourth item - small
+      "md:col-span-2 md:row-span-3 col-span-7 row-span-2",
+      "md:col-span-2 md:row-span-2 col-span-4 row-span-2",
+      "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
+      "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
     ];
     return positions[index] || "col-span-1 row-span-1";
   };
@@ -101,9 +101,7 @@ export default async function page(props: {
             {/* Product Description */}
             <div className="space-y-6">
               <div className="prose prose-gray max-w-none">
-                <h2 className="text-2xl font-semibold mb-4">
-                  Description
-                </h2>
+                <h2 className="text-2xl font-semibold mb-4">Description</h2>
                 <p className="leading-relaxed">
                   Experience the perfect blend of style and functionality with
                   this carefully crafted product. Designed with attention to
@@ -117,9 +115,7 @@ export default async function page(props: {
               {/* Reviews Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold">
-                    Customer Reviews
-                  </h2>
+                  <h2 className="text-2xl font-semibold">Customer Reviews</h2>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
