@@ -3,8 +3,6 @@ import CarousselVariants from "@/components/shared/caroussel-variants";
 import QuantityManagement from "@/components/shared/quantity-management";
 import VideoReviewMasonry from "@/components/shared/review-section";
 import SelectVariant from "@/components/shared/select-variant";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,10 +12,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { getProduct } from "@/lib/product/crud";
-import { Heart, Share2, Star } from "lucide-react";
-import Image from "next/image";
-import React from "react";
+import { Star, Heart, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import MediaGallery from "@/components/shared/media-gallery";
 
 interface MediaItem {
   id: string;
@@ -34,8 +34,6 @@ export default async function page(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
-
-  console.log(params.slug, searchParams);
 
   const variants = await getProduct(params.slug);
   const selectedVariants = variants.filter((variant) =>
@@ -76,11 +74,10 @@ export default async function page(props: {
     },
   ];
 
-  // Hardcoded grid positioning for masonry layout
   const getGridPosition = (index: number) => {
     const positions = [
-      "col-span-2 row-span-2", // First item - large
-      "col-span-2 row-span-1", // Second item - wide
+      "col-span-2 row-span-3", // First item - large
+      "col-span-2 row-span-2", // Second item - wide
       "col-span-1 row-span-1", // Third item - small
       "col-span-1 row-span-1", // Fourth item - small
     ];
@@ -88,137 +85,181 @@ export default async function page(props: {
   };
 
   return (
-    <main className="flex flex-col-reverse md:flex-row gap-8 w-full">
-      <div className="w-full md:w-4/7 h-1/2 md:h-full">
-        <div
-          className="grid grid-cols-4 gap-4 h-auto"
-          style={{ gridAutoRows: "200px" }}
-        >
-          {mediaItems.map((item, index) => (
-            <div
-              key={item.id}
-              className={`group overflow-hidden rounded-lg ${getGridPosition(index)}`}
-            >
-              {item.type === "image" ? (
-                <Image
-                  width={1000}
-                  height={1000}
-                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-                  src={item.src}
-                  alt={item.alt}
-                />
-              ) : (
-                <div className="relative w-full h-full">
-                  <Image
-                    width={1000}
-                    height={1000}
-                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
-                    src={item.thumbnail || item.src}
-                    alt={item.alt}
-                  />
-                  {/* Video Play Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-gray-800 ml-0.5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                  {/* Title overlay for videos */}
-                  {item.title && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                      <p className="text-white text-sm font-medium">
-                        {item.title}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+    <div className="min-h-screen">
+      <div className="">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Media Gallery */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="relative">
+              <MediaGallery
+                variant="default"
+                mediaItems={mediaItems}
+                getGridPosition={getGridPosition}
+              />
             </div>
-          ))}
-        </div>
-        <div>description</div>
-        <div>
-          <ScrollArea>
-            <VideoReviewMasonry />
-          </ScrollArea>
-        </div>
-      </div>
-      <div className="w-full md:w-3/7 h-1/2 md:h-full gap-4 flex flex-col">
-        <div>
-          <Card className="border-0 shadow-xl bg-card">
-            <CardHeader className="pb-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <Badge variant="secondary" className="w-fit">
-                    New Arrival
-                  </Badge>
-                  <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
-                    {params.slug
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </CardTitle>
+
+            {/* Product Description */}
+            <div className="space-y-6">
+              <div className="prose prose-gray max-w-none">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Description
+                </h2>
+                <p className="leading-relaxed">
+                  Experience the perfect blend of style and functionality with
+                  this carefully crafted product. Designed with attention to
+                  detail and built to last, it represents the pinnacle of modern
+                  design philosophy.
+                </p>
+              </div>
+
+              <Separator className="my-8" />
+
+              {/* Reviews Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold">
+                    Customer Reviews
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      (4.2 out of 5)
+                    </span>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                <ScrollArea className="">
+                  <VideoReviewMasonry />
+                </ScrollArea>
+              </div>
+            </div>
+          </div>
+
+          {/* Product Information */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="sticky top-20">
+              <Card className="border-0 shadow-xl bg-card">
+                <CardHeader className="pb-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <Badge variant="secondary" className="w-fit">
+                        New Arrival
+                      </Badge>
+                      <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
+                        {params.slug
+                          .replace(/-/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </CardTitle>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full"
+                      >
                         <Heart className="w-5 h-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="rounded-full">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full"
+                      >
                         <Share2 className="w-5 h-5" />
                       </Button>
-                </div>
-              </div>
-              <CardDescription className="text-base leading-relaxed">
-                Premium quality product designed for the modern lifestyle.
-                Crafted with precision and attention to detail.
-              </CardDescription>
-              <div className="flex items-center gap-4 pt-2">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
-                    />
-                  ))}
-                </div>
-                  <span className="text-sm text-muted-foreground">156 reviews</span>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                {selectedVariants.length > 1 && (
-                  <div className="flex-1">
-                    <SelectVariant variants={selectedVariants} />
+                    </div>
                   </div>
-                )}
-                <div className="flex-1">
-                  <QuantityManagement product={selectedVariant} />
-                </div>
-              </div>
-            </CardContent>
+                  <CardDescription className="text-base leading-relaxed">
+                    Premium quality product designed for the modern lifestyle.
+                    Crafted with precision and attention to detail.
+                  </CardDescription>
+                  <div className="flex items-center gap-4 pt-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      156 reviews
+                    </span>
+                  </div>
+                </CardHeader>
 
-            <CardFooter className="pt-0 pb-0">
-              <div className="w-full space-y-4">
-                <CarousselVariants products={variants} />
+                <CardContent className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    {selectedVariants.length > 1 && (
+                      <div className="flex-1">
+                        <SelectVariant variants={selectedVariants} />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <QuantityManagement product={selectedVariant} />
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="pt-0 pb-0">
+                  <div className="w-full space-y-4">
+                    <CarousselVariants products={variants} />
+                  </div>
+                </CardFooter>
+              </Card>
+
+              {/* Add to Cart */}
+              <div className="mt-6">
+                <AddToCartButton product={selectedVariant} />
               </div>
-            </CardFooter>
-          </Card>
-        </div>
-        <div>
-          <AddToCartButton product={selectedVariant} />
-        </div>
-        <div>
-          <div>{/*placeholder for pack maker if available*/}</div>
-          <ScrollArea>
-            {/*placeholder for pack that this product is part of*/}
-          </ScrollArea>
+
+              {/* Additional Information */}
+              <div className="mt-8 space-y-6">
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-900">
+                      Bundle Offers
+                    </CardTitle>
+                    <CardDescription>
+                      Save more when you buy together
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-gray-600">
+                      Bundle deals and pack options will appear here when
+                      available.
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold text-gray-900">
+                      Product Collections
+                    </CardTitle>
+                    <CardDescription>
+                      Part of curated collections
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-32">
+                      <div className="text-sm text-gray-600">
+                        Collections and related product packs will be displayed
+                        here.
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

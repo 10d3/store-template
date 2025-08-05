@@ -67,6 +67,7 @@ const categories = [
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
 
   const session = useSession();
   const user = {
@@ -75,6 +76,10 @@ export default function Navbar() {
     avatar: session.data?.user.image as string,
   };
   const { getItemCount } = useCartStore();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -186,7 +191,7 @@ export default function Navbar() {
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href="/cart">
                 <ShoppingBag className="h-5 w-5" />
-                {getItemCount() > 0 && (
+                {mounted && getItemCount() > 0 && (
                   <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
                     {getItemCount()}
                   </span>
