@@ -1,6 +1,6 @@
 import CartModal from "@/components/shared/cart/cart-modal";
 import Footer from "@/components/shared/footer";
-import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
+// import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
 import Navbar from "@/components/shared/nav/navigation-menu";
 import React from "react";
 
@@ -12,13 +12,13 @@ export default function Rootlayout({
   return (
     <>
       <Navbar />
-      <main className="flex-1 flex-col mt-4 md:px-14 px-4">
+      <main className="flex-1 flex-col mt-4 md:px-24 px-4">
         {children}
         <CartModal />
       </main>
-      <FooterWrapperCta>
-        <Footer />
-      </FooterWrapperCta>
+      {/* <FooterWrapperCta> */}
+      <Footer />
+      {/* </FooterWrapperCta> */}
     </>
   );
 }

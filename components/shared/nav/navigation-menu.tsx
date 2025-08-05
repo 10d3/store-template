@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu, Search, ShoppingBag, User } from "lucide-react";
+import { Menu, Search, User } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -28,9 +28,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useSession } from "@/lib/auth-client";
-import { useCartStore } from "@/lib/store";
 import { NavUserMenu } from "./nav-user-menu";
 import Image from "next/image";
+import { CartSummaryNav } from "./cart-summary-nav";
 
 const categories = [
   {
@@ -67,7 +67,6 @@ const categories = [
 
 export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
 
   const session = useSession();
   const user = {
@@ -75,14 +74,9 @@ export default function Navbar() {
     email: session.data?.user.email as string,
     avatar: session.data?.user.image as string,
   };
-  const { getItemCount } = useCartStore();
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-24">
       <div className="mx-auto">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -188,17 +182,7 @@ export default function Navbar() {
             )}
 
             {/* Shopping Cart */}
-            <Button variant="ghost" size="icon" asChild className="relative">
-              <Link href="/cart">
-                <ShoppingBag className="h-5 w-5" />
-                {mounted && getItemCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                    {getItemCount()}
-                  </span>
-                )}
-                <span className="sr-only">Shopping cart</span>
-              </Link>
-            </Button>
+            <CartSummaryNav />
 
             {/* Mobile Menu */}
             <Sheet>

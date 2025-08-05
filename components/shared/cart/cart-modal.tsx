@@ -9,6 +9,18 @@ import Link from "next/link";
 export default function CartModal() {
   const { cart, getTotalPrice } = useCartStore();
   console.log(cart);
+
+  // Helper function to safely extract price value
+  const getPriceDisplay = (price: unknown) => {
+    if (typeof price === 'number') {
+      return (price / 100).toFixed(2);
+    }
+    if (typeof price === 'object' && price && 'unit_amount' in price) {
+      const unitAmount = (price as { unit_amount: number }).unit_amount;
+      return (unitAmount / 100).toFixed(2);
+    }
+    return '0.00';
+  };
   return (
     <CartAsideContainer>
       <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
@@ -29,17 +41,19 @@ export default function CartModal() {
                         src={item.image}
                         alt={item.name}
                         className="w-16 h-16 rounded-md"
+                        width={64}
+                        height={64}
                       />
                     </div>
                     <div className="ml-4 flex-1">
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-sm font-medium">
                         {item.name}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center justify-end">
-                    <p className="text-sm font-medium text-neutral-900">
-                      ${item.price}
+                    <p className="text-sm font-medium">
+                      ${getPriceDisplay(item.price)}
                     </p>
                   </div>
                 </div>
@@ -50,12 +64,12 @@ export default function CartModal() {
         <div className="border-t border-neutral-200 px-4 py-6 sm:px-6">
           <div
             id="cart-overlay-description"
-            className="flex justify-between text-base font-medium text-neutral-900"
+            className="flex justify-between text-base font-medium"
           >
             <p>Total</p>
             <p>{getTotalPrice()}</p>
           </div>
-          <p className="mt-0.5 text-sm text-neutral-500">
+          <p className="mt-0.5 text-sm">
             Shipping and taxes are calculated at checkout.
           </p>
           <Button

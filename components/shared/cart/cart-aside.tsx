@@ -20,7 +20,7 @@ export default function CartAsideDrawer({
     >
       <DrawerTitle className="sr-only">{t("title")}</DrawerTitle>
       <DrawerContent
-        className="sm:fixed sm:bottom-0 sm:left-auto sm:right-0 sm:top-0 sm:mt-0 sm:flex sm:h-full sm:w-1/2 sm:flex-col sm:overflow-hidden sm:rounded-none sm:bg-white sm:shadow-xl lg:w-1/3"
+        className="sm:fixed sm:bottom-0 sm:left-auto sm:right-0 sm:top-0 sm:mt-0 sm:flex sm:h-full sm:w-1/2 sm:flex-col sm:overflow-hidden sm:rounded-none sm:shadow-xl lg:w-1/3"
         aria-describedby="cart-overlay-description"
         onPointerDownOutside={() => {
           setIsOpen(false);
