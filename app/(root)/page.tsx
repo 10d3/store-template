@@ -141,7 +141,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen py-12">
-      <div className=" mx-auto">
+      <div className="w-full">
         <Hover />
         {/* Products Section */}
         {transformedProducts.length > 0 && (

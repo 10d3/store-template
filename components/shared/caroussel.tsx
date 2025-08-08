@@ -170,7 +170,7 @@ export default function CarouselComponent({
   ];
 
   return (
-    <main className={cn("w-full h-fit relative", className)}>
+    <div className={cn("h-fit relative m-0 p-0 -mx-4 md:-mx-24", className)}>
       <Carousel
         setApi={setApi}
         opts={{
@@ -243,6 +243,6 @@ export default function CarouselComponent({
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

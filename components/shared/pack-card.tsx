@@ -81,7 +81,7 @@ export default function PackCard({
     } else {
       // Default cart behavior
       const bundleItems = products.map((product) => ({
-        id: Number.parseInt(product.id),
+        id: product.id,
         name: product.name,
         price: product.price,
         quantity: 1,
