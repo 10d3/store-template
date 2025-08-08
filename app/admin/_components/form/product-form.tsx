@@ -232,6 +232,32 @@ export function ProductForm({
 
               <FormField
                 control={form.control}
+                name="metadata.gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender / Target</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose audience" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="unisex">Unisex</SelectItem>
+                        <SelectItem value="men">Men</SelectItem>
+                        <SelectItem value="women">Women</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="metadata.seo_title"
                 render={({ field }) => (
                   <FormItem>

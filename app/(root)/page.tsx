@@ -140,7 +140,7 @@ export default async function Home() {
   );
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen">
       <div className="w-full">
         <Hover />
         {/* Products Section */}
