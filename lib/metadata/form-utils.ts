@@ -6,23 +6,27 @@ import { validateMetadata } from "@/lib/metadata/config";
  * Custom validation function for metadata fields in forms
  * Can be used with react-hook-form's validate option
  */
-export function createMetadataValidator(type: 'product' | 'price' | 'coupon' | 'checkout' | 'shipping') {
+export function createMetadataValidator(
+  type: "product" | "price" | "coupon" | "checkout" | "shipping"
+) {
   return (metadata: Record<string, string> | undefined) => {
     if (!metadata) return true;
-    
+
     // Filter out empty values
     const filteredMetadata = Object.fromEntries(
-      Object.entries(metadata).filter(([_, value]) => value !== "" && value !== undefined && value !== null)
+      Object.entries(metadata).filter(
+        ([_, value]) => value !== "" && value !== undefined && value !== null
+      )
     );
-    
+
     if (Object.keys(filteredMetadata).length === 0) return true;
-    
+
     const validation = validateMetadata(filteredMetadata, type);
-    
+
     if (!validation.isValid) {
       return validation.errors.join(", ");
     }
-    
+
     return true;
   };
 }
@@ -35,25 +39,25 @@ export function transformMetadataForSubmission(
   metadata: Record<string, any>
 ): Record<string, string | number | null> {
   const transformed: Record<string, string | number | null> = {};
-  
+
   for (const [key, value] of Object.entries(metadata)) {
     if (value === undefined) {
       continue; // Skip undefined values
     }
-    
+
     if (value === null) {
       transformed[key] = null;
-    } else if (typeof value === 'boolean') {
+    } else if (typeof value === "boolean") {
       transformed[key] = value.toString();
-    } else if (typeof value === 'number') {
+    } else if (typeof value === "number") {
       transformed[key] = value;
     } else if (Array.isArray(value)) {
-      transformed[key] = value.join(',');
+      transformed[key] = value.join(",");
     } else {
       transformed[key] = String(value);
     }
   }
-  
+
   return transformed;
 }
 
@@ -63,12 +67,12 @@ export function transformMetadataForSubmission(
  */
 export function transformMetadataFromStripe(
   metadata: Record<string, string> | undefined,
-  type: 'product' | 'price' | 'coupon' | 'checkout' | 'shipping'
+  type: "product" | "price" | "coupon" | "checkout" | "shipping"
 ): Record<string, any> {
   if (!metadata) return {};
-  
+
   const transformed: Record<string, any> = {};
-  
+
   for (const [key, value] of Object.entries(metadata)) {
     // Convert string booleans back to actual booleans
     if (value === "true") {
@@ -82,6 +86,6 @@ export function transformMetadataFromStripe(
       transformed[key] = value;
     }
   }
-  
+
   return transformed;
 }

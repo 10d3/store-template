@@ -1,7 +1,6 @@
-import CarouselComponent from "@/components/shared/caroussel";
+import Hover from "@/components/shared/hover";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
-import VideoReviewMasonry from "@/components/shared/review-section";
 // import { getTranslations } from "@/i18n/server";
 import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
 import type { StripeProduct } from "@/types/product";
@@ -143,16 +142,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen py-12">
       <div className=" mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Our Store</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover our premium products and exclusive bundle deals
-          </p>
-        </div>
-
-        <CarouselComponent />
-        <VideoReviewMasonry />
-
+        <Hover />
         {/* Products Section */}
         {transformedProducts.length > 0 && (
           <div className="mb-16">

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,10 +17,16 @@ import {
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Package, ShoppingCart, Edit } from "lucide-react";
 import { packSchema, PackFormData } from "@/lib/product/product.schema";
 import { StripeProduct } from "@/types/product";
-import { MetadataFormSection } from "@/components/shared/metadata-form-section";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface EnhancedPackFormProps {
@@ -331,12 +338,94 @@ export function EnhancedPackForm({
               )}
             />
 
-            {/* Structured Metadata Section */}
-            <MetadataFormSection 
-              type="product"
-              title="Pack Metadata"
-              description="Configure pack-specific metadata for bundling, analytics, and business logic."
-            />
+            {/* Only the friendly ones */}
+            <Card className="p-4 space-y-4">
+              <h3 className="font-semibold">Pack Settings</h3>
+
+              <FormField
+                control={form.control}
+                name="metadata.bundle_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bundle Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bundle type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="fixed">Fixed Bundle</SelectItem>
+                        <SelectItem value="build_your_own">Build Your Own</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Fixed bundles have predetermined products, Build Your Own allows customer selection
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. coffee-bundles, starter-packs" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.seo_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SEO optimized title for this pack" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.seo_description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="SEO meta description for this pack" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <Input placeholder="bundle,starter,premium" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Comma-separated tags for search and filtering
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Card>
 
             <Button
               type="submit"

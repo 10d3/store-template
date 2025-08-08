@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,7 +27,6 @@ import { Separator } from "@/components/ui/separator";
 import { Percent, Gift, Zap, Edit } from "lucide-react";
 import { couponSchema, CouponFormData } from "@/lib/product/product.schema";
 import { StripeCoupon } from "@/types/product";
-import { MetadataFormSection } from "@/components/shared/metadata-form-section";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface EnhancedCouponFormProps {
@@ -237,12 +237,88 @@ export function EnhancedCouponForm({
                 )}
               />
 
-              {/* Structured Metadata Section */}
-              <MetadataFormSection 
-                type="coupon"
-                title="Coupon Metadata"
-                description="Configure coupon-specific metadata for tracking, analytics, and business logic."
-              />
+              {/* Only the friendly ones */}
+              <Card className="p-4 space-y-4">
+                <h3 className="font-semibold">Coupon Settings</h3>
+
+                <FormField
+                  control={form.control}
+                  name="metadata.campaign"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Campaign Tag</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. SUMMER25, BLACKFRIDAY" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Used for tracking and analytics
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="metadata.tier_qty"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum Quantity</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="3" 
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Minimum items required for discount to apply
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="metadata.applies_to_group"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Group</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. coffee, apparel" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Only applies to products in this category
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="metadata.max_uses_per_customer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Max Uses Per Customer</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="1" 
+                          {...field}
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        How many times each customer can use this coupon
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading

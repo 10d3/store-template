@@ -5,10 +5,12 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,7 +29,6 @@ import {
 } from "@/lib/product/product.schema";
 import { Plus, Edit } from "lucide-react";
 import { type StripeProduct } from "@/types/product";
-import { MetadataFormSection } from "@/components/shared/metadata-form-section";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface ProductFormProps {
@@ -191,12 +192,136 @@ export function ProductForm({
               />
             </div>
 
-            {/* Structured Metadata Section */}
-            <MetadataFormSection
-              type="product"
-              title="Product Metadata"
-              description="Configure product-specific metadata for SEO, categorization, and business logic."
-            />
+            {/* Only the friendly ones */}
+            <Card className="p-4 space-y-4">
+              <h3 className="font-semibold">Extra Info</h3>
+
+              <FormField
+                control={form.control}
+                name="metadata.slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Slug</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. premium-coffee-blend"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Used for grouping similar products together
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. coffee, apparel" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.seo_title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SEO optimized title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.seo_description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="SEO meta description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.pack_size"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pack Size (units)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="1"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tags</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="organic,fair-trade,premium"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Comma-separated tags for search and filtering
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="metadata.digital"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">
+                        Digital Product
+                      </FormLabel>
+                      <FormDescription>
+                        This product doesn&apos;t require shipping
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value === "true"}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked ? "true" : "false")
+                        }
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </Card>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading
