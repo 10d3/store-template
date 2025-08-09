@@ -1,12 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import {
   Form,
   FormControl,
@@ -24,12 +28,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   type ProductFormData,
   productSchema,
 } from "@/lib/product/product.schema";
-import { Plus, Edit } from "lucide-react";
-import { type StripeProduct } from "@/types/product";
+import { Plus, Edit, ChevronDown, Package, Trash2, Copy } from "lucide-react";
+import type { StripeProductVariant, StripeProduct } from "@/types/product";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
@@ -37,11 +47,57 @@ interface ProductFormProps {
   isLoading?: boolean;
 }
 
+// Define the form variant type
+type FormVariant = {
+  id?: string;
+  name: string;
+  price: number;
+  currency: string;
+  description?: string;
+  images?: string[];
+  metadata?: Record<string, any>;
+};
+
+// Helper function to transform StripeProductVariant to form variant
+// function transformStripeVariantToFormVariant(
+//   stripeVariant: StripeProductVariant
+// ): FormVariant {
+//   return {
+//     id: stripeVariant.id,
+//     name: stripeVariant.name,
+//     price: stripeVariant.price,
+//     currency: stripeVariant.currency,
+//     description: stripeVariant.description || undefined,
+//     images: stripeVariant.image || [],
+//     metadata: stripeVariant.metadata || {},
+//   };
+// }
+
+// Helper function to create form variant from StripeProductVariant
+function createFormVariantFromStripe(
+  stripeVariant: StripeProductVariant
+): FormVariant {
+  return {
+    id: stripeVariant.id,
+    name: stripeVariant.name,
+    price: stripeVariant.price,
+    currency: stripeVariant.currency,
+    description: stripeVariant.description,
+    images: stripeVariant.image || [],
+    metadata: stripeVariant.metadata,
+  };
+}
+
 export function ProductForm({
   onSubmit,
   initialData,
   isLoading,
 }: ProductFormProps) {
+  const [showVariant, setShowVariant] = useState(false);
+  const [expandedVariants, setExpandedVariants] = useState<Set<string>>(
+    new Set()
+  );
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -52,13 +108,14 @@ export function ProductForm({
       currency: "usd",
       images: [],
       metadata: {},
+      variants: [],
     },
   });
 
   // Reset form when initialData changes
   useEffect(() => {
     if (initialData) {
-      const formData = {
+      const formData: ProductFormData = {
         id: initialData.id,
         name: initialData.name,
         description: initialData.description || "",
@@ -78,9 +135,14 @@ export function ProductForm({
         metadata: initialData.metadata
           ? transformMetadataFromStripe(initialData.metadata, "product")
           : {},
+        variants: initialData.variants
+          ? initialData.variants.map(createFormVariantFromStripe)
+          : [],
       };
-
       form.reset(formData);
+      if (formData.variants && formData.variants.length > 0) {
+        setShowVariant(true);
+      }
     } else {
       form.reset({
         id: "",
@@ -90,275 +152,641 @@ export function ProductForm({
         currency: "usd",
         images: [],
         metadata: {},
+        variants: [],
       });
     }
   }, [initialData, form]);
 
   const isEditing = !!initialData;
+  const variants = form.watch("variants") || [];
+
+  const addVariant = () => {
+    const newVariant: FormVariant = {
+      id: `variant-${Date.now()}`, // Temporary ID for new variants
+      name: "",
+      description: "",
+      images: [],
+      price: 0,
+      currency: "usd",
+      metadata: {},
+    };
+    const currentVariants = form.getValues("variants") || [];
+    form.setValue("variants", [...currentVariants, newVariant]);
+    setShowVariant(true);
+    // Auto-expand the new variant
+    setExpandedVariants((prev) => new Set([...prev, newVariant.id!]));
+  };
+
+  const duplicateVariant = (variantToDuplicate: FormVariant) => {
+    const newVariant: FormVariant = {
+      ...variantToDuplicate,
+      id: `variant-${Date.now()}`,
+      name: `${variantToDuplicate.name} (Copy)`,
+    };
+    const currentVariants = form.getValues("variants") || [];
+    form.setValue("variants", [...currentVariants, newVariant]);
+    setExpandedVariants((prev) => new Set([...prev, newVariant.id!]));
+  };
+
+  const updateVariant = (
+    id: string,
+    field: string,
+    value: string | number | boolean
+  ) => {
+    const currentVariants = form.getValues("variants") || [];
+    const updatedVariants = currentVariants.map((v) => {
+      if (v.id === id) {
+        return {
+          ...v,
+          [field]: value,
+        };
+      }
+      return v;
+    });
+    form.setValue("variants", updatedVariants);
+  };
+
+  const removeVariant = (id: string) => {
+    const currentVariants = form.getValues("variants") || [];
+    const updatedVariants = currentVariants.filter((v) => v.id !== id);
+    form.setValue("variants", updatedVariants);
+    setExpandedVariants((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(id);
+      return newSet;
+    });
+    if (updatedVariants.length === 0) {
+      setShowVariant(false);
+    }
+  };
+
+  const toggleVariantExpansion = (id: string) => {
+    setExpandedVariants((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          {isEditing ? (
-            <Edit className="h-5 w-5" />
-          ) : (
-            <Plus className="h-5 w-5" />
-          )}
-          {isEditing ? "Edit Product" : "Create Product"}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Product Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter product name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="max-w-4xl mx-auto space-y-6">
+      <Card className="border-0 shadow-lg bg-card">
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            {isEditing ? (
+              <Edit className="h-6 w-6 text-blue-600" />
+            ) : (
+              <Plus className="h-6 w-6 text-green-600" />
+            )}
+            {isEditing ? "Edit Product" : "Create Product"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {/* Basic Information */}
+              <div className="space-y-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Basic Information
+                </h3>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Enter product description"
-                      className="resize-none"
-                      {...field}
+                <div className="grid gap-6">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Product Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter product name"
+                            className="h-11 border-2 focus:border-blue-500 transition-colors"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Description
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Enter product description"
+                            className="min-h-[100px] border-2 focus:border-blue-500 transition-colors resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Price (cents)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="1000"
+                              className="h-11 border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(
+                                  Number.parseInt(e.target.value) || 0
+                                )
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Enter price in cents (e.g., 1000 = $10.00)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price (cents)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="1000"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(Number.parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <FormField
+                      control={form.control}
+                      name="currency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Currency
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="h-11 border-2 focus:border-blue-500 transition-colors">
+                                <SelectValue placeholder="Select currency" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="usd">USD ($)</SelectItem>
+                              <SelectItem value="eur">EUR (€)</SelectItem>
+                              <SelectItem value="gbp">GBP (£)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+              <Separator />
+
+              {/* Product Variants Section */}
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Package className="h-5 w-5" />
+                    Product Variants
+                    {variants.length > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {variants.length}{" "}
+                        {variants.length === 1 ? "variant" : "variants"}
+                      </Badge>
+                    )}
+                  </h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addVariant}
+                    className="flex items-center gap-2 border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 bg-transparent"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Variant
+                  </Button>
+                </div>
+
+                <AnimatePresence>
+                  {showVariant && variants.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="space-y-4"
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="usd">USD</SelectItem>
-                        <SelectItem value="eur">EUR</SelectItem>
-                        <SelectItem value="gbp">GBP</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      {variants.map((variant, index) => (
+                        <motion.div
+                          key={variant.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.2, delay: index * 0.1 }}
+                        >
+                          <Card className="border-2 border-gray-200 hover:border-gray-300 transition-colors">
+                            <Collapsible
+                              open={expandedVariants.has(variant.id!)}
+                              onOpenChange={() =>
+                                toggleVariantExpansion(variant.id!)
+                              }
+                            >
+                              <CollapsibleTrigger asChild>
+                                <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors pb-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <ChevronDown
+                                        className={`h-4 w-4 transition-transform duration-200 ${
+                                          expandedVariants.has(variant.id!)
+                                            ? "rotate-180"
+                                            : ""
+                                        }`}
+                                      />
+                                      <CardTitle className="text-base">
+                                        {variant.name || `Variant ${index + 1}`}
+                                      </CardTitle>
+                                      {variant.price > 0 && (
+                                        <Badge variant="outline">
+                                          ${(variant.price / 100).toFixed(2)}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          duplicateVariant(variant);
+                                        }}
+                                        className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                                      >
+                                        <Copy className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          removeVariant(variant.id!);
+                                        }}
+                                        className="h-8 w-8 text-gray-500 hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </CardHeader>
+                              </CollapsibleTrigger>
 
-            {/* Only the friendly ones */}
-            <Card className="p-4 space-y-4">
-              <h3 className="font-semibold">Extra Info</h3>
+                              <CollapsibleContent>
+                                <CardContent className="pt-0 space-y-4">
+                                  <div className="grid gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="text-sm font-medium mb-2 block">
+                                          Variant Name
+                                        </label>
+                                        <Input
+                                          placeholder="e.g., Small, Medium, Large"
+                                          value={variant.name}
+                                          onChange={(e) =>
+                                            updateVariant(
+                                              variant.id!,
+                                              "name",
+                                              e.target.value
+                                            )
+                                          }
+                                          className="border-2 focus:border-blue-500 transition-colors"
+                                        />
+                                      </div>
 
-              <FormField
-                control={form.control}
-                name="metadata.slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Slug</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g. premium-coffee-blend"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Used for grouping similar products together
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                      <div>
+                                        <label className="text-sm font-medium mb-2 block">
+                                          Price (cents)
+                                        </label>
+                                        <Input
+                                          type="number"
+                                          placeholder="1000"
+                                          value={variant.price || ""}
+                                          onChange={(e) =>
+                                            updateVariant(
+                                              variant.id!,
+                                              "price",
+                                              Number.parseInt(e.target.value) ||
+                                                0
+                                            )
+                                          }
+                                          className="border-2 focus:border-blue-500 transition-colors"
+                                        />
+                                      </div>
+                                    </div>
 
-              <FormField
-                control={form.control}
-                name="metadata.category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. coffee, apparel" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                    <div>
+                                      <label className="text-sm font-medium mb-2 block">
+                                        Description
+                                      </label>
+                                      <Textarea
+                                        placeholder="Variant description (optional)"
+                                        value={variant.description || ""}
+                                        onChange={(e) =>
+                                          updateVariant(
+                                            variant.id!,
+                                            "description",
+                                            e.target.value
+                                          )
+                                        }
+                                        className="border-2 focus:border-blue-500 transition-colors resize-none"
+                                        rows={3}
+                                      />
+                                    </div>
 
-              <FormField
-                control={form.control}
-                name="metadata.gender"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender / Target</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
+                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                      <div>
+                                        <label className="text-sm font-medium text-gray-700">
+                                          Active
+                                        </label>
+                                        <p className="text-xs text-gray-500">
+                                          Whether this variant is available for
+                                          purchase
+                                        </p>
+                                      </div>
+                                      <Switch
+                                        checked={
+                                          (variant as any).active || false
+                                        }
+                                        onCheckedChange={(checked) =>
+                                          updateVariant(
+                                            variant.id!,
+                                            "active",
+                                            checked
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {!showVariant && (
+                  <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                    <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">No variants added yet</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addVariant}
+                      className="border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 bg-transparent"
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choose audience" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="unisex">Unisex</SelectItem>
-                        <SelectItem value="men">Men</SelectItem>
-                        <SelectItem value="women">Women</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Your First Variant
+                    </Button>
+                  </div>
                 )}
-              />
+              </div>
 
-              <FormField
-                control={form.control}
-                name="metadata.seo_title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>SEO Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="SEO optimized title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <Separator />
+
+              {/* Metadata Section */}
+              <Card className="border-2 border-gray-100">
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    Additional Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="metadata.slug"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Product Slug
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g. premium-coffee-blend"
+                              className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Used for grouping similar products together
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Category
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g. coffee, apparel"
+                              className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Target Audience
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="border-2 focus:border-blue-500 transition-colors">
+                                <SelectValue placeholder="Choose audience" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="unisex">Unisex</SelectItem>
+                              <SelectItem value="men">Men</SelectItem>
+                              <SelectItem value="women">Women</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.pack_size"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Pack Size (units)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="1"
+                              className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid gap-6">
+                    <FormField
+                      control={form.control}
+                      name="metadata.seo_title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            SEO Title
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="SEO optimized title"
+                              className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.seo_description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            SEO Description
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="SEO meta description"
+                              className="border-2 focus:border-blue-500 transition-colors resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Tags
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="organic,fair-trade,premium"
+                              className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Comma-separated tags for search and filtering
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.digital"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border-2 border-gray-200 p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-base font-medium">
+                              Digital Product
+                            </FormLabel>
+                            <FormDescription className="text-sm">
+                              This product doesn&apos;t require shipping
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value === "true"}
+                              onCheckedChange={(checked) =>
+                                field.onChange(checked ? "true" : "false")
+                              }
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button
+                type="submit"
+                className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </div>
+                ) : isEditing ? (
+                  "Update Product"
+                ) : (
+                  "Create Product"
                 )}
-              />
-
-              <FormField
-                control={form.control}
-                name="metadata.seo_description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>SEO Description</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="SEO meta description" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="metadata.pack_size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pack Size (units)</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="1"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="metadata.tags"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tags</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="organic,fair-trade,premium"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Comma-separated tags for search and filtering
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="metadata.digital"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Digital Product
-                      </FormLabel>
-                      <FormDescription>
-                        This product doesn&apos;t require shipping
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value === "true"}
-                        onCheckedChange={(checked) =>
-                          field.onChange(checked ? "true" : "false")
-                        }
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </Card>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading
-                ? "Processing..."
-                : isEditing
-                  ? "Update Product"
-                  : "Create Product"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

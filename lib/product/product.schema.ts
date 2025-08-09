@@ -34,6 +34,16 @@ const shippingMetadataSchema = baseMetadataSchema.refine(
   { message: "Invalid shipping metadata" }
 );
 
+export const productSchemaVariant = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  price: z.number().min(0, "Price must be positive"),
+  currency: z.string().min(1, "Currency is required"), // Required
+  description: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  metadata: productMetadataSchema,
+});
+
 export const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   price: z.number().min(0, "Price must be positive"),
@@ -42,6 +52,7 @@ export const productSchema = z.object({
   description: z.string().optional(),
   images: z.array(z.string()).optional(),
   metadata: productMetadataSchema,
+  variants: z.array(productSchemaVariant).optional(),
 });
 
 export const couponSchema = z.object({
