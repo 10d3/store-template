@@ -408,7 +408,7 @@ export function ProductForm({
                               }
                             >
                               <CollapsibleTrigger asChild>
-                                <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors pb-4">
+                                <CardHeader className="cursor-pointer transition-colors pb-4">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                       <ChevronDown
@@ -519,12 +519,12 @@ export function ProductForm({
                                       />
                                     </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <div className="flex items-center justify-between p-4 rounded-lg">
                                       <div>
-                                        <label className="text-sm font-medium text-gray-700">
+                                        <label className="text-sm font-medium">
                                           Active
                                         </label>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs">
                                           Whether this variant is available for
                                           purchase
                                         </p>
