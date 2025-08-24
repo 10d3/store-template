@@ -143,7 +143,7 @@ export default function ProductMultiSelect({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
-                  className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg group hover:bg-blue-100 transition-colors"
+                  className="flex items-center justify-between p-3 border border-primary rounded-lg group transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">
@@ -165,7 +165,7 @@ export default function ProductMultiSelect({
                     variant="ghost"
                     size="icon"
                     onClick={() => removeProduct(product.id)}
-                    className="h-6 w-6 text-gray-500 hover:text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    className="h-6 w-6 text-gray-500 hover:text-red-600 hover:bg-red-100 opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
                   >
                     <X className="h-3 w-3" />
                   </Button>

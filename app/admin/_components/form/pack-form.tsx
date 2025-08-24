@@ -230,14 +230,14 @@ export function EnhancedPackForm({
 
                 {/* Pricing Summary */}
                 {selectedProducts.length > 0 && (
-                  <Card className="border-2 border-blue-100">
+                  <Card className="border-2 border-primary">
                     <CardContent className="p-4">
-                      <h4 className="font-semibold text-gray-900 mb-3">
+                      <h4 className="font-semibold mb-3">
                         Pricing Summary
                       </h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">
+                          <span className="">
                             Individual total:
                           </span>
                           <span className="font-medium">
