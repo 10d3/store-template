@@ -320,12 +320,14 @@ export async function createPack(data: PackFormData) {
 }
 
 export async function updatePack(id: string, data: PackFormData) {
+  console.log(data);
   try {
     const packMetadata = {
-      type: "bundle",
+      bundle_type: data.metadata?.bundle_type,
       contents: data.productIds.join(","),
-      discount: data?.discount?.toString() || "0",
-      ...data.metadata,
+      // discount: data?.discount?.toString() || "0",
+      // ...data.metadata,
+      category: data.metadata?.category,
     };
 
     const validatedMetadata = validateAndTransformMetadata(
@@ -368,7 +370,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
       expand: ["data.default_price"],
       limit: 100,
     });
-    console.log(products.data[0])
+    console.log(products.data[0]);
     return products.data.map(transformProduct);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -387,9 +389,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
 export async function getProduct(slug: string) {
   try {
     const products = await listProducts();
-    const variants = products.filter(
-      (product) => product.name === slug
-    );
+    const variants = products.filter((product) => product.name === slug);
     return variants;
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {

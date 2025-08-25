@@ -21,7 +21,7 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     key: "category",
     label: "Category",
     type: "select",
-    options: ["coffee", "tea", "accessories", "merchandise"],
+    options: ["coffee", "tea", "accessories", "merchandise",'men','women'],
     description: "Navigation & filters",
     placeholder: "Select category",
   },

@@ -76,6 +76,7 @@ export default function BundleManagementPage() {
   });
 
   const onPackSubmit = (data: PackFormData) => {
+    console.log("data form bundle form",data)
     if (editingPack) {
       handleUpdatePack({ id: editingPack.id, data });
     } else {
