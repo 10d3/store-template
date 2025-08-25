@@ -1,0 +1,252 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import {
+  Package,
+  Download,
+  Truck,
+  Clock,
+  CheckCircle,
+  ShoppingBag,
+} from "lucide-react";
+import Image from "next/image";
+
+// <CHANGE> Enhanced sample data with better structure
+const sampleOrders = [
+  {
+    id: "ORD001",
+    date: "2024-01-15",
+    status: "delivered",
+    total: 156.98,
+    items: [
+      {
+        name: "Colombian Coffee Beans",
+        quantity: 2,
+        price: 24.99,
+        image: "/coffee-beans-package.png",
+      },
+      {
+        name: "Coffee Grinder Pro",
+        quantity: 1,
+        price: 107.0,
+        image: "/coffee-grinder-machine.png",
+      },
+    ],
+  },
+  {
+    id: "ORD002",
+    date: "2024-01-10",
+    status: "processing",
+    total: 89.97,
+    items: [
+      {
+        name: "Ethiopian Coffee Beans",
+        quantity: 3,
+        price: 29.99,
+        image: "/ethiopian-coffee-beans.png",
+      },
+    ],
+  },
+];
+
+// <CHANGE> Added status configuration for better visual indicators
+const statusConfig = {
+  delivered: {
+    icon: CheckCircle,
+    variant: "default" as const,
+    color: "text-green-600",
+    bgColor: "bg-green-50 border-green-200",
+  },
+  processing: {
+    icon: Clock,
+    variant: "secondary" as const,
+    color: "text-amber-600",
+    bgColor: "bg-amber-50 border-amber-200",
+  },
+  shipped: {
+    icon: Truck,
+    variant: "outline" as const,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 border-blue-200",
+  },
+};
+
+export default function OrdersClientPage() {
+  const orders = sampleOrders;
+
+  return (
+    <div className="min-h-screen">
+      {/* <CHANGE> Enhanced header with better spacing and visual hierarchy */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-12">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold tracking-tight">
+                Order History
+              </h1>
+              <p className="text-lg">
+                Track and manage all your orders in one place
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="self-start sm:self-auto"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download All Invoices
+            </Button>
+          </div>
+
+          {orders.length === 0 ? (
+            // <CHANGE> Enhanced empty state with better visual design
+            <Card className="border-0 shadow-sm">
+              <CardContent className="py-16">
+                <div className="flex flex-col items-center text-center space-y-6">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center">
+                    <Package className="w-10 h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold">
+                      No orders yet
+                    </h3>
+                    <p className="max-w-md">
+                      When you place your first order, it will appear here for
+                      easy tracking and management.
+                    </p>
+                  </div>
+                  <Button asChild className="mt-4">
+                    <Link href="/" className="inline-flex items-center">
+                      <ShoppingBag className="w-4 h-4 mr-2" />
+                      Start Shopping
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            // <CHANGE> Enhanced order cards with better visual hierarchy and spacing
+            <div className="space-y-8">
+              {orders.map((order) => {
+                const statusInfo =
+                  statusConfig[order.status as keyof typeof statusConfig] ||
+                  statusConfig.processing;
+                const StatusIcon = statusInfo.icon;
+
+                return (
+                  <Card
+                    key={order.id}
+                    className="border-0 shadow-sm hover:shadow-md transition-all duration-200"
+                  >
+                    <CardHeader className="pb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="space-y-3">
+                          <CardTitle className="text-2xl font-semibold">
+                            Order #{order.id}
+                          </CardTitle>
+                          <div className="flex flex-wrap items-center gap-6 text-sm">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">Date:</span>
+                              <span>
+                                {new Date(order.date).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">Items:</span>
+                              <span>{order.items.length}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">Total:</span>
+                              <span className="font-semibold">
+                                ${order.total.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <Badge
+                          variant={statusInfo.variant}
+                          className={`${statusInfo.bgColor} ${statusInfo.color} border-0 px-3 py-1.5 font-medium`}
+                        >
+                          <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
+                          {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0">
+                      <div className="space-y-6">
+                        {/* <CHANGE> Enhanced item display with better visual hierarchy */}
+                        <div className="space-y-4">
+                          {order.items.map((item, index) => (
+                            <div key={index}>
+                              <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                                  <Image
+                                    width={1000}
+                                    height={1000}
+                                    src={item.image || "/placeholder.svg"}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold truncate">
+                                    {item.name}
+                                  </h4>
+                                  <p className="text-sm mt-1">
+                                    Quantity: {item.quantity} × $
+                                    {item.price.toFixed(2)}
+                                  </p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-semibold">
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                  </p>
+                                </div>
+                              </div>
+                              {index < order.items.length - 1 && (
+                                <Separator className="mt-4" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* <CHANGE> Enhanced action buttons with better styling */}
+                        <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Truck className="w-4 h-4 mr-2" />
+                            Track Order
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Invoice
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
