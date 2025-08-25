@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,60 +14,26 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import Image from "next/image";
+import { Order } from "@/lib/generated/prisma";
 
-// <CHANGE> Enhanced sample data with better structure
-const sampleOrders = [
-  {
-    id: "ORD001",
-    date: "2024-01-15",
-    status: "delivered",
-    total: 156.98,
-    items: [
-      {
-        name: "Colombian Coffee Beans",
-        quantity: 2,
-        price: 24.99,
-        image: "/coffee-beans-package.png",
-      },
-      {
-        name: "Coffee Grinder Pro",
-        quantity: 1,
-        price: 107.0,
-        image: "/coffee-grinder-machine.png",
-      },
-    ],
-  },
-  {
-    id: "ORD002",
-    date: "2024-01-10",
-    status: "processing",
-    total: 89.97,
-    items: [
-      {
-        name: "Ethiopian Coffee Beans",
-        quantity: 3,
-        price: 29.99,
-        image: "/ethiopian-coffee-beans.png",
-      },
-    ],
-  },
-];
+interface OrdersClientPageProps {
+  orders: Order[];
+}
 
-// <CHANGE> Added status configuration for better visual indicators
 const statusConfig = {
-  delivered: {
+  DELIVERED: {
     icon: CheckCircle,
     variant: "default" as const,
     color: "text-green-600",
     bgColor: "bg-green-50 border-green-200",
   },
-  processing: {
+  PROCESSING: {
     icon: Clock,
     variant: "secondary" as const,
     color: "text-amber-600",
     bgColor: "bg-amber-50 border-amber-200",
   },
-  shipped: {
+  SHIPPED: {
     icon: Truck,
     variant: "outline" as const,
     color: "text-blue-600",
@@ -74,13 +41,10 @@ const statusConfig = {
   },
 };
 
-export default function OrdersClientPage() {
-  const orders = sampleOrders;
-
+export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
   return (
-    <div className="min-h-screen">
-      {/* <CHANGE> Enhanced header with better spacing and visual hierarchy */}
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-fit">
+      <div className="container mx-auto py-4 md:py-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-12">
             <div className="space-y-2">
@@ -101,7 +65,6 @@ export default function OrdersClientPage() {
           </div>
 
           {orders.length === 0 ? (
-            // <CHANGE> Enhanced empty state with better visual design
             <Card className="border-0 shadow-sm">
               <CardContent className="py-16">
                 <div className="flex flex-col items-center text-center space-y-6">
@@ -127,13 +90,13 @@ export default function OrdersClientPage() {
               </CardContent>
             </Card>
           ) : (
-            // <CHANGE> Enhanced order cards with better visual hierarchy and spacing
             <div className="space-y-8">
               {orders.map((order) => {
                 const statusInfo =
                   statusConfig[order.status as keyof typeof statusConfig] ||
-                  statusConfig.processing;
+                  statusConfig.PROCESSING;
                 const StatusIcon = statusInfo.icon;
+                const lineItems = order.lineItems as any[];
 
                 return (
                   <Card
@@ -150,7 +113,7 @@ export default function OrdersClientPage() {
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Date:</span>
                               <span>
-                                {new Date(order.date).toLocaleDateString(
+                                {new Date(order.createdAt).toLocaleDateString(
                                   "en-US",
                                   {
                                     year: "numeric",
@@ -162,7 +125,7 @@ export default function OrdersClientPage() {
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Items:</span>
-                              <span>{order.items.length}</span>
+                              <span>{lineItems.length}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="font-medium">Total:</span>
@@ -177,17 +140,15 @@ export default function OrdersClientPage() {
                           className={`${statusInfo.bgColor} ${statusInfo.color} border-0 px-3 py-1.5 font-medium`}
                         >
                           <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
-                          {order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)}
+                          {order.status}
                         </Badge>
                       </div>
                     </CardHeader>
 
                     <CardContent className="pt-0">
                       <div className="space-y-6">
-                        {/* <CHANGE> Enhanced item display with better visual hierarchy */}
                         <div className="space-y-4">
-                          {order.items.map((item, index) => (
+                          {lineItems.map((item: any, index: number) => (
                             <div key={index}>
                               <div className="flex items-center gap-4">
                                 <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
@@ -214,14 +175,13 @@ export default function OrdersClientPage() {
                                   </p>
                                 </div>
                               </div>
-                              {index < order.items.length - 1 && (
+                              {index < lineItems.length - 1 && (
                                 <Separator className="mt-4" />
                               )}
                             </div>
                           ))}
                         </div>
 
-                        {/* <CHANGE> Enhanced action buttons with better styling */}
                         <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4 border-t">
                           <Button
                             variant="outline"
