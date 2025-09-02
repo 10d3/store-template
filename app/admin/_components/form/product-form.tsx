@@ -40,6 +40,9 @@ import { Plus, Edit, ChevronDown, Package, Trash2, Copy } from "lucide-react";
 import type { StripeProductVariant, StripeProduct } from "@/types/product";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { UploadButton } from "@/lib/uploadthing";
+import { uploadThemes } from "@/lib/theme/upload-theme";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
@@ -191,7 +194,7 @@ export function ProductForm({
   const updateVariant = (
     id: string,
     field: string,
-    value: string | number | boolean
+    value: string | number | boolean | string[]
   ) => {
     const currentVariants = form.getValues("variants") || [];
     const updatedVariants = currentVariants.map((v) => {
@@ -349,6 +352,115 @@ export function ProductForm({
                               <SelectItem value="gbp">GBP (£)</SelectItem>
                             </SelectContent>
                           </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="images"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Image</FormLabel>
+                          <FormControl>
+                            <div className="space-y-3">
+                              <UploadButton
+                                appearance={uploadThemes.colorful.uploadButton}
+                                endpoint="imageUploader"
+                                onClientUploadComplete={(res) => {
+                                  if (res?.[0]?.ufsUrl) {
+                                    res.map((item) => {
+                                      field.onChange([
+                                        ...(field.value || []),
+                                        item.ufsUrl,
+                                      ]);
+                                    });
+                                  }
+                                }}
+                                onUploadError={(error: Error) => {
+                                  console.error("Upload error:", error);
+                                }}
+                              />
+                              {field.value && field.value.length > 0 && (
+                                <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                  <div className="flex-shrink-0 flex flex-row gap-2 flex-wrap">
+                                    {field.value.map((item, index) => (
+                                      <div
+                                        key={index}
+                                        className="relative group"
+                                      >
+                                        <Image
+                                          width={1000}
+                                          height={1000}
+                                          src={item || "/placeholder.svg"}
+                                          alt={`Uploaded image ${index + 1}`}
+                                          className="w-16 h-16 object-cover rounded-md border"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const newImages = field.value
+                                              ? [...field.value]
+                                              : [];
+                                            newImages.splice(index, 1);
+                                            field.onChange(newImages);
+                                          }}
+                                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M6 18L18 6M6 6l12 12"
+                                            />
+                                          </svg>
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                      <span className="text-sm font-medium text-green-800">
+                                        {field.value.length}{" "}
+                                        {field.value.length === 1
+                                          ? "image"
+                                          : "images"}{" "}
+                                        uploaded successfully
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    onClick={() => field.onChange([])}
+                                    className="flex-shrink-0 p-1 text-green-600 hover:text-green-800 transition-colors"
+                                  >
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                      />
+                                    </svg>
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -530,6 +642,7 @@ export function ProductForm({
                                         </p>
                                       </div>
                                       <Switch
+                                        className=""
                                         checked={
                                           (variant as any).active || false
                                         }
@@ -541,6 +654,118 @@ export function ProductForm({
                                           )
                                         }
                                       />
+                                    </div>
+                                    <div className="space-y-3">
+                                      <UploadButton
+                                        appearance={
+                                          uploadThemes.colorful.uploadButton
+                                        }
+                                        endpoint="imageUploader"
+                                        onClientUploadComplete={(res) => {
+                                          if (res?.[0]?.ufsUrl) {
+                                            res.map((item) => {
+                                              updateVariant(
+                                                variant.id!,
+                                                "images",
+                                                [...(variant.images || []), item.ufsUrl]
+                                              )
+                                            });
+                                          }
+                                        }}
+                                        onUploadError={(error: Error) => {
+                                          console.error("Upload error:", error);
+                                        }}
+                                      />
+                                      {variant.images &&
+                                        variant.images.length > 0 && (
+                                          <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                            <div className="flex-shrink-0 flex flex-row gap-2 flex-wrap">
+                                              {variant.images.map(
+                                                (item, index) => (
+                                                  <div
+                                                    key={index}
+                                                    className="relative group"
+                                                  >
+                                                    <Image
+                                                      width={1000}
+                                                      height={1000}
+                                                      src={
+                                                        item ||
+                                                        "/placeholder.svg"
+                                                      }
+                                                      alt={`Uploaded image ${index + 1}`}
+                                                      className="w-16 h-16 object-cover rounded-md border"
+                                                    />
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const newImages =
+                                                          variant.images
+                                                            ? [...variant.images]
+                                                            : [];
+                                                        newImages.splice(
+                                                          index,
+                                                          1
+                                                        );
+                                                        updateVariant(
+                                                          variant.id!,
+                                                          "images",
+                                                          newImages
+                                                        );
+                                                      }}
+                                                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                      <svg
+                                                        className="w-4 h-4"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                      >
+                                                        <path
+                                                          strokeLinecap="round"
+                                                          strokeLinejoin="round"
+                                                          strokeWidth={2}
+                                                          d="M6 18L18 6M6 6l12 12"
+                                                        />
+                                                      </svg>
+                                                    </button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                                <span className="text-sm font-medium text-green-800">
+                                                  {variant.images.length}{" "}
+                                                  {variant.images.length === 1
+                                                    ? "image"
+                                                    : "images"}{" "}
+                                                  uploaded successfully
+                                                </span>
+                                              </div>
+                                            </div>
+                                            {/* <Button
+                                              type="button"
+                                              onClick={() => field.onChange([])}
+                                              className="flex-shrink-0 p-1 text-green-600 hover:text-green-800 transition-colors"
+                                            >
+                                              <svg
+                                                className="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth={2}
+                                                  d="M6 18L18 6M6 6l12 12"
+                                                />
+                                              </svg>
+                                            </Button> */}
+                                          </div>
+                                        )}
                                     </div>
                                   </div>
                                 </CardContent>

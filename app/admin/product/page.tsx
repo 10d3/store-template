@@ -114,9 +114,9 @@ export default function ProductManagementPage() {
           />
           {editingProduct && (
             <div className="mt-4">
-              <button onClick={onCancelEdit} className="text-sm text-muted-foreground hover:text-foreground">
+              <Button onClick={onCancelEdit} className="text-sm text-muted-foreground hover:text-foreground">
                 Cancel editing
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -10,19 +10,23 @@ const nextConfig: NextConfig = {
         pathname: "**",
       },
       {
-        protocol:"https",
-        hostname:"files.stripe.com",
-        pathname:"**"
+        protocol: "https",
+        hostname: "files.stripe.com",
+        pathname: "**",
       },
       {
-        protocol:"https",
-        hostname:"6ay8a7s9vf.ufs.sh",
-        pathname:"**"
+        protocol: "https",
+        hostname: "6ay8a7s9vf.ufs.sh",
+        pathname: "**",
       },
       {
-        protocol:"https",
-        hostname:"flowbite.s3.amazonaws.com",
-        pathname:"**"
+        protocol: "https",
+        hostname: "flowbite.s3.amazonaws.com",
+        pathname: "**",
+      },
+      { protocol: "https",
+        hostname: "l2yvnapk4q.ufs.sh",
+        pathname: "**"
       },
     ],
   },

@@ -1,4 +1,4 @@
-import Hover from "@/components/shared/hover";
+// import Hover from "@/components/shared/hover";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
 // import { getTranslations } from "@/i18n/server";
@@ -142,7 +142,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <div className="w-full">
-        <Hover />
+        {/* <Hover /> */}
         {/* Products Section */}
         {transformedProducts.length > 0 && (
           <div className="mb-16">

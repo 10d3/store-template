@@ -36,6 +36,7 @@ export default async function page(props: {
   const searchParams = await props.searchParams;
 
   const variants = await getProduct(params.slug);
+  console.log("variant form slug",variants)
   const selectedVariants = variants.filter((variant) =>
     variant.metadata?.variants?.includes(searchParams.variant as string)
   );
@@ -45,7 +46,7 @@ export default async function page(props: {
     {
       id: "1",
       type: "image",
-      src: "https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg",
+      src: variants[0]?.images?.[0] as string || '',
       alt: "Product image 1",
       title: "Main product view",
     },
@@ -61,14 +62,14 @@ export default async function page(props: {
     {
       id: "3",
       type: "image",
-      src: "https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg",
+      src: variants[0]?.images?.[1] as string || '',
       alt: "Product image 2",
       title: "Detail view",
     },
     {
       id: "4",
       type: "image",
-      src: "https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg",
+      src: variants[0]?.images?.[2] as string || '',
       alt: "Product image 4",
       title: "Usage example",
     },
@@ -103,10 +104,7 @@ export default async function page(props: {
               <div className="prose prose-gray max-w-none">
                 <h2 className="text-2xl font-semibold mb-4">Description</h2>
                 <p className="leading-relaxed">
-                  Experience the perfect blend of style and functionality with
-                  this carefully crafted product. Designed with attention to
-                  detail and built to last, it represents the pinnacle of modern
-                  design philosophy.
+                  {variants[0].description}
                 </p>
               </div>
 
@@ -148,9 +146,10 @@ export default async function page(props: {
                         New Arrival
                       </Badge>
                       <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
-                        {params.slug
+                        {/* {params.slug
                           .replace(/-/g, " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          .replace(/\b\w/g, (l) => l.toUpperCase())} */}
+                          {variants[0].name}
                       </CardTitle>
                     </div>
                     <div className="flex gap-2">
@@ -170,9 +169,8 @@ export default async function page(props: {
                       </Button>
                     </div>
                   </div>
-                  <CardDescription className="text-base leading-relaxed">
-                    Premium quality product designed for the modern lifestyle.
-                    Crafted with precision and attention to detail.
+                  <CardDescription className="text-base leading-relaxed line-clamp-3">
+                    {variants[0].description}
                   </CardDescription>
                   <div className="flex items-center gap-4 pt-2">
                     <div className="flex items-center gap-1">
