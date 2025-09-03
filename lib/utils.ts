@@ -18,3 +18,12 @@ export function invariant(
 export const getNestedValue = (obj: any, path: string): string => {
   return path.split(".").reduce((current, key) => current?.[key], obj) || "";
 };
+
+export const formatPrice = (price: number) => {
+  // transfrom cent to dollar
+  price = price / 100
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(price);
+};

@@ -103,6 +103,13 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     type: "boolean",
     description: "Skip inventory checks",
   },
+  {
+    key: "slug",
+    label: "Product Slug",
+    type: "text",
+    description: "Unique product identifier",
+    placeholder: "colombia-coffee-250g",
+  },
 ];
 
 // Price-level metadata fields

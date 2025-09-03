@@ -4,22 +4,22 @@ import { persist } from "zustand/middleware";
 
 export interface CartItem {
   id: string;
-  variantId?: string;                  // e.g. "42-red-XL"
-  sku?: string;                        // optional human sku
+  variantId?: string; // e.g. "42-red-XL"
+  sku?: string; // optional human sku
   name: string;
   image: string;
-  price: number;                       // unit price in cents
+  price: number; // unit price in cents
   quantity: number;
-  maxQuantity: number;                 // stock limit
-  stripePriceId?: string;              // ← NEW: pass to Checkout
-  metadata?: Record<string, any>;      // ← NEW: pack_size, group, …
+  maxQuantity: number; // stock limit
+  stripePriceId?: string; // ← NEW: pass to Checkout
+  metadata?: Record<string, any>; // ← NEW: pack_size, group, …
 }
 
 export interface CartCoupon {
-  id: string;                          // coupon id or promo code
+  id: string; // coupon id or promo code
   type: "percent" | "fixed";
-  value: number;                       // percent_off or amount_off (cents)
-  metadata?: Record<string, any>;      // campaign, tier, …
+  value: number; // percent_off or amount_off (cents)
+  metadata?: Record<string, any>; // campaign, tier, …
 }
 
 interface CartStore {
@@ -33,14 +33,16 @@ interface CartStore {
   removeItem: (id: string, variantId?: string) => void;
   clearCart: () => void;
 
-  addBundle: (items: CartItem[]) => void;                // pre-defined bundle
+  addBundle: (items: CartItem[]) => void; // pre-defined bundle
   addVirtualBundle: (stripePriceId: string, qty: number) => void; // virtual
   applyCoupon: (coupon: CartCoupon) => void;
   removeCoupon: () => void;
 
+  getItemCountById: (id: string) => number;
+  getItemCountByVariantId: (id: string, variantId?: string) => number;
   getItemCount: () => number;
-  getSubTotal: () => number;            // before coupon
-  getTotalPrice: () => number;          // after coupon
+  getSubTotal: () => number; // before coupon
+  getTotalPrice: () => number; // after coupon
   getTotalUniqueItems: () => number;
   isAddingToCart: boolean;
 
@@ -101,7 +103,9 @@ export const useCartStore = create<CartStore>()(
 
       removeItem: (id, variantId = "") =>
         set((s) => ({
-          cart: s.cart.filter((i) => !(i.id === id && i.variantId === variantId)),
+          cart: s.cart.filter(
+            (i) => !(i.id === id && i.variantId === variantId)
+          ),
         })),
 
       clearCart: () => set({ cart: [], coupon: null }),
@@ -130,10 +134,10 @@ export const useCartStore = create<CartStore>()(
       addVirtualBundle: (stripePriceId, qty) => {
         /* You can map the Price ID to a known virtual bundle item */
         const virtualItem: CartItem = {
-          id: "test",                                // virtual placeholder
+          id: "test", // virtual placeholder
           name: "Mystery Coffee 3-Pack",
           image: "/images/mystery.png",
-          price: 2400,                           // fetch from Stripe
+          price: 2400, // fetch from Stripe
           quantity: qty,
           maxQuantity: 100,
           stripePriceId,
@@ -145,8 +149,17 @@ export const useCartStore = create<CartStore>()(
       applyCoupon: (coupon) => set({ coupon }),
       removeCoupon: () => set({ coupon: null }),
 
-      getItemCount: () =>
-        get().cart.reduce((sum, i) => sum + i.quantity, 0),
+      getItemCount: () => get().cart.reduce((sum, i) => sum + i.quantity, 0),
+
+      getItemCountById: (id) =>
+        get().cart.reduce((sum, i) => sum + (i.id === id ? i.quantity : 0), 0),
+
+      getItemCountByVariantId: (id, variantId = "") =>
+        get().cart.reduce(
+          (sum, i) =>
+            sum + (i.id === id && i.variantId === variantId ? i.quantity : 0),
+          0
+        ),
 
       getSubTotal: () =>
         get().cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
@@ -157,9 +170,7 @@ export const useCartStore = create<CartStore>()(
         if (!coupon) return Number((sub / 100).toFixed(2));
 
         const discount =
-          coupon.type === "percent"
-            ? (coupon.value / 100) * sub
-            : coupon.value;
+          coupon.type === "percent" ? (coupon.value / 100) * sub : coupon.value;
         const total = Math.max(sub - discount, 0);
         return Number((total / 100).toFixed(2));
       },

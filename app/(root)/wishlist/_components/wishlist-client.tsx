@@ -76,7 +76,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                   <CardHeader className="">
                     <div className="flex items-start justify-between gap-4">
                       <Link
-                        href={`/product/${item.name}`}
+                        href={`/product/${item.metadata.slug}`}
                         className="flex-1 min-w-0"
                       >
                         <CardTitle className="text-xl font-semibold truncate group-hover:text-primary transition-colors">
@@ -97,7 +97,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                   <CardContent>
                     <div className="flex gap-6">
                       <Link
-                        href={`/product/${item.name}`}
+                        href={`/product/${item.metadata.slug}`}
                         className="block w-32 h-32 rounded-xl overflow-hidden flex-shrink-0"
                       >
                         <Image

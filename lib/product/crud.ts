@@ -389,7 +389,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
 export async function getProduct(slug: string) {
   try {
     const products = await listProducts();
-    const variants = products.filter((product) => product.name === slug);
+    const variants = products.filter((product) => product.metadata.slug === slug);
     return variants;
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {

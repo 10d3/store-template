@@ -58,6 +58,7 @@ export default async function Home() {
         (typeof product.default_price === "string"
           ? product.default_price
           : undefined),
+      slug: product.metadata?.slug,
     };
   });
 
@@ -160,6 +161,7 @@ export default async function Home() {
                   originalPrice={product.originalPrice}
                   discount={product.discount}
                   image={product.image}
+                  slug={product.slug}
                   hoverMedia={product.hoverMedia}
                   className="hover:scale-105 transition-transform duration-200"
                 />

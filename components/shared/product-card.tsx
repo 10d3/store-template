@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "@/i18n/server";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: string;
@@ -16,6 +17,7 @@ interface ProductCardProps {
   originalPrice?: number;
   discount?: number;
   image: string;
+  slug: string;
   hoverMedia?: {
     type: "image" | "video";
     src: string;
@@ -31,11 +33,14 @@ export function ProductCard({
   originalPrice,
   discount,
   image,
+  slug,
   hoverMedia,
   className,
   onAddToCart,
   ...props
 }: ProductCardProps) {
+
+  const router = useRouter();
   // const t = useTranslations("home");
   const [isHovered, setIsHovered] = React.useState(false);
   const [mediaLoaded, setMediaLoaded] = React.useState(false);
@@ -61,6 +66,7 @@ export function ProductCard({
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => router.push(`/product/${slug}`)}
       {...props}
     >
       {/* Discount Badge */}

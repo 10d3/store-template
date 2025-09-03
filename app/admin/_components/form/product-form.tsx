@@ -137,7 +137,16 @@ export function ProductForm({
         images: initialData.images || [],
         metadata: initialData.metadata
           ? transformMetadataFromStripe(initialData.metadata, "product")
-          : {},
+          : {
+              slug: "",
+              category: "",
+              gender: "",
+              pack_size: "",
+              seo_title: "",
+              seo_description: "",
+              tags: "",
+              digital: "false"
+            },
         variants: initialData.variants
           ? initialData.variants.map(createFormVariantFromStripe)
           : [],
@@ -154,7 +163,16 @@ export function ProductForm({
         price: 1000,
         currency: "usd",
         images: [],
-        metadata: {},
+        metadata: {
+          slug: "",
+          category: "",
+          gender: "",
+          pack_size: "",
+          seo_title: "",
+          seo_description: "",
+          tags: "",
+          digital: "false"
+        },
         variants: [],
       });
     }

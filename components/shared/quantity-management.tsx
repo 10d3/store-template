@@ -14,7 +14,7 @@ export default function QuantityManagement({
 }) {
   // console.log(product);
   const [mounted, setMounted] = React.useState(false);
-  const { getItemCount, addOrUpdateItem, setQuantity } =
+  const { getItemCountById, addOrUpdateItem, setQuantity } =
     useCartStore();
 
   React.useEffect(() => {
@@ -34,7 +34,7 @@ export default function QuantityManagement({
       <Button
         className="rounded-full cursor-pointer"
         variant="ghost"
-        disabled={getItemCount() < 1}
+        disabled={getItemCountById(product.id) < 1}
         onClick={() => addOrUpdateItem({
           id: product.id,
           name: product.name,
@@ -49,8 +49,8 @@ export default function QuantityManagement({
       </Button>
       <Input
         className="w-1/10 rounded-full text-center"
-        placeholder={mounted ? getItemCount().toString() : "0"}
-        value={mounted ? getItemCount() : 0}
+        placeholder={mounted ? getItemCountById(product.id).toString() : "0"}
+        value={mounted ? getItemCountById(product.id) : 0}
         onChange={(e) =>
           setQuantity(product.id, product.id, Number(e.target.value))
         }

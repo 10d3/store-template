@@ -1,83 +1,84 @@
-'use client'
+"use client";
+
 import React from "react";
 import { CartAsideContainer } from "./cart-aside-container";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 export default function CartModal() {
-  const { cart, getTotalPrice } = useCartStore();
-  console.log(cart);
+  const { cart, getTotalPrice, clearCart, getItemCount } = useCartStore();
 
-  // Helper function to safely extract price value
-  const getPriceDisplay = (price: unknown) => {
-    if (typeof price === 'number') {
-      return (price / 100).toFixed(2);
-    }
-    if (typeof price === 'object' && price && 'unit_amount' in price) {
-      const unitAmount = (price as { unit_amount: number }).unit_amount;
-      return (unitAmount / 100).toFixed(2);
-    }
-    return '0.00';
-  };
   return (
     <CartAsideContainer>
-      <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+      <div className="flex h-full flex-col overflow-hidden p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Shopping Cart</h2>
+          <h2 className="text-lg font-medium">Cart ({getItemCount()} items)</h2>
+          {cart.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={clearCart}
+            >
+              Clear all
+            </Button>
+          )}
         </div>
-        <div className="mt-8">
-          <ul role="list" className="-my-6 divide-y divide-neutral-200">
-            {cart.map((item) => (
-              <li
-                key={item.id}
-                className="grid grid-cols-[4rem_1fr_max-content] grid-rows-[auto_auto] gap-x-4 gap-y-2 py-6"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 rounded-md"
-                        width={64}
-                        height={64}
-                      />
-                    </div>
-                    <div className="ml-4 flex-1">
-                      <p className="text-sm font-medium">
-                        {item.name}
+
+        <div className="flex-1 overflow-y-auto py-6">
+          {cart.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              Your cart is empty
+            </div>
+          ) : (
+            <ul className="-my-6 divide-y divide-border">
+              {cart.map((item) => (
+                <li key={item.id} className="flex py-6">
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      width={64}
+                      height={64}
+                      className="h-full w-full object-cover object-center"
+                    />
+                  </div>
+                  <div className="ml-4 flex flex-1 flex-col">
+                    <div className="flex justify-between text-sm">
+                      <h3 className="font-medium">{item.name}</h3>
+                      <p className="ml-4">
+                        {formatPrice(
+                          typeof item.price === "number"
+                            ? item.price
+                            // : item.price && "unit_amount" in item.price
+                            //   ? item.price.unit_amount
+                              : 0
+                        )}
                       </p>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-end">
-                    <p className="text-sm font-medium">
-                      ${getPriceDisplay(item.price)}
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Quantity: {item.quantity}
                     </p>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className="border-t border-neutral-200 px-4 py-6 sm:px-6">
-          <div
-            id="cart-overlay-description"
-            className="flex justify-between text-base font-medium"
-          >
-            <p>Total</p>
-            <p>{getTotalPrice()}</p>
+
+        <div className="border-t border-border pt-6">
+          <div className="flex justify-between text-base">
+            <p className="font-medium">Subtotal</p>
+            <p className="font-medium">{formatPrice(getTotalPrice() * 100)}</p>
           </div>
-          <p className="mt-0.5 text-sm">
-            Shipping and taxes are calculated at checkout.
+          <p className="mt-1 text-sm text-muted-foreground">
+            Shipping and taxes calculated at checkout
           </p>
-          <Button
-            asChild={true}
-            size={"lg"}
-            className="mt-6 w-full rounded-full text-lg"
-          >
-            <Link href="/cart">Checkout</Link>
+          <Button asChild size="lg" className="mt-6 w-full rounded-full">
+            <Link href="/cart">Proceed to Checkout</Link>
           </Button>
         </div>
       </div>
