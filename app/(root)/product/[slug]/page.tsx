@@ -1,7 +1,7 @@
 import AddToCartButton from "@/components/shared/add-to-cart-button";
 import CarousselVariants from "@/components/shared/caroussel-variants";
 import QuantityManagement from "@/components/shared/quantity-management";
-import VideoReviewMasonry from "@/components/shared/review-section";
+// import VideoReviewMasonry from "@/components/shared/review-section";
 import SelectVariant from "@/components/shared/select-variant";
 import {
   Card,
@@ -21,9 +21,10 @@ import {
 } from "@/lib/product/crud";
 import { Star, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MediaGallery from "@/components/shared/media-gallery";
+// import MediaGallery from "@/components/shared/media-gallery";
 import PackCard from "@/components/shared/pack-card";
-import WishlistButton from '@/components/shared/wishlist-button';
+import WishlistButton from "@/components/shared/wishlist-button";
+import MediaProductGallery from "@/components/shared/media-product-gallery";
 
 interface MediaItem {
   id: string;
@@ -84,15 +85,15 @@ export default async function page(props: {
     },
   ];
 
-  const getGridPosition = (index: number) => {
-    const positions = [
-      "md:col-span-2 md:row-span-3 col-span-7 row-span-2",
-      "md:col-span-2 md:row-span-2 col-span-4 row-span-2",
-      "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
-      "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
-    ];
-    return positions[index] || "col-span-1 row-span-1";
-  };
+  // const getGridPosition = (index: number) => {
+  //   const positions = [
+  //     "md:col-span-2 md:row-span-3 col-span-7 row-span-2",
+  //     "md:col-span-2 md:row-span-2 col-span-4 row-span-2",
+  //     "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
+  //     "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
+  //   ];
+  //   return positions[index] || "col-span-1 row-span-1";
+  // };
 
   const transformedPacks = await Promise.all(
     packs.map(async (pack) => {
@@ -179,50 +180,14 @@ export default async function page(props: {
           {/* Media Gallery */}
           <div className="lg:col-span-7 space-y-8">
             <div className="relative">
-              <MediaGallery
-                variant="default"
-                mediaItems={mediaItems}
-                getGridPosition={getGridPosition}
+              <MediaProductGallery
+                // variant="default"
+                images={mediaItems.map((item) => item.src)}
+                // mediaItems={mediaItems}
+                // getGridPosition={getGridPosition}
               />
             </div>
-
-            {/* Product Description */}
-            <div className="space-y-6">
-              <div className="prose prose-gray max-w-none">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <p className="leading-relaxed">{variants[0].description}</p>
-              </div>
-
-              <Separator className="my-8" />
-
-              {/* Reviews Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold">Customer Reviews</h2>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      (4.2 out of 5)
-                    </span>
-                  </div>
-                </div>
-                <ScrollArea className="">
-                  <VideoReviewMasonry />
-                </ScrollArea>
-              </div>
-            </div>
-          </div>
-
-          {/* Product Information */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="sticky top-20">
+            <div className="md:hidden">
               <Card className="border-0 shadow-xl bg-card">
                 <CardHeader className="pb-6">
                   <div className="flex items-start justify-between">
@@ -287,9 +252,117 @@ export default async function page(props: {
                   </CardFooter>
                 )}
               </Card>
+            </div>
+            <div className="mt-6 md:hidden">
+              <AddToCartButton product={variants[0]} />
+            </div>
+
+            {/* Product Description */}
+            <div className="space-y-6">
+              <div className="prose prose-gray max-w-none">
+                <h2 className="text-2xl font-semibold mb-4">Description</h2>
+                <p className="leading-relaxed">{variants[0].description}</p>
+              </div>
+
+              <Separator className="my-8" />
+
+              {/* Reviews Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold">Customer Reviews</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      (4.2 out of 5)
+                    </span>
+                  </div>
+                </div>
+                {/* <ScrollArea className="">
+                  <VideoReviewMasonry />
+                </ScrollArea> */}
+              </div>
+            </div>
+          </div>
+
+          {/* Product Information */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="sticky top-20">
+              <div className="hidden md:block">
+                <Card className="border-0 shadow-xl bg-card">
+                  <CardHeader className="pb-6">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <Badge variant="secondary" className="w-fit">
+                          New Arrival
+                        </Badge>
+                        <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
+                          {/* {params.slug
+                          .replace(/-/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())} */}
+                          {variants[0].name}
+                        </CardTitle>
+                      </div>
+                      <div className="flex gap-2">
+                        <WishlistButton productId={variants[0].id} />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full"
+                        >
+                          <Share2 className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                    {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
+                    {variants[0].description}
+                  </CardDescription> */}
+                    <div className="flex items-center gap-4 pt-2">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        156 reviews
+                      </span>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      {selectedVariants.length > 1 && (
+                        <div className="flex-1">
+                          <SelectVariant variants={selectedVariants} />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <QuantityManagement product={variants[0]} />
+                      </div>
+                    </div>
+                  </CardContent>
+
+                  {selectedVariants.length > 1 && (
+                    <CardFooter className="pt-0 pb-0">
+                      <div className="w-full space-y-4">
+                        <CarousselVariants products={variants} />
+                      </div>
+                    </CardFooter>
+                  )}
+                </Card>
+              </div>
 
               {/* Add to Cart */}
-              <div className="mt-6">
+              <div className="mt-6 hidden md:block">
                 <AddToCartButton product={variants[0]} />
               </div>
 
