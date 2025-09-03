@@ -23,6 +23,7 @@ export default async function Home() {
     packs = allProducts.filter(
       (product) => product.metadata?.type === "bundle"
     );
+    console.log(packs)
   } catch (error) {
     console.error("Failed to fetch products:", error);
   }

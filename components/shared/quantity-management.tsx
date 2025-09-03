@@ -12,7 +12,7 @@ export default function QuantityManagement({
 }: {
   product: StripeProduct;
 }) {
-  console.log(product);
+  // console.log(product);
   const [mounted, setMounted] = React.useState(false);
   const { getItemCount, addOrUpdateItem, setQuantity } =
     useCartStore();
@@ -34,6 +34,7 @@ export default function QuantityManagement({
       <Button
         className="rounded-full cursor-pointer"
         variant="ghost"
+        disabled={getItemCount() < 1}
         onClick={() => addOrUpdateItem({
           id: product.id,
           name: product.name,

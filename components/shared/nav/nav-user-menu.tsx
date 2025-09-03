@@ -1,11 +1,11 @@
 "use client"
 
 import {
-  CreditCard,
   LogOut,
   Bell,
-  UserCircle,
   Settings,
+  Package,
+  Heart,
 } from "lucide-react"
 
 import {
@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export function NavUserMenu({
   user,
@@ -33,6 +34,7 @@ export function NavUserMenu({
     avatar: string
   }
 }) {
+  const router = useRouter()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -56,13 +58,13 @@ export function NavUserMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserCircle className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+          <DropdownMenuItem onClick={() => router.push("/orders")}>
+            <Package className="mr-2 h-4 w-4" />
+            <span>Orders</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
+          <DropdownMenuItem onClick={() => router.push("/wishlist")}>
+            <Heart className="mr-2 h-4 w-4" />
+            <span>WishList</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />

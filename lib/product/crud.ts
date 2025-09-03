@@ -513,3 +513,15 @@ export async function getProductsByProductIds(
     );
   }
 }
+
+export async function getPacks() {
+  const products = await listProducts();
+  const packs = products.filter((product) => product.metadata.type === "bundle");
+  return packs;
+}
+
+export async function getPack(productId: string) {
+  const packs = await getPacks();
+  const pack = packs.filter((pack) => pack.metadata.contents.includes(productId));
+  return pack;
+}

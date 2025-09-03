@@ -14,10 +14,16 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getProduct } from "@/lib/product/crud";
-import { Star, Heart, Share2 } from "lucide-react";
+import {
+  getPack,
+  getProduct,
+  getProductsByProductIds,
+} from "@/lib/product/crud";
+import { Star, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MediaGallery from "@/components/shared/media-gallery";
+import PackCard from "@/components/shared/pack-card";
+import WishlistButton from '@/components/shared/wishlist-button';
 
 interface MediaItem {
   id: string;
@@ -36,17 +42,20 @@ export default async function page(props: {
   const searchParams = await props.searchParams;
 
   const variants = await getProduct(params.slug);
-  console.log("variant form slug",variants)
+  console.log("variant form slug", variants);
   const selectedVariants = variants.filter((variant) =>
     variant.metadata?.variants?.includes(searchParams.variant as string)
   );
-  const selectedVariant = selectedVariants[0];
+  // const selectedVariant = selectedVariants[0];
 
+  const packs = await getPack(variants[0]?.id as string);
+
+  console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [
     {
       id: "1",
       type: "image",
-      src: variants[0]?.images?.[0] as string || '',
+      src: (variants[0]?.images?.[0] as string) || "",
       alt: "Product image 1",
       title: "Main product view",
     },
@@ -62,14 +71,14 @@ export default async function page(props: {
     {
       id: "3",
       type: "image",
-      src: variants[0]?.images?.[1] as string || '',
+      src: (variants[0]?.images?.[1] as string) || "",
       alt: "Product image 2",
       title: "Detail view",
     },
     {
       id: "4",
       type: "image",
-      src: variants[0]?.images?.[2] as string || '',
+      src: (variants[0]?.images?.[2] as string) || "",
       alt: "Product image 4",
       title: "Usage example",
     },
@@ -84,6 +93,84 @@ export default async function page(props: {
     ];
     return positions[index] || "col-span-1 row-span-1";
   };
+
+  const transformedPacks = await Promise.all(
+    packs.map(async (pack) => {
+      const packProducts = [];
+
+      // If pack has contents metadata, fetch actual products
+      if (pack.metadata?.contents) {
+        const contentIds = pack.metadata.contents.split(",");
+        try {
+          const contentProducts = await getProductsByProductIds(contentIds);
+
+          contentProducts.forEach((contentProduct, index) => {
+            const defaultPrice =
+              typeof contentProduct.default_price === "object" &&
+              contentProduct.default_price
+                ? contentProduct.default_price
+                : null;
+
+            packProducts.push({
+              id: `${pack.id}_${contentProduct.id}`,
+              name: contentProduct.name, // Use actual product name
+              price: defaultPrice?.unit_amount || 0,
+              image:
+                contentProduct.images?.[0] ||
+                pack.images?.[index] ||
+                "/placeholder.svg",
+              hoverMedia: contentProduct.images?.[1]
+                ? {
+                    type: "image" as const,
+                    src: contentProduct.images[1],
+                  }
+                : undefined,
+              stripePriceId: defaultPrice?.id || contentIds[index]?.trim(),
+            });
+          });
+        } catch (error) {
+          console.error("Failed to fetch pack contents:", error);
+          // Fallback to placeholder names if fetching fails
+          contentIds.forEach((productId, index) => {
+            packProducts.push({
+              id: `${pack.id}_${index}`,
+              name: `Product ${index + 1}`,
+              price: Math.floor(Math.random() * 5000) + 1000,
+              image: pack.images?.[index] || "/placeholder.svg",
+              stripePriceId: productId.trim(),
+            });
+          });
+        }
+      } else {
+        // Default pack content if no metadata
+        const defaultPrice =
+          typeof pack.default_price === "object" && pack.default_price
+            ? pack.default_price
+            : null;
+
+        packProducts.push({
+          id: `${pack.id}_1`,
+          name: pack.name,
+          price: defaultPrice?.unit_amount || 0,
+          image: pack.images?.[0] || "/placeholder.svg",
+          stripePriceId:
+            defaultPrice?.id ||
+            (typeof pack.default_price === "string"
+              ? pack.default_price
+              : undefined),
+        });
+      }
+
+      return {
+        id: pack.id,
+        name: pack.name, // Use the pack name directly
+        products: packProducts,
+        bundleDiscount: pack.metadata?.discount
+          ? parseInt(pack.metadata.discount)
+          : 0,
+      };
+    })
+  );
 
   return (
     <div className="min-h-screen">
@@ -103,9 +190,7 @@ export default async function page(props: {
             <div className="space-y-6">
               <div className="prose prose-gray max-w-none">
                 <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <p className="leading-relaxed">
-                  {variants[0].description}
-                </p>
+                <p className="leading-relaxed">{variants[0].description}</p>
               </div>
 
               <Separator className="my-8" />
@@ -149,17 +234,11 @@ export default async function page(props: {
                         {/* {params.slug
                           .replace(/-/g, " ")
                           .replace(/\b\w/g, (l) => l.toUpperCase())} */}
-                          {variants[0].name}
+                        {variants[0].name}
                       </CardTitle>
                     </div>
                     <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full"
-                      >
-                        <Heart className="w-5 h-5" />
-                      </Button>
+                      <WishlistButton productId={variants[0].id} />
                       <Button
                         variant="ghost"
                         size="icon"
@@ -169,9 +248,9 @@ export default async function page(props: {
                       </Button>
                     </div>
                   </div>
-                  <CardDescription className="text-base leading-relaxed line-clamp-3">
+                  {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
                     {variants[0].description}
-                  </CardDescription>
+                  </CardDescription> */}
                   <div className="flex items-center gap-4 pt-2">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -200,7 +279,7 @@ export default async function page(props: {
                   </div>
                 </CardContent>
 
-                { selectedVariants.length > 1 && (
+                {selectedVariants.length > 1 && (
                   <CardFooter className="pt-0 pb-0">
                     <div className="w-full space-y-4">
                       <CarousselVariants products={variants} />
@@ -211,7 +290,7 @@ export default async function page(props: {
 
               {/* Add to Cart */}
               <div className="mt-6">
-                <AddToCartButton product={selectedVariant} />
+                <AddToCartButton product={variants[0]} />
               </div>
 
               {/* Additional Information */}
@@ -226,10 +305,24 @@ export default async function page(props: {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-sm text-gray-600">
-                      Bundle deals and pack options will appear here when
-                      available.
-                    </div>
+                    {packs ? (
+                      transformedPacks.map((pack) => (
+                        <PackCard
+                          key={pack.id}
+                          id={pack.id}
+                          name={pack.name}
+                          products={pack.products}
+                          bundleDiscount={pack.bundleDiscount}
+                          className="hover:scale-105 transition-transform duration-200"
+                          // onAddToCart={()=> console.log("click")}
+                        />
+                      ))
+                    ) : (
+                      <div className="text-sm text-gray-600">
+                        Bundle deals and pack options will appear here when
+                        available.
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 

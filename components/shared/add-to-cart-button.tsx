@@ -29,7 +29,7 @@ export default function AddToCartButton({
             name: product.name,
             image: product?.images?.[0] as string,
             price: getPrice(),
-            quantity: -1,
+            quantity: +1,
             maxQuantity: 10,
             variantId: product.id,
           })

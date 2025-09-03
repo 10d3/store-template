@@ -115,7 +115,7 @@ export default function PackCard({
   return (
     <Card
       className={cn(
-        "m-0 p-0 bg-card relative group rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg",
+        "m-0 p-0 bg-card relative group rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border-card",
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -258,7 +258,7 @@ export default function PackCard({
               variant="default"
               size="lg"
               className={cn(
-                "rounded-full w-14 h-14 flex flex-col items-center justify-center gap-1 shadow-lg transition-all duration-300",
+                "rounded-full w-14 h-14 flex flex-col items-center justify-center gap-1 shadow-lg transition-all duration-300 cursor-pointer",
                 "bg-white text-black hover:bg-gray-100 border-2 border-gray-200",
                 isHovered && "shadow-xl scale-105"
               )}

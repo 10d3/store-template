@@ -35,8 +35,17 @@ model Order {
   @@map("order")
 }
 
+model Wishlist {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String[]
+  createdAt DateTime
+  updatedAt DateTime
+}
+
 model User {
-  id            String    @id
+  id            String     @id
   name          String
   email         String
   emailVerified Boolean
@@ -47,6 +56,7 @@ model User {
   accounts      Account[]
   orders        Order[]
   reviews       Review[]
+  wishlist      Wishlist[]
 
   stripeCustomerId String?
 
