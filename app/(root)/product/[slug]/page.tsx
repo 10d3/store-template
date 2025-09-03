@@ -195,16 +195,18 @@ export default async function page(props: {
                       </div>
                     )}
                     <div className="flex-1">
-                      <QuantityManagement product={selectedVariant} />
+                      <QuantityManagement product={variants[0]} />
                     </div>
                   </div>
                 </CardContent>
 
-                <CardFooter className="pt-0 pb-0">
-                  <div className="w-full space-y-4">
-                    <CarousselVariants products={variants} />
-                  </div>
-                </CardFooter>
+                { selectedVariants.length > 1 && (
+                  <CardFooter className="pt-0 pb-0">
+                    <div className="w-full space-y-4">
+                      <CarousselVariants products={variants} />
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
 
               {/* Add to Cart */}
