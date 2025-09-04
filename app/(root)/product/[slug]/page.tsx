@@ -25,6 +25,11 @@ import { Button } from "@/components/ui/button";
 import PackCard from "@/components/shared/pack-card";
 import WishlistButton from "@/components/shared/wishlist-button";
 import MediaProductGallery from "@/components/shared/media-product-gallery";
+import { Markdown } from "@/components/shared/markdown";
+import CardAnyText from "@/components/shared/card-any-text";
+import { MarkdownNutrition } from "@/components/shared/nutrition-label";
+import { usageExample } from "@/lib/test";
+import { StickyBottom } from "@/components/shared/sticky-bottom";
 
 interface MediaItem {
   id: string;
@@ -175,7 +180,7 @@ export default async function page(props: {
 
   return (
     <div className="min-h-screen">
-      <div className="">
+      <StickyBottom product={variants[0]}>
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Media Gallery */}
           <div className="lg:col-span-7 space-y-8">
@@ -259,9 +264,18 @@ export default async function page(props: {
 
             {/* Product Description */}
             <div className="space-y-6">
-              <div className="prose prose-gray max-w-none">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <p className="leading-relaxed">{variants[0].description}</p>
+              <div className="prose prose-gray max-w-none flex flex-col gap-4">
+                {/* <h2 className="text-2xl font-semibold mb-4">Description</h2> */}
+                <div className="prose text-secondary-foreground">
+                  <CardAnyText title="Product Description">
+                    <Markdown source={variants[0].description || ""} />
+                  </CardAnyText>
+                </div>
+                <div>
+                  <CardAnyText title="Product Information">
+                    <MarkdownNutrition source={usageExample} />
+                  </CardAnyText>
+                </div>
               </div>
 
               <Separator className="my-8" />
@@ -421,7 +435,7 @@ export default async function page(props: {
             </div>
           </div>
         </div>
-      </div>
+      </StickyBottom>
     </div>
   );
 }

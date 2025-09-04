@@ -21,7 +21,7 @@ export default function AddToCartButton({
   };
   const { addOrUpdateItem, isAddingToCart } = useCartStore();
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" id="button-add-to-cart">
       <Button
         onClick={() =>
           addOrUpdateItem({

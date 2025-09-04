@@ -1,18 +1,8 @@
-"use client"
+"use client";
 
-import {
-  LogOut,
-  Bell,
-  Settings,
-  Package,
-  Heart,
-} from "lucide-react"
+import { LogOut, Settings, Package, Heart } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,24 +11,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { ModeToggle } from "@/components/ui/toggle-theme";
 
 export function NavUserMenu({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative h-8 w-8 rounded-full cursor-pointer">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-8 w-8 rounded-full cursor-pointer"
+        >
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback className="rounded-lg">
@@ -58,11 +53,17 @@ export function NavUserMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/orders")}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push("/orders")}
+          >
             <Package className="mr-2 h-4 w-4" />
             <span>Orders</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={() => router.push("/wishlist")}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => router.push("/wishlist")}
+          >
             <Heart className="mr-2 h-4 w-4" />
             <span>WishList</span>
           </DropdownMenuItem>
@@ -70,11 +71,13 @@ export function NavUserMenu({
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer">
+          <ModeToggle isNav className="w-full justify-around" />
+          {/* <Bell className="mr-2 h-4 w-4" /> */}
+          {/* <span>Notifications</span> */}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
@@ -82,5 +85,5 @@ export function NavUserMenu({
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
