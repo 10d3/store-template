@@ -34,7 +34,7 @@ export default function MediaProductGallery({
       </Card>
 
       {/* Thumbnail Navigation */}
-      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-32 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[38rem] pb-2 md:pb-0">
+      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-32 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[38rem] pb-2 md:pb-0 items-center justify-center">
         {images.map((image, index) => (
           <Card
             key={index}
