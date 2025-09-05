@@ -110,6 +110,14 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     description: "Unique product identifier",
     placeholder: "colombia-coffee-250g",
   },
+  {
+    key: "discount",
+    label: "Discount",
+    type: "number",
+    description: "Discount amount",
+    placeholder: "10",
+    min: 0,
+  }
 ];
 
 // Price-level metadata fields

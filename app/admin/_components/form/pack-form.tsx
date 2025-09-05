@@ -99,7 +99,7 @@ export function EnhancedPackForm({
 
   const selectedProducts = form.watch("productIds");
   const packPrice = form.watch("packPrice");
-  // const discount = form.watch("discount");
+  const discount = form.watch("discount");
   const isEditing = !!initialData;
 
   const formatPrice = (amount: number, currency = "usd") => {
@@ -260,6 +260,14 @@ export function EnhancedPackForm({
                                 </span>
                               </div>
                             )}
+                            {(discount || 0) > 0 && (
+                              <div className="flex justify-between text-yellow-600">
+                                <span>Discount:</span>
+                                <span className="font-semibold">
+                                  {formatPrice(discount || 0)}
+                                </span>
+                              </div>
+                            )}
                           </>
                         )}
                       </div>
@@ -331,7 +339,7 @@ export function EnhancedPackForm({
                             type="number"
                             placeholder="10"
                             min="0"
-                            max="100"
+                            max="1000000"
                             className="h-11 border-2 focus:border-blue-500 transition-colors"
                             {...field}
                             onChange={(e) =>

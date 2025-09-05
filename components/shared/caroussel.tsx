@@ -141,18 +141,18 @@ export default function CarouselComponent({
 
   const items = [
     {
-      type: "video",
-      src: "https://cuajuep66z.ufs.sh/f/ZuLpxltn4GuJU3jCQdB2l6tPHkBKI7CAj5Z3c1yXdMTgiumq",
-      poster:
+      type: "image",
+      // src: "https://cuajuep66z.ufs.sh/f/ZuLpxltn4GuJU3jCQdB2l6tPHkBKI7CAj5Z3c1yXdMTgiumq",
+      src:
         "https://6ay8a7s9vf.ufs.sh/f/XID4kzR81z3MMnd2XdSwtNrIdlDQOqySUF8bJAxeVMZT2Hg0",
       width: 1280,
       height: 720,
       alt:"poster carousel"
     },
     {
-      type: "video",
-      src: "https://cuajuep66z.ufs.sh/f/ZuLpxltn4GuJFptlJYIyTZNuDsJjvkfhUWo2ySimKIVX7Ye1",
-      poster:
+      type: "image",
+      // src: "https://cuajuep66z.ufs.sh/f/ZuLpxltn4GuJFptlJYIyTZNuDsJjvkfhUWo2ySimKIVX7Ye1",
+      src:
         "https://6ay8a7s9vf.ufs.sh/f/XID4kzR81z3MYC4LM9Irtc1DTM7O6HaZCyVwnKUWesNpfi9u",
       width: 1280,
       height: 720,
@@ -182,6 +182,7 @@ export default function CarouselComponent({
             item.type === "image" ? (
               <CarouselItem key={i}>
                 <Image
+                className="w-full h-fit"
                   src={item.src}
                   alt={item.type === "image" ? item.alt : "carousel image"}
                   width={item.width as number}

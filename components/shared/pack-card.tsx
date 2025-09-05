@@ -23,9 +23,16 @@ interface PackProduct {
   stripePriceId?: string;
 }
 
+interface Price {
+  id: string;
+  unit_amount: number | null;
+  currency: string;
+}
+
 interface PackCardProps {
   id?: string;
   name?: string;
+  price?: Price | null | undefined | string
   products: PackProduct[];
   bundleDiscount?: number;
   className?: string;
@@ -35,6 +42,7 @@ interface PackCardProps {
 export default function PackCard({
   id = "pack-bundle",
   name = "BUNDLE PACK",
+  price,
   products = [],
   bundleDiscount = 0,
   className,
@@ -69,11 +77,16 @@ export default function PackCard({
       ? currentTotal * (1 - bundleDiscount / 100)
       : currentTotal;
 
-  // Get maximum individual discount
-  const maxDiscount = Math.max(
-    ...products.map((product) => product.discount ?? 0),
-    bundleDiscount
+  // Get discount in %
+  const discountInPercent = Math.floor(
+    ((bundleDiscount * 100 )/ (typeof price === 'object' && price?.unit_amount ? price.unit_amount : 0))
   );
+
+  // Get maximum individual discount
+  // const maxDiscount = Math.max(
+  //   ...products.map((product) => product.discount ?? 0),
+  //   bundleDiscount
+  // );
 
   const handleAddToCart = () => {
     if (onAddToCart) {
@@ -135,12 +148,12 @@ export default function PackCard({
       </div>
 
       {/* Discount Badge */}
-      {maxDiscount > 0 && (
+      {bundleDiscount > 0 && (
         <Badge
           variant="destructive"
           className="absolute top-3 right-3 z-30 bg-red-500 text-white font-semibold px-3 py-1 text-xs rounded-lg shadow-lg"
         >
-          {maxDiscount}% {t("discount")}
+          {discountInPercent}% {t("discount")}
         </Badge>
       )}
 
@@ -148,7 +161,7 @@ export default function PackCard({
         {/* Products Grid */}
         <div
           className={cn(
-            "grid gap-1 rounded-lg",
+            "grid gap-0 rounded-lg",
             products.length === 2 ? "grid-cols-2" : "grid-cols-3"
           )}
         >
@@ -159,8 +172,8 @@ export default function PackCard({
                 "relative aspect-square overflow-hidden transition-all duration-300",
                 index === 0 && "rounded-l-lg",
                 index === products.length - 1 && "rounded-r-lg",
-                hoveredProductId === product.id &&
-                  "ring-2 ring-blue-500 ring-offset-2"
+                // hoveredProductId === product.id &&
+                //   "ring-2 ring-blue-500 ring-offset-2"
               )}
               onMouseEnter={() => setHoveredProductId(product.id)}
               onMouseLeave={() => setHoveredProductId(null)}
@@ -265,7 +278,7 @@ export default function PackCard({
             >
               <Plus size={20} className="text-blue-600" />
               <span className="text-xs font-bold">
-                {formatPrice(finalTotal)}
+                {formatPrice((typeof price === 'object' && price?.unit_amount ? price.unit_amount : 0))}
               </span>
             </Button>
           </div>
@@ -282,7 +295,7 @@ export default function PackCard({
             )}
           >
             <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold inline-block">
-              Save {formatPrice(originalTotal - finalTotal)}
+              Save {formatPrice(bundleDiscount)}
             </div>
           </div>
         )}

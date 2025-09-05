@@ -113,12 +113,28 @@ export async function updateProduct(
       ? validateAndTransformMetadata(data.metadata, "product")
       : undefined;
 
+    // First, create the new price
+    const newPrice = await stripe.prices.create({
+      product: id, // Use the product ID directly
+      unit_amount: data.price,
+      currency: "usd",
+      active: true,
+    });
+
     const product = await stripe.products.update(id, {
       name: data.name,
       description: data.description,
       images: data.images,
       metadata: validatedMetadata,
+      default_price: newPrice.id, // Set the new price as default
     });
+
+    // Now safely deactivate the old price (if it exists and is different)
+    if (product.default_price && product.default_price !== newPrice.id) {
+      await stripe.prices.update(product.default_price as string, {
+        active: false,
+      });
+    }
 
     return transformProduct(product);
   } catch (error) {
@@ -325,8 +341,7 @@ export async function updatePack(id: string, data: PackFormData) {
     const packMetadata = {
       bundle_type: data.metadata?.bundle_type,
       contents: data.productIds.join(","),
-      // discount: data?.discount?.toString() || "0",
-      // ...data.metadata,
+      discount: data?.discount?.toString() || "0",
       category: data.metadata?.category,
     };
 
@@ -335,15 +350,28 @@ export async function updatePack(id: string, data: PackFormData) {
       "product"
     );
 
+    // First, create the new price
+    const newPrice = await stripe.prices.create({
+      product: id, // Use the product ID directly
+      unit_amount: data.packPrice,
+      currency: "usd",
+      active: true,
+    });
+
+    // Update the product with new metadata and default price
     const product = await stripe.products.update(id, {
       name: data.name,
       description: data.description,
       metadata: validatedMetadata,
+      default_price: newPrice.id, // Set the new price as default
     });
 
-    // Note: Stripe doesn't allow updating prices directly
-    // In a real application, you might want to create a new price and archive the old one
-    // For now, we'll just update the product metadata
+    // Now safely deactivate the old price (if it exists and is different)
+    if (product.default_price && product.default_price !== newPrice.id) {
+      await stripe.prices.update(product.default_price as string, {
+        active: false,
+      });
+    }
 
     return transformProduct(product);
   } catch (error) {
@@ -389,7 +417,9 @@ export async function listProducts(): Promise<StripeProduct[]> {
 export async function getProduct(slug: string) {
   try {
     const products = await listProducts();
-    const variants = products.filter((product) => product.metadata.slug === slug);
+    const variants = products.filter(
+      (product) => product.metadata.slug === slug
+    );
     return variants;
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -516,12 +546,16 @@ export async function getProductsByProductIds(
 
 export async function getPacks() {
   const products = await listProducts();
-  const packs = products.filter((product) => product.metadata.type === "bundle");
+  const packs = products.filter(
+    (product) => product.metadata.type === "bundle"
+  );
   return packs;
 }
 
 export async function getPack(productId: string) {
   const packs = await getPacks();
-  const pack = packs.filter((pack) => pack.metadata.contents.includes(productId));
+  const pack = packs.filter((pack) =>
+    pack.metadata.contents.includes(productId)
+  );
   return pack;
 }

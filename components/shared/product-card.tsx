@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,13 +44,6 @@ export function ProductCard({
   // const t = useTranslations("home");
   const [isHovered, setIsHovered] = React.useState(false);
   const [mediaLoaded, setMediaLoaded] = React.useState(false);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
 
   const handleAddToCart = () => {
     onAddToCart?.(id);

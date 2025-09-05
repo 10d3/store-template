@@ -1,4 +1,5 @@
-// import Hover from "@/components/shared/hover";
+
+// import Hero from "@/components/shared/hero";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
 // import { getTranslations } from "@/i18n/server";
@@ -134,6 +135,7 @@ export default async function Home() {
         id: pack.id,
         name: pack.name, // Use the pack name directly
         products: packProducts,
+        price: pack.default_price,
         bundleDiscount: pack.metadata?.discount
           ? parseInt(pack.metadata.discount)
           : 0,
@@ -144,7 +146,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <div className="w-full">
-        {/* <Hover /> */}
+        {/* <Hero/> */}
         {/* Products Section */}
         {transformedProducts.length > 0 && (
           <div className="mb-16">
@@ -176,12 +178,13 @@ export default async function Home() {
             <h2 className="text-2xl font-bold mb-8 text-center">
               Bundle Deals
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols- gap-6">
               {transformedPacks.map((pack) => (
                 <PackCard
                   key={pack.id}
                   id={pack.id}
                   name={pack.name}
+                  price={pack.price}
                   products={pack.products}
                   bundleDiscount={pack.bundleDiscount}
                   className="hover:scale-105 transition-transform duration-200"
