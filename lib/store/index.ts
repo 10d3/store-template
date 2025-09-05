@@ -2,6 +2,18 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export interface BundlePack {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  maxQuantity: number;
+  items: CartItem[];
+  discount: number;
+  originalPrice: number;
+  discountType: "percent" | "fixed";
+}
 export interface CartItem {
   id: string;
   variantId?: string; // e.g. "42-red-XL"
@@ -34,6 +46,7 @@ interface CartStore {
   clearCart: () => void;
 
   addBundle: (items: CartItem[]) => void; // pre-defined bundle
+  addBundleAsPack: (bundle: BundlePack) => void; // pre-defined bundle as pack
   addVirtualBundle: (stripePriceId: string, qty: number) => void; // virtual
   applyCoupon: (coupon: CartCoupon) => void;
   removeCoupon: () => void;
@@ -130,6 +143,51 @@ export const useCartStore = create<CartStore>()(
           return { cart: next };
         }),
 
+      // Add this new action alongside your existing addBundle
+      addBundleAsPack: (bundleData) =>
+        set((s) => {
+          const next = [...s.cart];
+
+          // Create a single cart item for the entire bundle
+          const bundleCartItem: CartItem = {
+            id: bundleData.id, // bundle/pack ID
+            name: bundleData.name,
+            price: bundleData.price, // the discounted bundle price
+            quantity: bundleData.quantity || 1,
+            maxQuantity: bundleData.maxQuantity || 10,
+            image:
+              bundleData.image ||
+              bundleData.items[0]?.image ||
+              "/default-bundle.png",
+            metadata: {
+              type: "bundle", // identifier to distinguish from individual items
+              bundleItems: bundleData.items, // store the individual items for reference
+              discount: bundleData.discount,
+              originalPrice: bundleData.originalPrice,
+              discountType: bundleData.discountType,
+            },
+          };
+
+          // Check if this bundle is already in cart
+          const existingBundleIndex = next.findIndex(
+            (item) =>
+              item.id === bundleData.id && item.metadata?.type === "bundle"
+          );
+
+          if (existingBundleIndex >= 0) {
+            // Update quantity if bundle already exists
+            next[existingBundleIndex].quantity = Math.min(
+              next[existingBundleIndex].quantity + (bundleData.quantity || 1),
+              next[existingBundleIndex].maxQuantity
+            );
+          } else {
+            // Add new bundle to cart
+            next.push(bundleCartItem);
+          }
+
+          return { cart: next };
+        }),
+
       /* Virtual bundle – single Price ID represents the whole pack */
       addVirtualBundle: (stripePriceId, qty) => {
         /* You can map the Price ID to a known virtual bundle item */
@@ -167,12 +225,30 @@ export const useCartStore = create<CartStore>()(
       getTotalPrice: () => {
         const sub = get().getSubTotal();
         const { coupon } = get();
-        if (!coupon) return Number((sub / 100).toFixed(2));
 
-        const discount =
-          coupon.type === "percent" ? (coupon.value / 100) * sub : coupon.value;
-        const total = Math.max(sub - discount, 0);
-        return Number((total / 100).toFixed(2));
+        console.log("🔍 Debug getTotalPrice:");
+        console.log("Subtotal (cents):", sub);
+        console.log("Coupon:", coupon);
+
+        // if (!coupon) {
+          const result = Number((sub / 100).toFixed(2));
+          console.log("No coupon - Total (dollars):", result);
+          return result;
+        // }
+
+        // const discount =
+        //   coupon.type === "percent" ? (coupon.value / 100) * sub : coupon.value;
+
+        // console.log("Discount calculation:", discount);
+        // console.log("Discount type:", coupon.type, "value:", coupon.value);
+
+        // const total = Math.max(sub - discount, 0);
+        // console.log("Total after discount (cents):", total);
+
+        // const finalResult = Number((total / 100).toFixed(2));
+        // console.log("Final result (dollars):", finalResult);
+
+        // return finalResult;
       },
 
       getTotalUniqueItems: () => get().cart.length,

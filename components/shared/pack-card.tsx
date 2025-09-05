@@ -32,7 +32,7 @@ interface Price {
 interface PackCardProps {
   id?: string;
   name?: string;
-  price?: Price | null | undefined | string
+  price?: Price | null | undefined | string;
   products: PackProduct[];
   bundleDiscount?: number;
   className?: string;
@@ -54,7 +54,7 @@ export default function PackCard({
   const [hoveredProductId, setHoveredProductId] = React.useState<string | null>(
     null
   );
-  const { addBundle, applyCoupon } = useCartStore();
+  const { applyCoupon, addBundleAsPack } = useCartStore();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -79,7 +79,8 @@ export default function PackCard({
 
   // Get discount in %
   const discountInPercent = Math.floor(
-    ((bundleDiscount * 100 )/ (typeof price === 'object' && price?.unit_amount ? price.unit_amount : 0))
+    (bundleDiscount * 100) /
+      (typeof price === "object" && price?.unit_amount ? price.unit_amount : 0)
   );
 
   // Get maximum individual discount
@@ -103,7 +104,21 @@ export default function PackCard({
         image: product.image,
       }));
 
-      addBundle(bundleItems);
+      addBundleAsPack({
+        id,
+        name,
+        price:
+          typeof price === "object" && price?.unit_amount
+            ? price.unit_amount
+            : 0, // Extract the actual price number
+        image: products[0].image || "", // Add the image
+        quantity: 1, // Add missing quantity
+        maxQuantity: 5, // Add missing maxQuantity
+        items: bundleItems, // Use 'items' instead of 'bundleItems' to match interface
+        discount: discountInPercent, // Ensure it's a number
+        originalPrice: originalTotal,
+        discountType: "percent" as const, // Add missing discountType - adjust based on your logic
+      });
 
       if (bundleDiscount > 0) {
         applyCoupon({
@@ -171,7 +186,7 @@ export default function PackCard({
               className={cn(
                 "relative aspect-square overflow-hidden transition-all duration-300",
                 index === 0 && "rounded-l-lg",
-                index === products.length - 1 && "rounded-r-lg",
+                index === products.length - 1 && "rounded-r-lg"
                 // hoveredProductId === product.id &&
                 //   "ring-2 ring-blue-500 ring-offset-2"
               )}
@@ -278,7 +293,11 @@ export default function PackCard({
             >
               <Plus size={20} className="text-blue-600" />
               <span className="text-xs font-bold">
-                {formatPrice((typeof price === 'object' && price?.unit_amount ? price.unit_amount : 0))}
+                {formatPrice(
+                  typeof price === "object" && price?.unit_amount
+                    ? price.unit_amount
+                    : 0
+                )}
               </span>
             </Button>
           </div>

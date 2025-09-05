@@ -9,6 +9,7 @@ import { ShoppingBagIcon } from "lucide-react";
 import { Suspense } from "react";
 import { CartLink } from "./cart-link";
 import { Badge } from "@/components/ui/badge";
+import { formatPrice } from "@/lib/utils";
 
 const CartFallback = () => (
   <div className="h-6 w-6 opacity-30">
@@ -51,13 +52,13 @@ const CartSummaryNavInner = () => {
                   <span>{totalItems > 99 ? "99+" : totalItems}</span>
                 </Badge>
               </div>
-              <span className="sr-only">Total: {total}</span>
+              <span className="sr-only">Total: {formatPrice(total * 100)}</span>
             </CartLink>
           </div>
         </TooltipTrigger>
         <TooltipContent side="left" sideOffset={25}>
           <p>Total items: {totalItems}</p>
-          <p>Total: {total}</p>
+          <p>Total: {formatPrice(total * 100)}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

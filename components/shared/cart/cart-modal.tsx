@@ -20,7 +20,7 @@ export default function CartModal() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={clearCart}
             >
               Clear all
@@ -52,10 +52,7 @@ export default function CartModal() {
                       <p className="ml-4">
                         {formatPrice(
                           typeof item.price === "number"
-                            ? item.price
-                            // : item.price && "unit_amount" in item.price
-                            //   ? item.price.unit_amount
-                              : 0
+                            ? item.price : 0
                         )}
                       </p>
                     </div>
