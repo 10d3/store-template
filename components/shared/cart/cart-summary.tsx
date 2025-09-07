@@ -9,36 +9,40 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Info } from "lucide-react";
 import Image from "next/image";
+import { useCartStore } from "@/lib/store";
+import { formatPrice } from "@/lib/utils";
 
-interface CartItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+// interface CartItem {
+//   id: string;
+//   name: string;
+//   category: string;
+//   price: number;
+//   quantity: number;
+//   image: string;
+// }
 
 interface CartSummaryProps {
-  items: CartItem[];
-  shippingCost: number;
-  onContinueToPayment: () => void;
+  // items: CartItem[];
+  // shippingCost: number;
+  onContinueToPayment?: () => void;
 }
 
 export function CartSummary({
-  items,
-  shippingCost,
+  // items,
+  // shippingCost,
   onContinueToPayment,
 }: CartSummaryProps) {
   const [discountCode, setDiscountCode] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
 
-  const subtotal = items.reduce(
+  const {cart} = useCartStore()
+
+  const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const estimatedTaxes = 5.0;
-  const total = subtotal + shippingCost + estimatedTaxes - appliedDiscount;
+  const estimatedTaxes = 500;
+  const total = subtotal  + estimatedTaxes - appliedDiscount;
 
   const handleApplyDiscount = () => {
     // Simple discount logic - in real app, this would call an API
@@ -63,7 +67,7 @@ export function CartSummary({
         <CardContent className="space-y-6">
           {/* Cart Items */}
           <div className="space-y-4">
-            {items.map((item, index) => (
+            {cart.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -86,16 +90,16 @@ export function CartSummary({
                     {item.quantity}
                   </Badge>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 justify-between flex flex-col">
                   <h4 className="font-medium text-foreground truncate">
                     {item.name}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    {item.category}
+                    {item.variantId}
                   </p>
                 </div>
                 <div className="text-lg font-semibold text-foreground">
-                  ${item.price.toFixed(2)}
+                  {formatPrice(item.price)}
                 </div>
               </motion.div>
             ))}
@@ -143,18 +147,18 @@ export function CartSummary({
           >
             <div className="flex justify-between text-foreground">
               <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
             <div className="flex justify-between text-foreground">
               <span>Shipping</span>
-              <span>${shippingCost.toFixed(2)}</span>
+              {/* <span>${shippingCost.toFixed(2)}</span> */}
             </div>
             <div className="flex justify-between text-foreground">
               <span className="flex items-center space-x-1">
                 <span>Estimated taxes</span>
                 <Info className="w-4 h-4 text-muted-foreground" />
               </span>
-              <span>${estimatedTaxes.toFixed(2)}</span>
+              <span>{formatPrice(estimatedTaxes)}</span>
             </div>
             {appliedDiscount > 0 && (
               <div className="flex justify-between text-accent">
@@ -165,7 +169,7 @@ export function CartSummary({
             <Separator />
             <div className="flex justify-between text-lg font-semibold text-foreground">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{formatPrice(total)}</span>
             </div>
           </motion.div>
 

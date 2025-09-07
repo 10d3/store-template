@@ -1,3 +1,9 @@
+import PaymentForm from "./payment-form";
+
 export default function StripePayment() {
-  return <div>page</div>;
+  return (
+    <div>
+      <PaymentForm />
+    </div>
+  );
 }

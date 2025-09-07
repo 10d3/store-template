@@ -1,5 +1,3 @@
-
-
 // export const generateMetadata = async (): Promise<Metadata> => {
 //   const t = await getTranslations("/cart.metadata");
 //   return {
@@ -7,12 +5,13 @@
 //   };
 // };
 
-export default async function CartPage() {
+import CheckoutCard from "@/components/shared/cart/checkout-card";
 
-
+export default async function page() {
   return (
     <>
-      <h1>Cart</h1>
+      <h1>La vie</h1>
+      <CheckoutCard />
     </>
   );
 }
