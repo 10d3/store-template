@@ -231,9 +231,9 @@ export const useCartStore = create<CartStore>()(
         console.log("Coupon:", coupon);
 
         // if (!coupon) {
-          const result = Number((sub / 100).toFixed(2));
-          console.log("No coupon - Total (dollars):", result);
-          return result;
+        const result = Number((sub / 100).toFixed(2));
+        console.log("No coupon - Total (dollars):", result);
+        return result;
         // }
 
         // const discount =
@@ -257,6 +257,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: STORAGE_KEY,
+      // storage: createJSONStorage(() => cookieStorage),
       partialize: (state) => ({
         cart: state.cart,
         coupon: state.coupon,
