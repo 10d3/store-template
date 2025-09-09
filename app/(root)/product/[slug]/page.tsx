@@ -28,7 +28,6 @@ import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { Markdown } from "@/components/shared/markdown";
 import CardAnyText from "@/components/shared/card-any-text";
 import { MarkdownNutrition } from "@/components/shared/nutrition-label";
-import { usageExample } from "@/lib/test";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
 
 interface MediaItem {
@@ -271,11 +270,15 @@ export default async function page(props: {
                     <Markdown source={variants[0].description || ""} />
                   </CardAnyText>
                 </div>
-                <div>
-                  <CardAnyText title="Product Information">
-                    <MarkdownNutrition source={usageExample} />
-                  </CardAnyText>
-                </div>
+                {variants[0].metadata.nutrition && (
+                  <div>
+                    <CardAnyText title="Product Information">
+                      <MarkdownNutrition
+                        source={variants[0].metadata.nutrition}
+                      />
+                    </CardAnyText>
+                  </div>
+                )}
               </div>
 
               <Separator className="my-8" />
