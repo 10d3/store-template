@@ -10,6 +10,7 @@ import type { StripeProduct, StripeCoupon } from "@/types/product";
 import { validateMetadata } from "@/lib/metadata/config";
 import { transformMetadataForSubmission } from "@/lib/metadata/form-utils";
 import { ProductCrudError } from "./errors";
+import { prisma } from "../prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
@@ -74,11 +75,31 @@ export async function createProduct(data: ProductFormData) {
       "product"
     );
 
+    // dont send metadata.nutrition to stripe its too long
+    const metadataToSendToStripe = {
+      ...validatedMetadata,
+      nutrition: "",
+    };
+
     const product = await stripe.products.create({
       name: data.name,
       description: data.description,
       images: data.images,
-      metadata: validatedMetadata,
+      metadata: metadataToSendToStripe,
+    });
+
+    //send the metadata.nutriton to our db instead
+    const productNutrition = await prisma.productNutrition.upsert({
+      where: {
+        productId: product.id,
+      },
+      update: {
+        nutrition: data.metadata?.nutrition,
+      },
+      create: {
+        productId: product.id,
+        nutrition: data.metadata?.nutrition,
+      },
     });
 
     await stripe.prices.create({
@@ -87,7 +108,16 @@ export async function createProduct(data: ProductFormData) {
       currency: data.currency,
     });
 
-    return transformProduct(product);
+    //reconstruct the product before returning it
+    const productWithNutrition = {
+      ...product,
+      metadata: {
+        ...product.metadata,
+        nutrition: productNutrition.nutrition,
+      },
+    };
+
+    return transformProduct(productWithNutrition);
   } catch (error) {
     if (error instanceof ProductCrudError) {
       throw error;
@@ -121,11 +151,31 @@ export async function updateProduct(
       active: true,
     });
 
+    //send the metadata.nutriton to our db instead
+
+    const productNutrition = await prisma.productNutrition.upsert({
+      where: {
+        productId: id,
+      },
+      update: {
+        nutrition: data.metadata?.nutrition,
+      },
+      create: {
+        productId: id,
+        nutrition: data.metadata?.nutrition,
+      },
+    });
+
+    // dont send metadata.nutrition to stripe its too long
+    const metadataToSendToStripe = {
+      ...validatedMetadata,
+      nutrition: "",
+    };
     const product = await stripe.products.update(id, {
       name: data.name,
       description: data.description,
       images: data.images,
-      metadata: validatedMetadata,
+      metadata: metadataToSendToStripe,
       default_price: newPrice.id, // Set the new price as default
     });
 
@@ -136,7 +186,16 @@ export async function updateProduct(
       });
     }
 
-    return transformProduct(product);
+    //reconstruct the product before returning it
+    const productWithNutrition = {
+      ...product,
+      metadata: {
+        ...product.metadata,
+        nutrition: productNutrition.nutrition,
+      },
+    };
+
+    return transformProduct(productWithNutrition);
   } catch (error) {
     if (error instanceof ProductCrudError) {
       throw error;
@@ -398,8 +457,28 @@ export async function listProducts(): Promise<StripeProduct[]> {
       expand: ["data.default_price"],
       limit: 100,
     });
-    console.log(products.data[0]);
-    return products.data.map(transformProduct);
+    // add the nutrition to the products while conserving the same structure
+    const productsWithNutrition = await Promise.all(
+      products.data.map(async (product) => {
+        const productNutrition = await prisma.productNutrition.findUnique({
+          where: {
+            productId: product.id,
+          },
+        });
+        // Ensure nutrition is always a string or excluded
+        const metadata = { ...product.metadata };
+        if (productNutrition?.nutrition) {
+          metadata.nutrition = productNutrition.nutrition;
+        }
+
+        return {
+          ...product,
+          metadata,
+        };
+      })
+    );
+    // console.log(products.data[0]);
+    return productsWithNutrition.map(transformProduct);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
       throw new ProductCrudError(

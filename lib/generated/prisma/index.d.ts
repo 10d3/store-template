@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model ProductNutrition
+ * 
+ */
+export type ProductNutrition = $Result.DefaultSelection<Prisma.$ProductNutritionPayload>
+/**
  * Model Review
  * 
  */
@@ -75,8 +80,8 @@ export const Status: typeof $Enums.Status
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Reviews
- * const reviews = await prisma.review.findMany()
+ * // Fetch zero or more ProductNutritions
+ * const productNutritions = await prisma.productNutrition.findMany()
  * ```
  *
  *
@@ -96,8 +101,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Reviews
-   * const reviews = await prisma.review.findMany()
+   * // Fetch zero or more ProductNutritions
+   * const productNutritions = await prisma.productNutrition.findMany()
    * ```
    *
    *
@@ -187,6 +192,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.productNutrition`: Exposes CRUD operations for the **ProductNutrition** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductNutritions
+    * const productNutritions = await prisma.productNutrition.findMany()
+    * ```
+    */
+  get productNutrition(): Prisma.ProductNutritionDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.review`: Exposes CRUD operations for the **Review** model.
     * Example usage:
     * ```ts
@@ -695,6 +710,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    ProductNutrition: 'ProductNutrition',
     Review: 'Review',
     Order: 'Order',
     Wishlist: 'Wishlist',
@@ -720,10 +736,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "review" | "order" | "wishlist" | "user" | "session" | "account" | "verification"
+      modelProps: "productNutrition" | "review" | "order" | "wishlist" | "user" | "session" | "account" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      ProductNutrition: {
+        payload: Prisma.$ProductNutritionPayload<ExtArgs>
+        fields: Prisma.ProductNutritionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductNutritionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductNutritionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductNutritionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductNutritionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          findMany: {
+            args: Prisma.ProductNutritionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>[]
+          }
+          create: {
+            args: Prisma.ProductNutritionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          createMany: {
+            args: Prisma.ProductNutritionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProductNutritionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>[]
+          }
+          delete: {
+            args: Prisma.ProductNutritionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          update: {
+            args: Prisma.ProductNutritionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductNutritionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductNutritionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ProductNutritionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>[]
+          }
+          upsert: {
+            args: Prisma.ProductNutritionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductNutritionPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductNutritionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductNutrition>
+          }
+          groupBy: {
+            args: Prisma.ProductNutritionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductNutritionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductNutritionCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductNutritionCountAggregateOutputType> | number
+          }
+        }
+      }
       Review: {
         payload: Prisma.$ReviewPayload<ExtArgs>
         fields: Prisma.ReviewFieldRefs
@@ -1334,6 +1424,7 @@ export namespace Prisma {
     omit?: Prisma.GlobalOmitConfig
   }
   export type GlobalOmitConfig = {
+    productNutrition?: ProductNutritionOmit
     review?: ReviewOmit
     order?: OrderOmit
     wishlist?: WishlistOmit
@@ -1486,6 +1577,975 @@ export namespace Prisma {
   /**
    * Models
    */
+
+  /**
+   * Model ProductNutrition
+   */
+
+  export type AggregateProductNutrition = {
+    _count: ProductNutritionCountAggregateOutputType | null
+    _min: ProductNutritionMinAggregateOutputType | null
+    _max: ProductNutritionMaxAggregateOutputType | null
+  }
+
+  export type ProductNutritionMinAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    nutrition: string | null
+  }
+
+  export type ProductNutritionMaxAggregateOutputType = {
+    id: string | null
+    productId: string | null
+    nutrition: string | null
+  }
+
+  export type ProductNutritionCountAggregateOutputType = {
+    id: number
+    productId: number
+    nutrition: number
+    _all: number
+  }
+
+
+  export type ProductNutritionMinAggregateInputType = {
+    id?: true
+    productId?: true
+    nutrition?: true
+  }
+
+  export type ProductNutritionMaxAggregateInputType = {
+    id?: true
+    productId?: true
+    nutrition?: true
+  }
+
+  export type ProductNutritionCountAggregateInputType = {
+    id?: true
+    productId?: true
+    nutrition?: true
+    _all?: true
+  }
+
+  export type ProductNutritionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductNutrition to aggregate.
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductNutritions to fetch.
+     */
+    orderBy?: ProductNutritionOrderByWithRelationInput | ProductNutritionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductNutritionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductNutritions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductNutritions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductNutritions
+    **/
+    _count?: true | ProductNutritionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductNutritionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductNutritionMaxAggregateInputType
+  }
+
+  export type GetProductNutritionAggregateType<T extends ProductNutritionAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductNutrition]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductNutrition[P]>
+      : GetScalarType<T[P], AggregateProductNutrition[P]>
+  }
+
+
+
+
+  export type ProductNutritionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductNutritionWhereInput
+    orderBy?: ProductNutritionOrderByWithAggregationInput | ProductNutritionOrderByWithAggregationInput[]
+    by: ProductNutritionScalarFieldEnum[] | ProductNutritionScalarFieldEnum
+    having?: ProductNutritionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductNutritionCountAggregateInputType | true
+    _min?: ProductNutritionMinAggregateInputType
+    _max?: ProductNutritionMaxAggregateInputType
+  }
+
+  export type ProductNutritionGroupByOutputType = {
+    id: string
+    productId: string
+    nutrition: string
+    _count: ProductNutritionCountAggregateOutputType | null
+    _min: ProductNutritionMinAggregateOutputType | null
+    _max: ProductNutritionMaxAggregateOutputType | null
+  }
+
+  type GetProductNutritionGroupByPayload<T extends ProductNutritionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductNutritionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductNutritionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductNutritionGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductNutritionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductNutritionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    nutrition?: boolean
+  }, ExtArgs["result"]["productNutrition"]>
+
+  export type ProductNutritionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    nutrition?: boolean
+  }, ExtArgs["result"]["productNutrition"]>
+
+  export type ProductNutritionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    productId?: boolean
+    nutrition?: boolean
+  }, ExtArgs["result"]["productNutrition"]>
+
+  export type ProductNutritionSelectScalar = {
+    id?: boolean
+    productId?: boolean
+    nutrition?: boolean
+  }
+
+  export type ProductNutritionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "nutrition", ExtArgs["result"]["productNutrition"]>
+
+  export type $ProductNutritionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductNutrition"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      productId: string
+      nutrition: string
+    }, ExtArgs["result"]["productNutrition"]>
+    composites: {}
+  }
+
+  type ProductNutritionGetPayload<S extends boolean | null | undefined | ProductNutritionDefaultArgs> = $Result.GetResult<Prisma.$ProductNutritionPayload, S>
+
+  type ProductNutritionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProductNutritionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProductNutritionCountAggregateInputType | true
+    }
+
+  export interface ProductNutritionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductNutrition'], meta: { name: 'ProductNutrition' } }
+    /**
+     * Find zero or one ProductNutrition that matches the filter.
+     * @param {ProductNutritionFindUniqueArgs} args - Arguments to find a ProductNutrition
+     * @example
+     * // Get one ProductNutrition
+     * const productNutrition = await prisma.productNutrition.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductNutritionFindUniqueArgs>(args: SelectSubset<T, ProductNutritionFindUniqueArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProductNutrition that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProductNutritionFindUniqueOrThrowArgs} args - Arguments to find a ProductNutrition
+     * @example
+     * // Get one ProductNutrition
+     * const productNutrition = await prisma.productNutrition.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductNutritionFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductNutritionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductNutrition that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionFindFirstArgs} args - Arguments to find a ProductNutrition
+     * @example
+     * // Get one ProductNutrition
+     * const productNutrition = await prisma.productNutrition.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductNutritionFindFirstArgs>(args?: SelectSubset<T, ProductNutritionFindFirstArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductNutrition that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionFindFirstOrThrowArgs} args - Arguments to find a ProductNutrition
+     * @example
+     * // Get one ProductNutrition
+     * const productNutrition = await prisma.productNutrition.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductNutritionFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductNutritionFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProductNutritions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductNutritions
+     * const productNutritions = await prisma.productNutrition.findMany()
+     * 
+     * // Get first 10 ProductNutritions
+     * const productNutritions = await prisma.productNutrition.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productNutritionWithIdOnly = await prisma.productNutrition.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductNutritionFindManyArgs>(args?: SelectSubset<T, ProductNutritionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProductNutrition.
+     * @param {ProductNutritionCreateArgs} args - Arguments to create a ProductNutrition.
+     * @example
+     * // Create one ProductNutrition
+     * const ProductNutrition = await prisma.productNutrition.create({
+     *   data: {
+     *     // ... data to create a ProductNutrition
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductNutritionCreateArgs>(args: SelectSubset<T, ProductNutritionCreateArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProductNutritions.
+     * @param {ProductNutritionCreateManyArgs} args - Arguments to create many ProductNutritions.
+     * @example
+     * // Create many ProductNutritions
+     * const productNutrition = await prisma.productNutrition.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductNutritionCreateManyArgs>(args?: SelectSubset<T, ProductNutritionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProductNutritions and returns the data saved in the database.
+     * @param {ProductNutritionCreateManyAndReturnArgs} args - Arguments to create many ProductNutritions.
+     * @example
+     * // Create many ProductNutritions
+     * const productNutrition = await prisma.productNutrition.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProductNutritions and only return the `id`
+     * const productNutritionWithIdOnly = await prisma.productNutrition.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProductNutritionCreateManyAndReturnArgs>(args?: SelectSubset<T, ProductNutritionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ProductNutrition.
+     * @param {ProductNutritionDeleteArgs} args - Arguments to delete one ProductNutrition.
+     * @example
+     * // Delete one ProductNutrition
+     * const ProductNutrition = await prisma.productNutrition.delete({
+     *   where: {
+     *     // ... filter to delete one ProductNutrition
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductNutritionDeleteArgs>(args: SelectSubset<T, ProductNutritionDeleteArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProductNutrition.
+     * @param {ProductNutritionUpdateArgs} args - Arguments to update one ProductNutrition.
+     * @example
+     * // Update one ProductNutrition
+     * const productNutrition = await prisma.productNutrition.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductNutritionUpdateArgs>(args: SelectSubset<T, ProductNutritionUpdateArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProductNutritions.
+     * @param {ProductNutritionDeleteManyArgs} args - Arguments to filter ProductNutritions to delete.
+     * @example
+     * // Delete a few ProductNutritions
+     * const { count } = await prisma.productNutrition.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductNutritionDeleteManyArgs>(args?: SelectSubset<T, ProductNutritionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductNutritions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductNutritions
+     * const productNutrition = await prisma.productNutrition.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductNutritionUpdateManyArgs>(args: SelectSubset<T, ProductNutritionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductNutritions and returns the data updated in the database.
+     * @param {ProductNutritionUpdateManyAndReturnArgs} args - Arguments to update many ProductNutritions.
+     * @example
+     * // Update many ProductNutritions
+     * const productNutrition = await prisma.productNutrition.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ProductNutritions and only return the `id`
+     * const productNutritionWithIdOnly = await prisma.productNutrition.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ProductNutritionUpdateManyAndReturnArgs>(args: SelectSubset<T, ProductNutritionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ProductNutrition.
+     * @param {ProductNutritionUpsertArgs} args - Arguments to update or create a ProductNutrition.
+     * @example
+     * // Update or create a ProductNutrition
+     * const productNutrition = await prisma.productNutrition.upsert({
+     *   create: {
+     *     // ... data to create a ProductNutrition
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductNutrition we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductNutritionUpsertArgs>(args: SelectSubset<T, ProductNutritionUpsertArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProductNutritions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionCountArgs} args - Arguments to filter ProductNutritions to count.
+     * @example
+     * // Count the number of ProductNutritions
+     * const count = await prisma.productNutrition.count({
+     *   where: {
+     *     // ... the filter for the ProductNutritions we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductNutritionCountArgs>(
+      args?: Subset<T, ProductNutritionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductNutritionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductNutrition.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductNutritionAggregateArgs>(args: Subset<T, ProductNutritionAggregateArgs>): Prisma.PrismaPromise<GetProductNutritionAggregateType<T>>
+
+    /**
+     * Group by ProductNutrition.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductNutritionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductNutritionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductNutritionGroupByArgs['orderBy'] }
+        : { orderBy?: ProductNutritionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductNutritionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductNutritionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductNutrition model
+   */
+  readonly fields: ProductNutritionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductNutrition.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductNutritionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductNutrition model
+   */
+  interface ProductNutritionFieldRefs {
+    readonly id: FieldRef<"ProductNutrition", 'String'>
+    readonly productId: FieldRef<"ProductNutrition", 'String'>
+    readonly nutrition: FieldRef<"ProductNutrition", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductNutrition findUnique
+   */
+  export type ProductNutritionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductNutrition to fetch.
+     */
+    where: ProductNutritionWhereUniqueInput
+  }
+
+  /**
+   * ProductNutrition findUniqueOrThrow
+   */
+  export type ProductNutritionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductNutrition to fetch.
+     */
+    where: ProductNutritionWhereUniqueInput
+  }
+
+  /**
+   * ProductNutrition findFirst
+   */
+  export type ProductNutritionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductNutrition to fetch.
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductNutritions to fetch.
+     */
+    orderBy?: ProductNutritionOrderByWithRelationInput | ProductNutritionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductNutritions.
+     */
+    cursor?: ProductNutritionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductNutritions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductNutritions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductNutritions.
+     */
+    distinct?: ProductNutritionScalarFieldEnum | ProductNutritionScalarFieldEnum[]
+  }
+
+  /**
+   * ProductNutrition findFirstOrThrow
+   */
+  export type ProductNutritionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductNutrition to fetch.
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductNutritions to fetch.
+     */
+    orderBy?: ProductNutritionOrderByWithRelationInput | ProductNutritionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductNutritions.
+     */
+    cursor?: ProductNutritionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductNutritions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductNutritions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductNutritions.
+     */
+    distinct?: ProductNutritionScalarFieldEnum | ProductNutritionScalarFieldEnum[]
+  }
+
+  /**
+   * ProductNutrition findMany
+   */
+  export type ProductNutritionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter, which ProductNutritions to fetch.
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductNutritions to fetch.
+     */
+    orderBy?: ProductNutritionOrderByWithRelationInput | ProductNutritionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductNutritions.
+     */
+    cursor?: ProductNutritionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductNutritions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductNutritions.
+     */
+    skip?: number
+    distinct?: ProductNutritionScalarFieldEnum | ProductNutritionScalarFieldEnum[]
+  }
+
+  /**
+   * ProductNutrition create
+   */
+  export type ProductNutritionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ProductNutrition.
+     */
+    data: XOR<ProductNutritionCreateInput, ProductNutritionUncheckedCreateInput>
+  }
+
+  /**
+   * ProductNutrition createMany
+   */
+  export type ProductNutritionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductNutritions.
+     */
+    data: ProductNutritionCreateManyInput | ProductNutritionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductNutrition createManyAndReturn
+   */
+  export type ProductNutritionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * The data used to create many ProductNutritions.
+     */
+    data: ProductNutritionCreateManyInput | ProductNutritionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductNutrition update
+   */
+  export type ProductNutritionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ProductNutrition.
+     */
+    data: XOR<ProductNutritionUpdateInput, ProductNutritionUncheckedUpdateInput>
+    /**
+     * Choose, which ProductNutrition to update.
+     */
+    where: ProductNutritionWhereUniqueInput
+  }
+
+  /**
+   * ProductNutrition updateMany
+   */
+  export type ProductNutritionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductNutritions.
+     */
+    data: XOR<ProductNutritionUpdateManyMutationInput, ProductNutritionUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductNutritions to update
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * Limit how many ProductNutritions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductNutrition updateManyAndReturn
+   */
+  export type ProductNutritionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * The data used to update ProductNutritions.
+     */
+    data: XOR<ProductNutritionUpdateManyMutationInput, ProductNutritionUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductNutritions to update
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * Limit how many ProductNutritions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductNutrition upsert
+   */
+  export type ProductNutritionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ProductNutrition to update in case it exists.
+     */
+    where: ProductNutritionWhereUniqueInput
+    /**
+     * In case the ProductNutrition found by the `where` argument doesn't exist, create a new ProductNutrition with this data.
+     */
+    create: XOR<ProductNutritionCreateInput, ProductNutritionUncheckedCreateInput>
+    /**
+     * In case the ProductNutrition was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductNutritionUpdateInput, ProductNutritionUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductNutrition delete
+   */
+  export type ProductNutritionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+    /**
+     * Filter which ProductNutrition to delete.
+     */
+    where: ProductNutritionWhereUniqueInput
+  }
+
+  /**
+   * ProductNutrition deleteMany
+   */
+  export type ProductNutritionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductNutritions to delete
+     */
+    where?: ProductNutritionWhereInput
+    /**
+     * Limit how many ProductNutritions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductNutrition without action
+   */
+  export type ProductNutritionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductNutrition
+     */
+    select?: ProductNutritionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductNutrition
+     */
+    omit?: ProductNutritionOmit<ExtArgs> | null
+  }
+
 
   /**
    * Model Review
@@ -9371,6 +10431,15 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const ProductNutritionScalarFieldEnum: {
+    id: 'id',
+    productId: 'productId',
+    nutrition: 'nutrition'
+  };
+
+  export type ProductNutritionScalarFieldEnum = (typeof ProductNutritionScalarFieldEnum)[keyof typeof ProductNutritionScalarFieldEnum]
+
+
   export const ReviewScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -9607,6 +10676,48 @@ export namespace Prisma {
    * Deep Input Types
    */
 
+
+  export type ProductNutritionWhereInput = {
+    AND?: ProductNutritionWhereInput | ProductNutritionWhereInput[]
+    OR?: ProductNutritionWhereInput[]
+    NOT?: ProductNutritionWhereInput | ProductNutritionWhereInput[]
+    id?: StringFilter<"ProductNutrition"> | string
+    productId?: StringFilter<"ProductNutrition"> | string
+    nutrition?: StringFilter<"ProductNutrition"> | string
+  }
+
+  export type ProductNutritionOrderByWithRelationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    nutrition?: SortOrder
+  }
+
+  export type ProductNutritionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    productId?: string
+    AND?: ProductNutritionWhereInput | ProductNutritionWhereInput[]
+    OR?: ProductNutritionWhereInput[]
+    NOT?: ProductNutritionWhereInput | ProductNutritionWhereInput[]
+    nutrition?: StringFilter<"ProductNutrition"> | string
+  }, "id" | "productId">
+
+  export type ProductNutritionOrderByWithAggregationInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    nutrition?: SortOrder
+    _count?: ProductNutritionCountOrderByAggregateInput
+    _max?: ProductNutritionMaxOrderByAggregateInput
+    _min?: ProductNutritionMinOrderByAggregateInput
+  }
+
+  export type ProductNutritionScalarWhereWithAggregatesInput = {
+    AND?: ProductNutritionScalarWhereWithAggregatesInput | ProductNutritionScalarWhereWithAggregatesInput[]
+    OR?: ProductNutritionScalarWhereWithAggregatesInput[]
+    NOT?: ProductNutritionScalarWhereWithAggregatesInput | ProductNutritionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProductNutrition"> | string
+    productId?: StringWithAggregatesFilter<"ProductNutrition"> | string
+    nutrition?: StringWithAggregatesFilter<"ProductNutrition"> | string
+  }
 
   export type ReviewWhereInput = {
     AND?: ReviewWhereInput | ReviewWhereInput[]
@@ -10139,6 +11250,48 @@ export namespace Prisma {
     expiresAt?: DateTimeWithAggregatesFilter<"Verification"> | Date | string
     createdAt?: DateTimeNullableWithAggregatesFilter<"Verification"> | Date | string | null
     updatedAt?: DateTimeNullableWithAggregatesFilter<"Verification"> | Date | string | null
+  }
+
+  export type ProductNutritionCreateInput = {
+    id?: string
+    productId: string
+    nutrition: string
+  }
+
+  export type ProductNutritionUncheckedCreateInput = {
+    id?: string
+    productId: string
+    nutrition: string
+  }
+
+  export type ProductNutritionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    nutrition?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ProductNutritionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    nutrition?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ProductNutritionCreateManyInput = {
+    id?: string
+    productId: string
+    nutrition: string
+  }
+
+  export type ProductNutritionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    nutrition?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ProductNutritionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    nutrition?: StringFieldUpdateOperationsInput | string
   }
 
   export type ReviewCreateInput = {
@@ -10752,6 +11905,42 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type ProductNutritionCountOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    nutrition?: SortOrder
+  }
+
+  export type ProductNutritionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    nutrition?: SortOrder
+  }
+
+  export type ProductNutritionMinOrderByAggregateInput = {
+    id?: SortOrder
+    productId?: SortOrder
+    nutrition?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -10859,24 +12048,6 @@ export namespace Prisma {
 
   export type ReviewSumOrderByAggregateInput = {
     rating?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -11356,14 +12527,14 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
   export type UserCreateNestedOneWithoutReviewsInput = {
     create?: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
     connectOrCreate?: UserCreateOrConnectWithoutReviewsInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -11699,6 +12870,23 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -11733,23 +12921,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {

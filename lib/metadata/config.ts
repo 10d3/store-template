@@ -21,7 +21,7 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     key: "category",
     label: "Category",
     type: "select",
-    options: ["coffee", "tea", "accessories", "merchandise",'men','women'],
+    options: ["coffee", "tea", "accessories", "merchandise", "men", "women"],
     description: "Navigation & filters",
     placeholder: "Select category",
   },
@@ -117,7 +117,14 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     description: "Discount amount",
     placeholder: "10",
     min: 0,
-  }
+  },
+  {
+    key: "nutrition",
+    label: "Nutrition",
+    type: "textarea",
+    description: "Nutrition information",
+    placeholder: "Calories: 200, Protein: 10g, Fat: 5g, Carbs: 30g",
+  },
 ];
 
 // Price-level metadata fields

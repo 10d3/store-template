@@ -145,7 +145,8 @@ export function ProductForm({
               seo_title: "",
               seo_description: "",
               tags: "",
-              digital: "false"
+              digital: "false",
+              nutrition: "",
             },
         variants: initialData.variants
           ? initialData.variants.map(createFormVariantFromStripe)
@@ -171,7 +172,8 @@ export function ProductForm({
           seo_title: "",
           seo_description: "",
           tags: "",
-          digital: "false"
+          digital: "false",
+          nutrition: "",
         },
         variants: [],
       });
@@ -685,8 +687,11 @@ export function ProductForm({
                                               updateVariant(
                                                 variant.id!,
                                                 "images",
-                                                [...(variant.images || []), item.ufsUrl]
-                                              )
+                                                [
+                                                  ...(variant.images || []),
+                                                  item.ufsUrl,
+                                                ]
+                                              );
                                             });
                                           }
                                         }}
@@ -719,7 +724,9 @@ export function ProductForm({
                                                       onClick={() => {
                                                         const newImages =
                                                           variant.images
-                                                            ? [...variant.images]
+                                                            ? [
+                                                                ...variant.images,
+                                                              ]
                                                             : [];
                                                         newImages.splice(
                                                           index,
@@ -931,6 +938,26 @@ export function ProductForm({
                             <Input
                               placeholder="SEO optimized title"
                               className="border-2 focus:border-blue-500 transition-colors"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="metadata.nutrition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium">
+                            Nutrition Details
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Enter product description"
+                              className="min-h-[100px] border-2 focus:border-blue-500 transition-colors resize-none"
                               {...field}
                             />
                           </FormControl>
