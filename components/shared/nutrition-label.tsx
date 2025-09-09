@@ -6,13 +6,13 @@ import { Card } from "../ui/card"
 import { Button } from "../ui/button"
 
 const SupplementPanel = ({ children }: { children: React.ReactNode }) => (
-  <Card className="max-w-5xl mx-auto border border-border rounded-xl overflow-hidden shadow-sm bg-card p-0">
+  <div className="max-w-5xl mx-auto rounded-xl overflow-hidden shadow-sm bg-card p-0">
     {children}
-  </Card>
+  </div>
 )
 
 const ProductHeader = ({ title, icon }: { title: string; icon?: string }) => (
-  <div className="bg-muted/30 px-6 py-5 border-b border-border">
+  <div className="px-0 py-5">
     <div className="flex items-center justify-between">
       <h1 className="text-xl font-semibold text-foreground tracking-tight">{title}</h1>
       {icon && (
@@ -29,11 +29,11 @@ const SupplementLayout = ({ children }: { children: React.ReactNode }) => (
 )
 
 const MainInfo = ({ children }: { children: React.ReactNode }) => (
-  <div className="p-6 space-y-5 xl:border-r border-border bg-card/50">{children}</div>
+  <div className="p-0 space-y-5 xl:border-r border-border bg-card/50">{children}</div>
 )
 
 const AdditionalInfo = ({ children }: { children: React.ReactNode }) => (
-  <div className="p-6 space-y-5 bg-card/30">{children}</div>
+  <div className="py-6 space-y-5 bg-card/30">{children}</div>
 )
 
 const ProductDetails = ({ children }: { children: React.ReactNode }) => (

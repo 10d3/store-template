@@ -30,7 +30,7 @@ export default function QuantityManagement({
   };
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 w-full">
       <Button
         className="rounded-full cursor-pointer"
         variant="ghost"
@@ -48,7 +48,7 @@ export default function QuantityManagement({
         <Minus />
       </Button>
       <Input
-        className="w-1/10 rounded-full text-center"
+        className=" md:w-1/10 rounded-full text-center"
         placeholder={mounted ? getItemCountById(product.id).toString() : "0"}
         value={mounted ? getItemCountById(product.id) : 0}
         onChange={(e) =>

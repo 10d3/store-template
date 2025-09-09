@@ -21,30 +21,35 @@ export const ProductBottomStickyCard = ({
           : "transform translate-y-full"
       )}
     >
+      <div className="absolute inset-0 bg-gradient-to-t from-background/5 to-transparent pointer-events-none" />
       <div className="mx-auto w-full max-w-7xl gap-x-2 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <div className="flex items-center gap-x-2 sm:gap-x-4 min-w-0">
           <div className="shrink-0">
             {product.images && (
-              <Image
-                className="w-16 h-16 rounded-lg bg-background-100 object-cover object-center"
-                src={product.images?.[0] ?? ""}
-                loading="eager"
-                priority
-                alt=""
-                width={700}
-                height={700}
-                sizes="(max-width: 1024x) 100vw, (max-width: 1280px) 50vw, 700px"
-              />
+              <div className="relative overflow-hidden rounded-xl bg-muted/50 ring-1 ring-border/10">
+                <Image
+                  className="w-16 h-16 sm:w-18 sm:h-18 object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                  src={product.images?.[0] ?? ""}
+                  loading="eager"
+                  priority
+                  alt=""
+                  width={700}
+                  height={700}
+                  // sizes="(max-width: 1024x) 100vw, (max-width: 1280px) 50vw, 700px"
+                  sizes="72px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
+              </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-xs sm:text-base md:text-lg whitespace-nowrap text-ellipsis overflow-clip">
+            <h3 className="font-semibold text-md sm:text-base text-foreground leading-tight line-clamp-2 text-balance">
               {product.name}
             </h3>
 
             {typeof product.default_price === "object" &&
               product.default_price?.unit_amount && (
-                <p className="text-xs sm:text-sm">
+                <p className="text-lg sm:text-xl font-bold text-primary leading-none">
                   {formatPrice(product.default_price.unit_amount)}
                 </p>
               )}
