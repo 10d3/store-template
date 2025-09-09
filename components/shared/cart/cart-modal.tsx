@@ -1,15 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { CartAsideContainer } from "./cart-aside-container";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { createCheckoutSession } from "@/lib/cart/checkout-session";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function CartModal() {
+  const [isLoading, setIsLoading] = useState(false);
   const { cart, getTotalPrice, clearCart, getItemCount } = useCartStore();
+  const router = useRouter();
+
+  const createCheckoutUrl = async () => {
+    setIsLoading(true);
+    const session = await createCheckoutSession(cart);
+    router.push(session as string);
+    setIsLoading(false);
+  };
+  // const stripeCheckoutSession = useQuery({
+  //   queryKey: ["stripe-checkout-session"],
+  //   queryFn: async () => {
+  //     const session = await createCheckoutSession(cart);
+  //     return session;
+  //   },
+  // });
+
+  // console.log(stripeCheckoutSession.data)
 
   return (
     <CartAsideContainer>
@@ -51,8 +71,7 @@ export default function CartModal() {
                       <h3 className="font-medium">{item.name}</h3>
                       <p className="ml-4">
                         {formatPrice(
-                          typeof item.price === "number"
-                            ? item.price : 0
+                          typeof item.price === "number" ? item.price : 0
                         )}
                       </p>
                     </div>
@@ -74,8 +93,17 @@ export default function CartModal() {
           <p className="mt-1 text-sm text-muted-foreground">
             Shipping and taxes calculated at checkout
           </p>
-          <Button asChild size="lg" className="mt-6 w-full rounded-full">
-            <Link href="/cart">Proceed to Checkout</Link>
+          <Button
+            onClick={createCheckoutUrl}
+            disabled={isLoading}
+            size="lg"
+            className="mt-6 w-full rounded-full"
+          >
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Proceed to Checkout"
+            )}
           </Button>
         </div>
       </div>
