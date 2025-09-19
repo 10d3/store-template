@@ -110,7 +110,17 @@ export function ProductForm({
       price: 1000,
       currency: "usd",
       images: [],
-      metadata: {},
+      metadata: transformMetadataFromStripe({
+         slug: "",
+         category: "",
+         gender: "",
+         pack_size: "",
+         seo_title: "",
+         seo_description: "",
+         tags: "",
+         digital: "false",
+         nutrition: ""
+       }, "product"),
       variants: [],
     },
   });
@@ -135,19 +145,17 @@ export function ProductForm({
             ? initialData.default_price.currency
             : "usd",
         images: initialData.images || [],
-        metadata: initialData.metadata
-          ? transformMetadataFromStripe(initialData.metadata, "product")
-          : {
-              slug: "",
-              category: "",
-              gender: "",
-              pack_size: "",
-              seo_title: "",
-              seo_description: "",
-              tags: "",
-              digital: "false",
-              nutrition: "",
-            },
+        metadata: transformMetadataFromStripe(initialData.metadata || {
+          slug: "",
+          category: "",
+          gender: "",
+          pack_size: "",
+          seo_title: "",
+          seo_description: "",
+          tags: "",
+          digital: "false",
+          nutrition: ""
+        }, "product"),
         variants: initialData.variants
           ? initialData.variants.map(createFormVariantFromStripe)
           : [],
@@ -164,7 +172,7 @@ export function ProductForm({
         price: 1000,
         currency: "usd",
         images: [],
-        metadata: {
+        metadata: transformMetadataFromStripe({
           slug: "",
           category: "",
           gender: "",
@@ -173,8 +181,8 @@ export function ProductForm({
           seo_description: "",
           tags: "",
           digital: "false",
-          nutrition: "",
-        },
+          nutrition: ""
+        }, "product"),
         variants: [],
       });
     }
