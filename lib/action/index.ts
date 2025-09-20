@@ -1,3 +1,4 @@
+"use server"
 import { prisma } from "../prisma";
 
 export const fsindBlog = async (id: string | undefined) => {
@@ -29,7 +30,7 @@ export const findBlogs = async () => {
 
 export const findBlogBySlug = async (
   slug: string,
-  viewerIdentifier: string, // Add viewerIdentifier parameter
+  viewerIdentifier: string // Add viewerIdentifier parameter
 ) => {
   try {
     const blog = await prisma.blog.findUnique({
@@ -72,5 +73,18 @@ export const findBlogBySlug = async (
   } catch (error) {
     console.error(error);
     return null;
+  }
+};
+
+export const publishBlog = async (id: string) => {
+  try {
+    await prisma.blog.update({
+      where: { id },
+      data: {
+        published: true,
+      },
+    });
+  } catch (error) {
+    console.error(error);
   }
 };

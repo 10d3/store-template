@@ -28,10 +28,11 @@ export const Editor = ({
 }: {
   content: string;
   onChange?: (content: string) => void;
+  isReadOnly?: boolean;
 }) => {
   const { startUpload } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
-        console.log(res)
+      console.log(res);
       if (res && res.length > 0) {
         editor?.chain().focus().setImage({ src: res[0].ufsUrl }).run();
       }
@@ -78,7 +79,7 @@ export const Editor = ({
     }),
     ImageExtension,
     ImagePlaceholder.configure({
-      onDrop: async(files) => {
+      onDrop: async (files) => {
         startUpload(files);
       },
     }),
