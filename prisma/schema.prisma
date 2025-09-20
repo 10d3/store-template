@@ -8,6 +8,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Blog {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  title          String
+  coverImage     String?
+  content        String?    @db.Text
+  seoTitle       String?
+  seoDescription String?
+  authorId       String
+  published      Boolean    @default(false)
+  views          Int        @default(0)
+  author         User       @relation(fields: [authorId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  BlogView       BlogView[]
+}
+
+model BlogView {
+  id               String   @id @default(cuid())
+  blogId           String
+  blog             Blog     @relation(fields: [blogId], references: [id])
+  viewerIdentifier String // This could be an IP address or a session ID
+  createdAt        DateTime @default(now())
+
+  @@unique([blogId, viewerIdentifier]) // Ensures a unique view per blog per viewer
+}
+
 model ProductNutrition {
   id        String @id @default(uuid())
   productId String @unique
@@ -70,6 +97,7 @@ model User {
   banned     Boolean?
   banReason  String?
   banExpires DateTime?
+  Blog       Blog[]
 
   @@unique([email])
   @@map("user")

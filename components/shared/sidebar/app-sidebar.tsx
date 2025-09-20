@@ -16,6 +16,7 @@ import { NavUser } from "./nav-user";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
+import { PiArticleNyTimesDuotone } from "react-icons/pi";
 
 const sidebarData = {
   navMain: [
@@ -44,6 +45,11 @@ const sidebarData = {
       url: "/admin/order",
       icon: Users,
     },
+    {
+      title: "Blog",
+      url:"/admin/blog",
+      icon: PiArticleNyTimesDuotone
+    }
   ],
 };
 
