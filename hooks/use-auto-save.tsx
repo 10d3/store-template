@@ -41,6 +41,7 @@ export default function useAutoSave(blogData: Blog) {
           seoDescription: newData.seoDescription,
           authorId: newData.authorId,
         });
+        console.log(updateData)
         setBlogId(updateData?.id as string);
         setLastSaveData(newData);
 

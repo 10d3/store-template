@@ -67,7 +67,7 @@ export default async function page(props: { params: Promise<{ id: string }> }) {
 
       <main className="max-w-4xl mx-auto px-2 md:px-6 py-6 md:py-12 lg:py-16">
         <div
-          className="prose prose-lg prose-neutral dark:prose-invert max-w-none
+          className="prose prose-lg prose-neutral dark:prose-invert max-w-none prose-p:text-justify
                      prose-headings:font-light prose-headings:text-foreground
                      prose-p:text-foreground/90 prose-p:leading-relaxed
                      prose-a:text-primary prose-a:no-underline hover:prose-a:underline

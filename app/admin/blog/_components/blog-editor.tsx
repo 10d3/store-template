@@ -7,6 +7,9 @@ import type { Blog } from "@/lib/generated/prisma";
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Loader2, Save, AlertCircle } from "lucide-react";
+import { UploadButton } from "@/lib/uploadthing";
+import { uploadThemes } from "@/lib/theme/upload-theme";
+import Image from "next/image";
 
 export default function BlogEditor({ blogData }: { blogData: Blog }) {
   const [blogDataS, setBlogDataS] = useState(blogData);
@@ -101,6 +104,13 @@ export default function BlogEditor({ blogData }: { blogData: Blog }) {
     }));
   };
 
+  const handleCoverImageUpload = (url: string) => {
+    setBlogDataS((prev) => ({
+      ...prev,
+      coverImage: url,
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl md:px-4 py-8 sm:px-0 lg:px-8">
@@ -152,6 +162,34 @@ export default function BlogEditor({ blogData }: { blogData: Blog }) {
               )}
             </h1>
           )}
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Cover Image
+          </label>
+          {blogDataS.coverImage && (
+            <div className="relative w-full h-64 mb-4 rounded-md overflow-hidden">
+              <Image
+                src={blogDataS.coverImage}
+                alt="Cover Image"
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
+          )}
+          <UploadButton
+            appearance={uploadThemes.colorful.uploadButton}
+            endpoint="imageUploader"
+            onClientUploadComplete={(res) => {
+              if (res?.[0]?.ufsUrl) {
+                handleCoverImageUpload(res[0].ufsUrl);
+              }
+            }}
+            onUploadError={(error: Error) => {
+              console.error("Upload error:", error);
+            }}
+          />
         </div>
 
         <div className="mb-12">
