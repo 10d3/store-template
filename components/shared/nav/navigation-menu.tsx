@@ -141,6 +141,15 @@ export default function Navbar() {
                   <Link href="/contact">Contact</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}
+                >
+                  <Link href="/blog">Insight</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
@@ -192,7 +201,7 @@ export default function Navbar() {
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[320px] sm:w-[380px] p-0">
+              <SheetContent side="left" className="w-[320px] sm:w-[380px] p-0">
                 <div className="flex flex-col h-full">
                   {/* Header */}
                   <div className="px-6 py-4 border-b bg-muted/20">
@@ -255,6 +264,13 @@ export default function Navbar() {
                         className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
                       >
                         Contact
+                      </Link>
+
+                      <Link
+                        href="/blog"
+                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
+                      >
+                        Insight
                       </Link>
                     </nav>
                   </div>

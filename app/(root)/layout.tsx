@@ -2,7 +2,15 @@ import CartModal from "@/components/shared/cart/cart-modal";
 import Footer from "@/components/shared/footer";
 import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
 import Navbar from "@/components/shared/nav/navigation-menu";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Vitanou Store",
+  description: "",
+  keywords: [],
+  creator: ""
+}
 
 export default function Rootlayout({
   children,
