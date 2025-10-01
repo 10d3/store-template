@@ -1,7 +1,46 @@
-import { findBlogBySlug } from "@/lib/action";
+import { findBlogBySlug, findBlogBySlugWithoutView } from "@/lib/action";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { Calendar, Eye, User } from "lucide-react";
+import { getBaseURL } from "@/lib/utils";
+
+interface paramsProp {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+export async function generateMetadata({ params }: paramsProp) {
+  const { slug } = await params;
+  const blog = await findBlogBySlugWithoutView(slug);
+
+  const ogImageUrl = `${getBaseURL()}/api/og?template=minimal-blog&title=${encodeURIComponent(blog?.title || "")}&logo=${encodeURIComponent("https://fhi5b89inu.ufs.sh/f/RPE5CBbg6eKjkfFs83icCP1fGOZSHyLix7snjqw3EzgJbN49")}&date=${blog?.createdAt ? new Date(blog.createdAt).toLocaleDateString() : ""}&image=${encodeURIComponent(blog?.coverImage || "")}&bgColor=#a8d5d8`;
+
+  return {
+    title: blog?.title,
+    openGraph: {
+      title: blog?.title,
+      description: `${blog?.seoDescription}`,
+      url: `isolatucasa.com/blog/${blog?.slug}`,
+      siteName: "ISOLA",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 800,
+          height: 600,
+        },
+        {
+          url: ogImageUrl,
+          width: 1800,
+          height: 1600,
+          alt: `image of ${blog?.title}`,
+        },
+      ],
+      locale: "es_SP",
+      type: "website",
+    },
+  };
+}
 
 export default async function page(props: { params: Promise<{ id: string }> }) {
   const headersList = await headers();

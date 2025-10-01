@@ -28,6 +28,19 @@ export const findBlogs = async () => {
   }
 };
 
+export const findBlogBySlugWithoutView = async (slug: string) => {
+  try {
+    const blog = await prisma.blog.findUnique({
+      where: { slug },
+    });
+    return blog;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+
 export const findBlogBySlug = async (
   slug: string,
   viewerIdentifier: string // Add viewerIdentifier parameter

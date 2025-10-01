@@ -55,3 +55,13 @@ export const transformTitletoSlug = (title: string): string => {
     .replace(/\s+/g, "-") // Replace spaces with single hyphens
     .replace(/-+/g, "-"); // Replace multiple hyphens with single hyphen
 };
+
+export const getBaseURL = () => {
+  if (typeof window !== "undefined") {
+    // Client-side: use current origin
+    return window.location.origin;
+  }
+
+  // Server-side: use environment variable
+  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+};
