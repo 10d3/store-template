@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: paramsProp) {
     openGraph: {
       title: blog?.title,
       description: `${blog?.seoDescription}`,
-      url: `isolatucasa.com/blog/${blog?.slug}`,
-      siteName: "ISOLA",
+      url: `${getBaseURL()}/blog/${blog?.slug}`,
+      siteName: "Vitanou",
       images: [
         {
           url: ogImageUrl,
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: paramsProp) {
           alt: `image of ${blog?.title}`,
         },
       ],
-      locale: "es_SP",
+      locale: "en_US",
       type: "website",
     },
   };
