@@ -98,6 +98,10 @@ model User {
   banReason  String?
   banExpires DateTime?
   Blog       Blog[]
+  affiliate  Affiliate?
+  referredBy Referral?  @relation("ReferredUser")
+  Referral   Referral?  @relation(fields: [referralId], references: [id])
+  referralId String?
 
   @@unique([email])
   @@map("user")
@@ -148,6 +152,215 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+// affilation
+
+model Affiliate {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Affiliate details
+  referralCode   String          @unique
+  status         AffiliateStatus @default(PENDING)
+  commissionRate Float           @default(10.0) // percentage or fixed amount
+  commissionType CommissionType  @default(PERCENTAGE)
+
+  // Payment info
+  paypalEmail   String?
+  bankAccount   String?
+  paymentMethod PaymentMethod?
+
+  // Statistics
+  totalClicks      Int   @default(0)
+  totalConversions Int   @default(0)
+  totalEarnings    Float @default(0)
+  availableBalance Float @default(0)
+  lifetimeEarnings Float @default(0)
+
+  // Metadata
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  approvedAt DateTime?
+
+  // Relations
+  referrals   Referral[]
+  commissions Commission[]
+  payouts     Payout[]
+  clicks      AffiliateClick[]
+
+  @@index([referralCode])
+  @@index([status])
+  @@map("affiliates")
+}
+
+// Track referral clicks
+model AffiliateClick {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  // Click details
+  ipAddress   String?
+  userAgent   String?
+  referer     String?
+  landingPage String?
+
+  // Tracking
+  converted   Boolean   @default(false)
+  convertedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([affiliateId])
+  @@index([ipAddress, createdAt])
+  @@index([converted])
+  @@map("affiliate_clicks")
+}
+
+// Purchase referral record (main conversion)
+model Referral {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  // Customer info
+  userId String? @unique
+  user   User?   @relation("ReferredUser", fields: [userId], references: [id], onDelete: SetNull)
+  email  String?
+
+  // Purchase details
+  status     ReferralStatus @default(PENDING)
+  orderValue Float          @default(0) // Total purchase amount
+
+  // Tracking
+  ipAddress   String?
+  convertedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  commissions Commission[]
+  User        User[]
+
+  @@index([affiliateId])
+  @@index([email])
+  @@index([status])
+  @@index([convertedAt])
+  @@map("referrals")
+}
+
+// Commission records (payment to affiliate)
+model Commission {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  referralId String
+  referral   Referral @relation(fields: [referralId], references: [id], onDelete: Cascade)
+
+  // Commission details
+  amount Float
+  type   CommissionType
+  rate   Float // Rate at time of commission
+  status CommissionStatus @default(PENDING)
+
+  // Payout tracking
+  payoutId String?
+  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+
+  // Metadata
+  description String?
+  notes       String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  paidAt    DateTime?
+
+  @@index([affiliateId])
+  @@index([referralId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("commissions")
+}
+
+// Payout records (batch payments to affiliates)
+model Payout {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  // Payout details
+  amount Float
+  method PaymentMethod
+  status PayoutStatus  @default(PENDING)
+
+  // Payment details
+  transactionId  String?
+  paymentEmail   String?
+  paymentAccount String?
+
+  // Metadata
+  notes         String?
+  failureReason String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  processedAt DateTime?
+  completedAt DateTime?
+
+  // Relations
+  commissions Commission[]
+
+  @@index([affiliateId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payouts")
+}
+
+// Enums
+enum AffiliateStatus {
+  PENDING // Waiting for admin approval
+  ACTIVE // Can earn commissions
+  SUSPENDED // Temporarily disabled
+  REJECTED // Application rejected
+}
+
+enum ReferralStatus {
+  PENDING // Purchase initiated but not completed
+  COMPLETED // Purchase completed successfully
+  CANCELLED // Purchase cancelled
+  REFUNDED // Purchase refunded
+}
+
+enum CommissionType {
+  PERCENTAGE // Commission based on percentage of sale
+  FIXED // Fixed amount per sale
+}
+
+enum CommissionStatus {
+  PENDING // Awaiting approval
+  APPROVED // Approved, ready for payout
+  PAID // Already paid out
+  CANCELLED // Cancelled (e.g., due to refund)
+}
+
+enum PaymentMethod {
+  PAYPAL
+  BANK_TRANSFER
+  STRIPE
+  CRYPTO
+}
+
+enum PayoutStatus {
+  PENDING // Waiting to be processed
+  PROCESSING // Currently being processed
+  COMPLETED // Successfully completed
+  FAILED // Payment failed
+  CANCELLED // Payout cancelled
 }
 
 enum Status {
