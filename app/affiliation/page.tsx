@@ -144,7 +144,7 @@ export default async function Page() {
   ];
 
   return (
-    <div className="pt-8 flex flex-col gap-8">
+    <div className="pt-8 flex flex-col gap-8 bg-secondary/80 px-4 h-full">
       <div className="grid grid-cols-5 gap-4">
         {statsData.map((stat, index) => (
           <CardStats
@@ -162,7 +162,7 @@ export default async function Page() {
           />
         ))}
       </div>
-      <div className="p-4 bg-purple-500 rounded-2xl flex flex-col gap-6">
+      <div className="p-4 bg-background rounded-2xl flex flex-col gap-6">
         <h1 className="text-2xl font-bold text-white">
           Top products affiliate
         </h1>

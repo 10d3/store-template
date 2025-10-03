@@ -35,7 +35,7 @@ export default async function Layout({
             <Separator orientation="vertical" className="mr-2 h-4" />
             <BreadcrumbNav activeTenat={"affiliate"} />
           </div>
-          <div className="flex-1 flex justify-center px-4">
+          <div className="flex-1 flex justify-center">
             <div className="w-full">{children}</div>
           </div>
         </div>

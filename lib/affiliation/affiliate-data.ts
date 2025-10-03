@@ -107,7 +107,7 @@ export async function getAffiliationData() {
 
     // Get top selling product
     const topProduct = await prisma.referral.groupBy({
-      by: ['productId', 'productName'],
+      by: ["productId", "productName"],
       where: {
         affiliateId: affiliate.id,
         status: "COMPLETED",
@@ -117,7 +117,7 @@ export async function getAffiliationData() {
       },
       orderBy: {
         _sum: {
-          quantity: 'desc',
+          quantity: "desc",
         },
       },
       take: 1,
@@ -140,11 +140,14 @@ export async function getAffiliationData() {
         recentSales,
         recentEarnings: recentEarnings._sum.amount || 0,
         totalSoldProducts: totalSoldProducts._sum.quantity || 0,
-        topProduct: topProduct.length > 0 ? {
-          productId: topProduct[0].productId,
-          productName: topProduct[0].productName,
-          quantity: topProduct[0]._sum.quantity || 0
-        } : null,
+        topProduct:
+          topProduct.length > 0
+            ? {
+                productId: topProduct[0].productId,
+                productName: topProduct[0].productName,
+                quantity: topProduct[0]._sum.quantity || 0,
+              }
+            : null,
         createdAt: affiliate.createdAt,
       },
       referrals: affiliate.referrals,
@@ -153,6 +156,29 @@ export async function getAffiliationData() {
     };
   } catch (error) {
     console.error("Get dashboard error:", error);
+    throw new Error("");
+  }
+}
+
+export async function getRefferalCode() {
+  try {
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    const affiliate = await prisma.affiliate.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!affiliate) {
+      throw new Error("Affiliate not found");
+    }
+
+    return affiliate.referralCode;
+  } catch (error) {
+    console.error("Get referral code error:", error);
     throw new Error("");
   }
 }
