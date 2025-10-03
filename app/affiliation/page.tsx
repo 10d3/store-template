@@ -1,7 +1,11 @@
-import React from "react";
+import React, { Suspense } from "react";
 import CardStats from "./_components/card-stats";
 import CardProduct from "./_components/card-product";
+import CardStatsSkeleton from "./_components/card-stats-skeleton";
+import CardProductSkeleton from "./_components/card-product-skeleton";
 import { getAffiliationData } from "@/lib/affiliation/affiliate-data";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default async function Page() {
   const data = await getAffiliationData();
@@ -145,38 +149,67 @@ export default async function Page() {
 
   return (
     <div className="pt-8 flex flex-col gap-8 bg-secondary/80 px-4 h-full">
-      <div className="grid grid-cols-5 gap-4">
-        {statsData.map((stat, index) => (
-          <CardStats
-            key={index}
-            title={stat.title}
-            totalSales={stat.value}
-            chartData={stat.chartData}
-            chartConfig={{
-              desktop: {
-                label: stat.title,
-                color: "var(--chart-1)",
-              },
-            }}
-            pourcentageChange={stat.percentageChange}
-          />
-        ))}
-      </div>
+      <Suspense fallback={
+        <div className="grid grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <CardStatsSkeleton key={i} />
+          ))}
+        </div>
+      }>
+        {!data || !affiliate ? (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Could not load affiliate data. Please try again later.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <div className="grid grid-cols-5 gap-4">
+            {statsData.map((stat, index) => (
+              <CardStats
+                key={index}
+                title={stat.title}
+                totalSales={stat.value || 0}
+                chartData={stat.chartData || []}
+                chartConfig={{
+                  desktop: {
+                    label: stat.title,
+                    color: "var(--chart-1)",
+                  },
+                }}
+                pourcentageChange={stat.percentageChange || 0}
+              />
+            ))}
+          </div>
+        )}
+      </Suspense>
+
       <div className="p-4 bg-background rounded-2xl flex flex-col gap-6">
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-2xl font-bold text-foreground">
           Top products affiliate
         </h1>
-        {affiliate.topProduct && (
-          <CardProduct
-            productName={affiliate.topProduct.productName}
-            postedAt={
-              data.referrals[0]?.convertedAt?.toISOString().split("T")[0] || "-"
-            }
-            totalClicks={affiliate.totalClicks}
-            commissions={affiliate.availableBalance}
-            sold={affiliate.topProduct.quantity}
-          />
-        )}
+        <Suspense fallback={<CardProductSkeleton />}>
+          {!affiliate?.topProduct ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>No top product</AlertTitle>
+              <AlertDescription>
+                Start promoting products to see your top performer here.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <CardProduct
+              productName={affiliate.topProduct.productName}
+              postedAt={
+                data.referrals[0]?.convertedAt?.toISOString().split("T")[0] || "-"
+              }
+              totalClicks={affiliate.totalClicks}
+              commissions={affiliate.availableBalance}
+              sold={affiliate.topProduct.quantity}
+            />
+          )}
+        </Suspense>
       </div>
     </div>
   );

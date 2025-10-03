@@ -48,12 +48,12 @@ export default async function page() {
             <div className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3">
               <div className="max-w-xs">
                 <p className="truncate text-sm text-muted-foreground">
-                  {`${getBaseURL()}/product/${product.metadata.slug}?affiliate=${refferalCode}`}
+                  {`${getBaseURL()}/product/${product.metadata.slug}?ref=${refferalCode}`}
                 </p>
               </div>
               <CopyLinkButton
                 productId={product.id}
-                link={`${getBaseURL()}/product/${product.metadata.slug}?affiliate=${refferalCode}`}
+                link={`${getBaseURL()}/product/${product.metadata.slug}?ref=${refferalCode}`}
               />
             </div>
           </div>
