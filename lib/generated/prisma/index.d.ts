@@ -207,7 +207,7 @@ export const Status: typeof $Enums.Status
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -239,6 +239,13 @@ export class PrismaClient<
    * Disconnect from the database
    */
   $disconnect(): $Utils.JsPromise<void>;
+
+  /**
+   * Add a middleware
+   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
+   * @see https://pris.ly/d/extensions
+   */
+  $use(cb: Prisma.Middleware): void
 
 /**
    * Executes a prepared raw query and returns the number of affected rows.
@@ -516,8 +523,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.16.3
-   * Query Engine version: bb420e667c1820a8c05a38023385f6cc7ef8e83a
+   * Prisma Client JS version: 6.12.0
+   * Query Engine version: 8047c96bbd92db98a2abc7c9323ce77c02c89dbc
    */
   export type PrismaVersion = {
     client: string
@@ -2088,24 +2095,16 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Shorthand for `emit: 'stdout'`
+     * // Defaults to stdout
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events only
+     * // Emit as events
      * log: [
-     *   { emit: 'event', level: 'query' },
-     *   { emit: 'event', level: 'info' },
-     *   { emit: 'event', level: 'warn' }
-     *   { emit: 'event', level: 'error' }
+     *   { emit: 'stdout', level: 'query' },
+     *   { emit: 'stdout', level: 'info' },
+     *   { emit: 'stdout', level: 'warn' }
+     *   { emit: 'stdout', level: 'error' }
      * ]
-     * 
-     * / Emit as events and log to stdout
-     * og: [
-     *  { emit: 'stdout', level: 'query' },
-     *  { emit: 'stdout', level: 'info' },
-     *  { emit: 'stdout', level: 'warn' }
-     *  { emit: 'stdout', level: 'error' }
-     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -2120,10 +2119,6 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
-    /**
-     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
-     */
-    adapter?: runtime.SqlDriverAdapterFactory | null
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -2165,15 +2160,10 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
-
-  export type GetLogType<T> = CheckIsLogLevel<
-    T extends LogDefinition ? T['level'] : T
-  >;
-
-  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
-    ? GetLogType<T[number]>
-    : never;
+  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
+  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
+    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
+    : never
 
   export type QueryEvent = {
     timestamp: Date
@@ -2213,6 +2203,25 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
+
+  /**
+   * These options are being passed into the middleware as "params"
+   */
+  export type MiddlewareParams = {
+    model?: ModelName
+    action: PrismaAction
+    args: any
+    dataPath: string[]
+    runInTransaction: boolean
+  }
+
+  /**
+   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
+   */
+  export type Middleware<T = any> = (
+    params: MiddlewareParams,
+    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
+  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -16211,10 +16220,12 @@ export namespace Prisma {
 
   export type ReferralAvgAggregateOutputType = {
     orderValue: number | null
+    quantity: number | null
   }
 
   export type ReferralSumAggregateOutputType = {
     orderValue: number | null
+    quantity: number | null
   }
 
   export type ReferralMinAggregateOutputType = {
@@ -16224,6 +16235,9 @@ export namespace Prisma {
     email: string | null
     status: $Enums.ReferralStatus | null
     orderValue: number | null
+    productId: string | null
+    productName: string | null
+    quantity: number | null
     ipAddress: string | null
     convertedAt: Date | null
     createdAt: Date | null
@@ -16237,6 +16251,9 @@ export namespace Prisma {
     email: string | null
     status: $Enums.ReferralStatus | null
     orderValue: number | null
+    productId: string | null
+    productName: string | null
+    quantity: number | null
     ipAddress: string | null
     convertedAt: Date | null
     createdAt: Date | null
@@ -16250,6 +16267,9 @@ export namespace Prisma {
     email: number
     status: number
     orderValue: number
+    productId: number
+    productName: number
+    quantity: number
     ipAddress: number
     convertedAt: number
     createdAt: number
@@ -16260,10 +16280,12 @@ export namespace Prisma {
 
   export type ReferralAvgAggregateInputType = {
     orderValue?: true
+    quantity?: true
   }
 
   export type ReferralSumAggregateInputType = {
     orderValue?: true
+    quantity?: true
   }
 
   export type ReferralMinAggregateInputType = {
@@ -16273,6 +16295,9 @@ export namespace Prisma {
     email?: true
     status?: true
     orderValue?: true
+    productId?: true
+    productName?: true
+    quantity?: true
     ipAddress?: true
     convertedAt?: true
     createdAt?: true
@@ -16286,6 +16311,9 @@ export namespace Prisma {
     email?: true
     status?: true
     orderValue?: true
+    productId?: true
+    productName?: true
+    quantity?: true
     ipAddress?: true
     convertedAt?: true
     createdAt?: true
@@ -16299,6 +16327,9 @@ export namespace Prisma {
     email?: true
     status?: true
     orderValue?: true
+    productId?: true
+    productName?: true
+    quantity?: true
     ipAddress?: true
     convertedAt?: true
     createdAt?: true
@@ -16399,6 +16430,9 @@ export namespace Prisma {
     email: string | null
     status: $Enums.ReferralStatus
     orderValue: number
+    productId: string
+    productName: string
+    quantity: number
     ipAddress: string | null
     convertedAt: Date | null
     createdAt: Date
@@ -16431,6 +16465,9 @@ export namespace Prisma {
     email?: boolean
     status?: boolean
     orderValue?: boolean
+    productId?: boolean
+    productName?: boolean
+    quantity?: boolean
     ipAddress?: boolean
     convertedAt?: boolean
     createdAt?: boolean
@@ -16449,6 +16486,9 @@ export namespace Prisma {
     email?: boolean
     status?: boolean
     orderValue?: boolean
+    productId?: boolean
+    productName?: boolean
+    quantity?: boolean
     ipAddress?: boolean
     convertedAt?: boolean
     createdAt?: boolean
@@ -16464,6 +16504,9 @@ export namespace Prisma {
     email?: boolean
     status?: boolean
     orderValue?: boolean
+    productId?: boolean
+    productName?: boolean
+    quantity?: boolean
     ipAddress?: boolean
     convertedAt?: boolean
     createdAt?: boolean
@@ -16479,13 +16522,16 @@ export namespace Prisma {
     email?: boolean
     status?: boolean
     orderValue?: boolean
+    productId?: boolean
+    productName?: boolean
+    quantity?: boolean
     ipAddress?: boolean
     convertedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ReferralOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "affiliateId" | "userId" | "email" | "status" | "orderValue" | "ipAddress" | "convertedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["referral"]>
+  export type ReferralOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "affiliateId" | "userId" | "email" | "status" | "orderValue" | "productId" | "productName" | "quantity" | "ipAddress" | "convertedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["referral"]>
   export type ReferralInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     affiliate?: boolean | AffiliateDefaultArgs<ExtArgs>
     user?: boolean | Referral$userArgs<ExtArgs>
@@ -16517,6 +16563,9 @@ export namespace Prisma {
       email: string | null
       status: $Enums.ReferralStatus
       orderValue: number
+      productId: string
+      productName: string
+      quantity: number
       ipAddress: string | null
       convertedAt: Date | null
       createdAt: Date
@@ -16954,6 +17003,9 @@ export namespace Prisma {
     readonly email: FieldRef<"Referral", 'String'>
     readonly status: FieldRef<"Referral", 'ReferralStatus'>
     readonly orderValue: FieldRef<"Referral", 'Float'>
+    readonly productId: FieldRef<"Referral", 'String'>
+    readonly productName: FieldRef<"Referral", 'String'>
+    readonly quantity: FieldRef<"Referral", 'Int'>
     readonly ipAddress: FieldRef<"Referral", 'String'>
     readonly convertedAt: FieldRef<"Referral", 'DateTime'>
     readonly createdAt: FieldRef<"Referral", 'DateTime'>
@@ -20115,6 +20167,9 @@ export namespace Prisma {
     email: 'email',
     status: 'status',
     orderValue: 'orderValue',
+    productId: 'productId',
+    productName: 'productName',
+    quantity: 'quantity',
     ipAddress: 'ipAddress',
     convertedAt: 'convertedAt',
     createdAt: 'createdAt',
@@ -21337,6 +21392,9 @@ export namespace Prisma {
     email?: StringNullableFilter<"Referral"> | string | null
     status?: EnumReferralStatusFilter<"Referral"> | $Enums.ReferralStatus
     orderValue?: FloatFilter<"Referral"> | number
+    productId?: StringFilter<"Referral"> | string
+    productName?: StringFilter<"Referral"> | string
+    quantity?: IntFilter<"Referral"> | number
     ipAddress?: StringNullableFilter<"Referral"> | string | null
     convertedAt?: DateTimeNullableFilter<"Referral"> | Date | string | null
     createdAt?: DateTimeFilter<"Referral"> | Date | string
@@ -21354,6 +21412,9 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     status?: SortOrder
     orderValue?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    quantity?: SortOrder
     ipAddress?: SortOrderInput | SortOrder
     convertedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21374,6 +21435,9 @@ export namespace Prisma {
     email?: StringNullableFilter<"Referral"> | string | null
     status?: EnumReferralStatusFilter<"Referral"> | $Enums.ReferralStatus
     orderValue?: FloatFilter<"Referral"> | number
+    productId?: StringFilter<"Referral"> | string
+    productName?: StringFilter<"Referral"> | string
+    quantity?: IntFilter<"Referral"> | number
     ipAddress?: StringNullableFilter<"Referral"> | string | null
     convertedAt?: DateTimeNullableFilter<"Referral"> | Date | string | null
     createdAt?: DateTimeFilter<"Referral"> | Date | string
@@ -21391,6 +21455,9 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     status?: SortOrder
     orderValue?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    quantity?: SortOrder
     ipAddress?: SortOrderInput | SortOrder
     convertedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21412,6 +21479,9 @@ export namespace Prisma {
     email?: StringNullableWithAggregatesFilter<"Referral"> | string | null
     status?: EnumReferralStatusWithAggregatesFilter<"Referral"> | $Enums.ReferralStatus
     orderValue?: FloatWithAggregatesFilter<"Referral"> | number
+    productId?: StringWithAggregatesFilter<"Referral"> | string
+    productName?: StringWithAggregatesFilter<"Referral"> | string
+    quantity?: IntWithAggregatesFilter<"Referral"> | number
     ipAddress?: StringNullableWithAggregatesFilter<"Referral"> | string | null
     convertedAt?: DateTimeNullableWithAggregatesFilter<"Referral"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Referral"> | Date | string
@@ -22688,6 +22758,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -22705,6 +22778,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -22718,6 +22794,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22735,6 +22814,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22750,6 +22832,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -22761,6 +22846,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22774,6 +22862,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24007,6 +24098,9 @@ export namespace Prisma {
     email?: SortOrder
     status?: SortOrder
     orderValue?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    quantity?: SortOrder
     ipAddress?: SortOrder
     convertedAt?: SortOrder
     createdAt?: SortOrder
@@ -24015,6 +24109,7 @@ export namespace Prisma {
 
   export type ReferralAvgOrderByAggregateInput = {
     orderValue?: SortOrder
+    quantity?: SortOrder
   }
 
   export type ReferralMaxOrderByAggregateInput = {
@@ -24024,6 +24119,9 @@ export namespace Prisma {
     email?: SortOrder
     status?: SortOrder
     orderValue?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    quantity?: SortOrder
     ipAddress?: SortOrder
     convertedAt?: SortOrder
     createdAt?: SortOrder
@@ -24037,6 +24135,9 @@ export namespace Prisma {
     email?: SortOrder
     status?: SortOrder
     orderValue?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    quantity?: SortOrder
     ipAddress?: SortOrder
     convertedAt?: SortOrder
     createdAt?: SortOrder
@@ -24045,6 +24146,7 @@ export namespace Prisma {
 
   export type ReferralSumOrderByAggregateInput = {
     orderValue?: SortOrder
+    quantity?: SortOrder
   }
 
   export type EnumReferralStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -26374,6 +26476,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -26389,6 +26494,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -26407,6 +26515,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -26423,6 +26534,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -26693,6 +26807,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26708,6 +26825,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26732,6 +26852,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26748,6 +26871,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27027,6 +27153,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -27042,6 +27171,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -27259,6 +27391,9 @@ export namespace Prisma {
     email?: StringNullableFilter<"Referral"> | string | null
     status?: EnumReferralStatusFilter<"Referral"> | $Enums.ReferralStatus
     orderValue?: FloatFilter<"Referral"> | number
+    productId?: StringFilter<"Referral"> | string
+    productName?: StringFilter<"Referral"> | string
+    quantity?: IntFilter<"Referral"> | number
     ipAddress?: StringNullableFilter<"Referral"> | string | null
     convertedAt?: DateTimeNullableFilter<"Referral"> | Date | string | null
     createdAt?: DateTimeFilter<"Referral"> | Date | string
@@ -27904,6 +28039,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -27920,6 +28058,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -28046,6 +28187,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28062,6 +28206,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28586,6 +28733,9 @@ export namespace Prisma {
     email?: string | null
     status?: $Enums.ReferralStatus
     orderValue?: number
+    productId: string
+    productName: string
+    quantity?: number
     ipAddress?: string | null
     convertedAt?: Date | string | null
     createdAt?: Date | string
@@ -28639,6 +28789,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28654,6 +28807,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28668,6 +28824,9 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumReferralStatusFieldUpdateOperationsInput | $Enums.ReferralStatus
     orderValue?: FloatFieldUpdateOperationsInput | number
+    productId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     convertedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

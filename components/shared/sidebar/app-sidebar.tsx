@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { BarChart3, LayoutDashboard, Folder, List, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,44 +15,11 @@ import { NavUser } from "./nav-user";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
-import { PiArticleNyTimesDuotone } from "react-icons/pi";
 
-const sidebarData = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Product",
-      url: "/admin/product",
-      icon: List,
-    },
-    {
-      title: "Bundle",
-      url: "/admin/bundle",
-      icon: BarChart3,
-    },
-    {
-      title: "Coupon",
-      url: "/admin/coupon",
-      icon: Folder,
-    },
-    {
-      title: "Order",
-      url: "/admin/order",
-      icon: Users,
-    },
-    {
-      title: "Blog",
-      url:"/admin/blog",
-      icon: PiArticleNyTimesDuotone
-    }
-  ],
-};
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  sidebarData,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { sidebarData: { navMain: { title: string; url: string; icon?: string; items?: { title: string; url: string }[] }[] } }) {
   const session = useSession();
   const user = {
     name: session.data?.user.name as string,
@@ -84,7 +50,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={sidebarData.navMain} />
+        <NavMain items={sidebarData.navMain.map(item => ({
+          title: item.title,
+          url: item.url,
+          icon: item.icon,
+          items: item.items
+        }))} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

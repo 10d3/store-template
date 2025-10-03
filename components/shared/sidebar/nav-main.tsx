@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import {
@@ -8,7 +8,24 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { BarChart3, Folder, LayoutDashboard, List, Users } from "lucide-react";
+import { FcMoneyTransfer } from "react-icons/fc";
+import { PiArticleNyTimesDuotone } from "react-icons/pi";
 import { usePathname, useRouter } from "next/navigation";
+import React from "react";
+import { IoIosLink } from "react-icons/io";
+
+// Direct icon mapping
+const iconComponents: Record<string, React.ComponentType> = {
+  "LayoutDashboard": LayoutDashboard,
+  "List": List,
+  "BarChart3": BarChart3,
+  "Folder": Folder,
+  "Users": Users,
+  "FcMoneyTransfer": FcMoneyTransfer,
+  "PiArticleNyTimesDuotone": PiArticleNyTimesDuotone,
+  "IoIosLink": IoIosLink,
+};
 
 export function NavMain({
   items,
@@ -16,7 +33,7 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon?: any;
+    icon?: string;
   }[];
 }) {
   const router = useRouter();
@@ -25,6 +42,17 @@ export function NavMain({
   const isActive = (url: string) => {
     return pathname === url;
   };
+
+  const renderIcon = (iconName: string) => {
+    const IconComponent = iconComponents[iconName];
+    if (!IconComponent) {
+      console.warn(`Icon "${iconName}" not found in icon mapping`);
+      return null;
+    }
+    // Create element with proper React component
+    return React.createElement(IconComponent);
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -38,7 +66,7 @@ export function NavMain({
                 className={`${isActive(item.url) && "bg-primary/10 text-primary font-medium"}`}
                 tooltip={item.title}
               >
-                {item.icon && <item.icon />}
+                {item.icon && renderIcon(item.icon)}
                 <span>{item.title}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>

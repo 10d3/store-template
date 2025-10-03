@@ -232,8 +232,11 @@ model Referral {
   email  String?
 
   // Purchase details
-  status     ReferralStatus @default(PENDING)
-  orderValue Float          @default(0) // Total purchase amount
+  status      ReferralStatus @default(PENDING)
+  orderValue  Float          @default(0) // Total purchase amount
+  productId   String // Product identifier
+  productName String // Product name
+  quantity    Int            @default(1) // Quantity of products purchased
 
   // Tracking
   ipAddress   String?

@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppSidebar } from "@/components/shared/sidebar/app-sidebar";
 import { BreadcrumbNav } from "@/components/shared/sidebar/breadcrumb-nav";
 import { Separator } from "@/components/ui/separator";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
+import { sideBarCentralizedNav } from "@/lib/const/sidebar";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
 
 export default async function Layout({
   children,
@@ -25,7 +28,7 @@ export default async function Layout({
 
   return (
     <SidebarProvider>
-      <AppSidebar collapsible="icon" />
+      <AppSidebar sidebarData={sideBarCentralizedNav.admin as any} collapsible="icon" />
       <main className="flex-1 w-full">
         <div className="flex flex-col min-h-screen">
           <div className="flex items-center p-1 border-b bg-card">
