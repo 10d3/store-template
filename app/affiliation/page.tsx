@@ -148,9 +148,9 @@ export default async function Page() {
   ];
 
   return (
-    <div className="pt-8 flex flex-col gap-8 bg-secondary/80 px-4 h-full">
+    <div className="py-8 flex flex-col gap-8 bg-secondary/80 px-4 h-full">
       <Suspense fallback={
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid md:grid-cols-5 gap-4">
           {[...Array(5)].map((_, i) => (
             <CardStatsSkeleton key={i} />
           ))}
@@ -165,7 +165,7 @@ export default async function Page() {
             </AlertDescription>
           </Alert>
         ) : (
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid md:grid-cols-5 gap-4">
             {statsData.map((stat, index) => (
               <CardStats
                 key={index}

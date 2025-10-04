@@ -176,7 +176,7 @@ export async function getRefferalCode() {
       throw new Error("Affiliate not found");
     }
 
-    console.log("affiliate", affiliate);
+    // console.log("affiliate", affiliate);
     return affiliate.referralCode;
   } catch (error) {
     console.error("Get referral code error:", error);

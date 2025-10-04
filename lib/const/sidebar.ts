@@ -48,7 +48,7 @@ export const sideBarCentralizedNav = {
       {
         title: "Payment ",
         url: "/affiliation/payment",
-        icon: "FcMoneyTransfer",
+        icon: "FaMoneyCheckAlt",
       },
     ],
   },
