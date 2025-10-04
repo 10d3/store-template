@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { trackPurchase } from "@/lib/affiliation/track-purshase";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -71,6 +72,34 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
   console.log("Payment succeeded:", paymentIntent.id);
 
   try {
+    // Track affiliate purchase if referral exists
+    if (paymentIntent.metadata?.line_items) {
+      const lineItems = JSON.parse(paymentIntent.metadata.line_items);
+
+      // Track each product in the order
+      for (const item of lineItems) {
+        try {
+          // Calculate individual item total
+          const itemTotal = (item.price * item.quantity) / 100;
+
+          await trackPurchase({
+            userId: paymentIntent.metadata?.user_id || "",
+            email: paymentIntent.receipt_email || "",
+            orderValue: itemTotal,
+            orderId: paymentIntent.id,
+            productId: item.id,
+            productName: item.name,
+          });
+        } catch (error) {
+          // Log error but continue processing other items
+          console.error(
+            `Affiliate tracking failed for product ${item.id}:`,
+            error
+          );
+        }
+      }
+    }
+
     // Update or create order in database
     await prisma.order.upsert({
       where: { id: paymentIntent.id },

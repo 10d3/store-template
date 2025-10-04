@@ -21,7 +21,7 @@ export default async function page() {
       <h1 className="text-2xl font-bold text-foreground">
         Products affiliate links
       </h1>
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-6">
         {transformedDataProduct.map((product) => (
           <div
             key={product.id}

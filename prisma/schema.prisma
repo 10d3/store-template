@@ -78,18 +78,18 @@ model Wishlist {
 }
 
 model User {
-  id            String     @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  orders        Order[]
-  reviews       Review[]
-  wishlist      Wishlist[]
+  id              String     @id
+  name            String
+  email           String
+  emailVerified   Boolean
+  image           String?
+  createdAt       DateTime
+  updatedAt       DateTime
+  sessions        Session[]
+  accounts        Account[]
+  orders          Order[]
+  reviews         Review[]
+  wishlist        Wishlist[]
 
   stripeCustomerId String?
 
@@ -234,9 +234,9 @@ model Referral {
   // Purchase details
   status      ReferralStatus @default(PENDING)
   orderValue  Float          @default(0) // Total purchase amount
-  productId   String         // Product identifier
-  productName String         // Product name
-  quantity    Int           @default(1)  // Quantity of products purchased
+  productId   String // Product identifier
+  productName String // Product name
+  quantity    Int            @default(1) // Quantity of products purchased
 
   // Tracking
   ipAddress   String?

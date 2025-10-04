@@ -75,3 +75,7 @@ export function generateReferralCode(length = 8): string {
   }
   return code;
 }
+
+export const getStripeLink = (url: string, data: string) => {
+  return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${url}&state=${data}`;
+};
