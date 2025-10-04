@@ -8,13 +8,15 @@ export async function trackPurchase({
   email,
   orderValue,
   orderId,
-//   orderDetails,
+  productId,
+  productName,
 }: {
   userId: string;
   email: string;
   orderValue: number;
   orderId: string;
-  orderDetails: string;
+  productId: string;
+  productName: string;
 }) {
   try {
     if (!orderValue || orderValue <= 0) {
@@ -78,6 +80,8 @@ export async function trackPurchase({
           email,
           status: "COMPLETED",
           orderValue,
+          productId,
+          productName,
           ipAddress,
           convertedAt: new Date(),
         },

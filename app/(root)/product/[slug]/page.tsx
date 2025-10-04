@@ -47,7 +47,7 @@ export default async function page(props: {
   const searchParams = await props.searchParams;
 
   const variants = await getProduct(params.slug);
-  console.log("variant form slug", variants);
+  // console.log("variant form slug", variants);
   const selectedVariants = variants.filter((variant) =>
     variant.metadata?.variants?.includes(searchParams.variant as string)
   );
@@ -55,7 +55,7 @@ export default async function page(props: {
 
   const packs = await getPack(variants[0]?.id as string);
 
-  console.log("packs from slug", packs);
+  // console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [
     {
       id: "1",

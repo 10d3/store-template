@@ -7,6 +7,7 @@ import { getRefferalCode } from "@/lib/affiliation/affiliate-data";
 
 export default async function page() {
   const refferalCode = await getRefferalCode();
+  console.log("refferalCode", refferalCode);
   const products = await listProducts();
   const transformedDataProduct = products.map((product) => ({
     id: product.id,
