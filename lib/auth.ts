@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { admin, haveIBeenPwned, magicLink } from "better-auth/plugins";
 import { stripe } from "@better-auth/stripe";
 import { stripeClient } from "./stripe";
+import handleSubscription from "./subcription";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -25,6 +26,7 @@ export const auth = betterAuth({
       stripeClient,
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       createCustomerOnSignUp: true,
+      onEvent: handleSubscription
     }),
     admin(),
     magicLink({

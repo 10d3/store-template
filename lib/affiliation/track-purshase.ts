@@ -22,6 +22,7 @@ export async function trackPurchase({
     if (!orderValue || orderValue <= 0) {
       throw new Error("Order value must be greater than 0");
     }
+    console.log(userId, email, orderValue, orderId, productId, productName);
     const cookiesStore = await cookies();
     const headersList = await headers();
     // const session = await auth.api.getSession({ headers: headersList });
