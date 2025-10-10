@@ -155,23 +155,22 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                                   <Image
                                     width={1000}
                                     height={1000}
-                                    src={item.image || "/placeholder.svg"}
-                                    alt={item.name}
+                                    src={item.price_data.product_data.images[0] || "/placeholder.svg"}
+                                    alt={item.price_data.product_data.name}
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-semibold truncate">
-                                    {item.name}
+                                    {item.price_data.product_data.name}
                                   </h4>
                                   <p className="text-sm mt-1">
-                                    Quantity: {item.quantity} × $
-                                    {item.price.toFixed(2)}
+                                    Quantity: {item.quantity}
                                   </p>
                                 </div>
                                 <div className="text-right">
                                   <p className="font-semibold">
-                                    ${(item.price * item.quantity).toFixed(2)}
+                                    ${((item.price_data.unit_amount as number / 100) * item.quantity).toFixed(2)}
                                   </p>
                                 </div>
                               </div>

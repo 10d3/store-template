@@ -91,7 +91,7 @@ model User {
   reviews       Review[]
   wishlist      Wishlist[]
 
-  stripeCustomerId String?
+  stripeCustomerId String? @unique
 
   role       String?
   banned     Boolean?

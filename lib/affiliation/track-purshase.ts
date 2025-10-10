@@ -1,4 +1,5 @@
-import { cookies, headers } from "next/headers";
+"use server"
+import { headers } from "next/headers";
 import { prisma } from "../prisma";
 // import { auth } from "../auth";
 
@@ -10,6 +11,7 @@ export async function trackPurchase({
   orderId,
   productId,
   productName,
+  referralCode
 }: {
   userId: string;
   email: string;
@@ -17,17 +19,14 @@ export async function trackPurchase({
   orderId: string;
   productId: string;
   productName: string;
+  referralCode: string | null;
 }) {
   try {
     if (!orderValue || orderValue <= 0) {
       throw new Error("Order value must be greater than 0");
     }
     console.log(userId, email, orderValue, orderId, productId, productName);
-    const cookiesStore = await cookies();
     const headersList = await headers();
-    // const session = await auth.api.getSession({ headers: headersList });
-
-    const referralCode = cookiesStore.get("referral_code")?.value || "";
 
     if (!referralCode) {
       // No referral, purchase is successful but not tracked

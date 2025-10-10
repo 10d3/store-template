@@ -8,7 +8,7 @@ const PAYMENT_THRESHOLD = 50.0; // Minimum amount required for payout
 
 export const sendTransfer = inngest.createFunction(
   { id: "send-transfer" },
-  { cron: "0 0 */15 * *" },
+  { cron: "* * * * *" },
   async ({ step }) => {
     // load user that have affiliate
     const users = await step.run(
@@ -37,6 +37,8 @@ export const sendTransfer = inngest.createFunction(
           email: user.user.email,
           bankAccount: user.bankAccount!,
           availableBalance: user.availableBalance,
+          affiliateId: user.id,
+          paymentMethod: user.paymentMethod!,
         },
       };
     });
@@ -49,9 +51,14 @@ export const sendWeeklyDigest = inngest.createFunction(
   { event: "app/send.weekly.digest" },
   async ({ event }) => {
     // 3️⃣ We can now grab the email and user id from the event payload
-    const { email, } = event.data;
+    const { email } = event.data;
 
-    await sendMoney(event.data.bankAccount, event.data.availableBalance);
+    await sendMoney(
+      event.data.bankAccount,
+      event.data.availableBalance,
+      event.data.affiliateId,
+      // event.data.paymentMethod
+    );
 
     // 4️⃣ Finally, we send the email itself:
     const emailHtml = generatePayoutConfirmationEmail({

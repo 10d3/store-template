@@ -9,11 +9,14 @@ export const emailService = {
     data: any,
     subject: string
   }) {
-    return await resend.emails.send({
-      from: 'noreply@votreapp.com',
+   const result = await resend.emails.send({
+      from: 'Nexora <no-reply@mynexora.net>',
       to: options.to,
       subject: options.subject,
       html: options.data
     });
+    console.log(result.data)
+    console.log(result.error)
+    return result
   }
 };

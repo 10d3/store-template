@@ -20883,6 +20883,7 @@ export namespace Prisma {
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+    stripeCustomerId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -20891,7 +20892,6 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    stripeCustomerId?: StringNullableFilter<"User"> | string | null
     role?: StringNullableFilter<"User"> | string | null
     banned?: BoolNullableFilter<"User"> | boolean | null
     banReason?: StringNullableFilter<"User"> | string | null
@@ -20906,7 +20906,7 @@ export namespace Prisma {
     affiliate?: XOR<AffiliateNullableScalarRelationFilter, AffiliateWhereInput> | null
     referredBy?: XOR<ReferralNullableScalarRelationFilter, ReferralWhereInput> | null
     Referral?: XOR<ReferralNullableScalarRelationFilter, ReferralWhereInput> | null
-  }, "id" | "email">
+  }, "id" | "stripeCustomerId" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
