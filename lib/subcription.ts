@@ -222,6 +222,7 @@ async function handleTransferCreated(transfer: Stripe.Transfer) {
         method: "STRIPE",
         status: "COMPLETED",
         transactionId: transfer.id,
+        notes: transfer.description
       },
     });
     // Update affiliate balance
