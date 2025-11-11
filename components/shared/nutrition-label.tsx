@@ -25,11 +25,11 @@ const ProductHeader = ({ title, icon }: { title: string; icon?: string }) => (
 )
 
 const SupplementLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className="grid grid-cols-1 xl:grid-cols-2 gap-0">{children}</div>
+  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">{children}</div>
 )
 
 const MainInfo = ({ children }: { children: React.ReactNode }) => (
-  <div className="p-0 space-y-5 xl:border-r border-border bg-card/50">{children}</div>
+  <div className="px-2 space-y-5 xl:border-r border-border bg-card/50">{children}</div>
 )
 
 const AdditionalInfo = ({ children }: { children: React.ReactNode }) => (
@@ -68,11 +68,10 @@ const TabNavigation = ({
         key={tab}
         variant={tab === activeTab ? "default" : "ghost"}
         size="sm"
-        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-          tab === activeTab
-            ? "bg-primary text-primary-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        }`}
+        className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${tab === activeTab
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          }`}
       >
         {tab}
       </Button>
@@ -98,9 +97,8 @@ const NutrientRow = ({
   isHeader?: boolean
 }) => (
   <div
-    className={`flex justify-between items-center px-4 py-3 ${
-      isHeader ? "bg-muted/40 font-semibold text-foreground" : "bg-card hover:bg-muted/20 transition-colors"
-    }`}
+    className={`flex justify-between items-center px-4 py-3 ${isHeader ? "bg-muted/40 font-semibold text-foreground" : "bg-card hover:bg-muted/20 transition-colors"
+      }`}
   >
     <span className={`${isHeader ? "font-semibold text-base" : "text-sm font-medium"} text-foreground`}>{name}</span>
     <div className="text-right">

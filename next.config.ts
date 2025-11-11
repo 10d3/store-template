@@ -2,6 +2,7 @@ import { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -24,7 +25,8 @@ const nextConfig: NextConfig = {
         hostname: "flowbite.s3.amazonaws.com",
         pathname: "**",
       },
-      { protocol: "https",
+      {
+        protocol: "https",
         hostname: "l2yvnapk4q.ufs.sh",
         pathname: "**"
       },
