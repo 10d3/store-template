@@ -12,7 +12,7 @@ import { useToolbar } from "@/components/toolbars/toolbar-provider";
 import { CornerUpLeft } from "lucide-react";
 import React from "react";
 
-const UndoToolbar = React.forwardRef<HTMLButtonElement, any>(
+const UndoToolbar = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<typeof Button>>(
   ({ className, onClick, children, ...props }, ref) => {
     const { editor } = useToolbar();
 
