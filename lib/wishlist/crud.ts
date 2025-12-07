@@ -91,9 +91,15 @@ export async function getWishlist() {
       where: { userId: session.user.id },
     });
 
-    const products = await getProductsByProductIds(
-      wishlist?.productId as string[]
-    );
+    // Return early with empty products if no wishlist exists
+    if (!wishlist || !wishlist.productId || wishlist.productId.length === 0) {
+      return {
+        wishlist: null,
+        products: [],
+      };
+    }
+
+    const products = await getProductsByProductIds(wishlist.productId);
 
     return {
       wishlist,

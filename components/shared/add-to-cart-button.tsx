@@ -19,21 +19,28 @@ export default function AddToCartButton({
     }
     return 0; // fallback if no price available
   };
-  const { addOrUpdateItem, isAddingToCart } = useCartStore();
+
+  const { addOrUpdateItem, isAddingToCart, getPendingQuantity, resetPendingQuantity } = useCartStore();
+
+  const handleAddToCart = () => {
+    const quantity = getPendingQuantity(product.id);
+    addOrUpdateItem({
+      id: product.id,
+      name: product.name,
+      image: product?.images?.[0] as string,
+      price: getPrice(),
+      quantity: quantity,
+      maxQuantity: 10,
+      variantId: product.id,
+    });
+    // Reset the pending quantity after adding to cart
+    resetPendingQuantity(product.id);
+  };
+
   return (
     <div className="space-y-3" id="button-add-to-cart">
       <Button
-        onClick={() =>
-          addOrUpdateItem({
-            id: product.id,
-            name: product.name,
-            image: product?.images?.[0] as string,
-            price: getPrice(),
-            quantity: +1,
-            maxQuantity: 10,
-            variantId: product.id,
-          })
-        }
+        onClick={handleAddToCart}
         disabled={isAddingToCart}
         className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
       >

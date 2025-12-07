@@ -37,6 +37,7 @@ export interface CartCoupon {
 interface CartStore {
   cart: CartItem[];
   coupon?: CartCoupon | null;
+  pendingQuantity: Record<string, number>; // productId -> quantity (for quantity selector)
 
   addOrUpdateItem: (
     item: Omit<CartItem, "quantity"> & { quantity?: number }
@@ -59,6 +60,11 @@ interface CartStore {
   getTotalUniqueItems: () => number;
   isAddingToCart: boolean;
 
+  // Pending quantity management (for quantity selector before adding to cart)
+  getPendingQuantity: (productId: string) => number;
+  setPendingQuantity: (productId: string, quantity: number) => void;
+  resetPendingQuantity: (productId: string) => void;
+
   loadServerCart: (items: CartItem[]) => void;
 }
 
@@ -70,6 +76,24 @@ export const useCartStore = create<CartStore>()(
       cart: [],
       coupon: null,
       isAddingToCart: false,
+      pendingQuantity: {},
+
+      getPendingQuantity: (productId) => get().pendingQuantity[productId] || 1,
+
+      setPendingQuantity: (productId, quantity) =>
+        set((s) => ({
+          pendingQuantity: {
+            ...s.pendingQuantity,
+            [productId]: Math.max(1, Math.min(quantity, 10)),
+          },
+        })),
+
+      resetPendingQuantity: (productId) =>
+        set((s) => {
+          const { [productId]: _, ...rest } = s.pendingQuantity;
+          return { pendingQuantity: rest };
+        }),
+
       addOrUpdateItem: (incoming) => {
         const { id, variantId = "", quantity = 1 } = incoming;
         set((s) => {

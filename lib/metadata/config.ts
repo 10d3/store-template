@@ -26,6 +26,14 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     placeholder: "Select category",
   },
   {
+    key: "gender",
+    label: "Gender",
+    type: "select",
+    options: ["men", "women", "unisex"],
+    description: "Target gender for clothing/apparel products",
+    placeholder: "Select gender",
+  },
+  {
     key: "tags",
     label: "Tags",
     type: "text",

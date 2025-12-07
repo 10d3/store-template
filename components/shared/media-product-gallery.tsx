@@ -18,7 +18,7 @@ export default function MediaProductGallery({
   return (
     <div
       className={cn(
-        "w-full flex flex-col-reverse md:flex-row gap-4 md:max-h-[38rem]",
+        "w-full flex flex-col-reverse md:flex-row gap-4 md:max-h-[48rem]",
         className
       )}
     >
@@ -28,19 +28,19 @@ export default function MediaProductGallery({
           src={selectedImage}
           alt="Product image"
           fill
-          className="object-cover"
+          className=" object-cover"
           priority
         />
       </Card>
 
       {/* Thumbnail Navigation */}
-      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-32 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[38rem] pb-2 md:pb-0 items-center justify-center">
+      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-32 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[48rem] pb-2 md:pb-0 items-center justify-center">
         {images.map((image, index) => (
           <Card
             key={index}
             className={cn(
               "relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-background transition-all flex-shrink-0 w-16 h-16 md:w-full md:h-auto",
-            //   selectedImage === image && "ring-2 ring-primary"
+              //   selectedImage === image && "ring-2 ring-primary"
             )}
             onClick={() => setSelectedImage(image)}
           >

@@ -66,27 +66,33 @@ export default async function page(props: {
     },
     {
       id: "2",
-      type: "video",
-      src: "/placeholder-video.mp4",
-      thumbnail:
-        "https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg",
+      type: "image",
+      src: (variants[0].images?.[1] as string) || "",
+      thumbnail: (variants[0].images?.[1] as string) || "",
       alt: "Product demo video",
       title: "Product demonstration",
     },
     {
       id: "3",
       type: "image",
-      src: (variants[0]?.images?.[1] as string) || "",
+      src: (variants[0]?.images?.[2] as string) || "",
       alt: "Product image 2",
       title: "Detail view",
     },
     {
       id: "4",
       type: "image",
-      src: (variants[0]?.images?.[2] as string) || "",
+      src: (variants[0]?.images?.[3] as string) || "",
       alt: "Product image 4",
       title: "Usage example",
     },
+    {
+      id: "5",
+      type: "image",
+      src: (variants[0]?.images?.[4] as string) || "",
+      alt: "product image 5",
+      title: " benefit"
+    }
   ];
 
   // const getGridPosition = (index: number) => {
@@ -112,7 +118,7 @@ export default async function page(props: {
           contentProducts.forEach((contentProduct, index) => {
             const defaultPrice =
               typeof contentProduct.default_price === "object" &&
-              contentProduct.default_price
+                contentProduct.default_price
                 ? contentProduct.default_price
                 : null;
 
@@ -126,9 +132,9 @@ export default async function page(props: {
                 "/placeholder.svg",
               hoverMedia: contentProduct.images?.[1]
                 ? {
-                    type: "image" as const,
-                    src: contentProduct.images[1],
-                  }
+                  type: "image" as const,
+                  src: contentProduct.images[1],
+                }
                 : undefined,
               stripePriceId: defaultPrice?.id || contentIds[index]?.trim(),
             });
@@ -187,8 +193,8 @@ export default async function page(props: {
               <MediaProductGallery
                 // variant="default"
                 images={mediaItems.map((item) => item.src)}
-                // mediaItems={mediaItems}
-                // getGridPosition={getGridPosition}
+              // mediaItems={mediaItems}
+              // getGridPosition={getGridPosition}
               />
             </div>
             <div className="md:hidden">
@@ -404,7 +410,7 @@ export default async function page(props: {
                           products={pack.products}
                           bundleDiscount={pack.bundleDiscount}
                           className="hover:scale-105 transition-transform duration-200"
-                          // onAddToCart={()=> console.log("click")}
+                        // onAddToCart={()=> console.log("click")}
                         />
                       ))
                     ) : (
