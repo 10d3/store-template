@@ -34,7 +34,7 @@ export default function BundleManagementPage() {
   });
 
   // Filter to show only packs
-  const packs = products.filter((p) => p.metadata?.type === "pack");
+  const packs = products.filter((p) => p.metadata?.type === "bundle");
 
   // Mutations
   const { mutate: handleCreatePack, isPending: creatingPack } = useMutation({
@@ -76,7 +76,7 @@ export default function BundleManagementPage() {
   });
 
   const onPackSubmit = (data: PackFormData) => {
-    console.log("data form bundle form",data)
+    console.log("data form bundle form", data)
     if (editingPack) {
       handleUpdatePack({ id: editingPack.id, data });
     } else {

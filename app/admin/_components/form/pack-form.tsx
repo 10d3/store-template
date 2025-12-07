@@ -66,8 +66,8 @@ export function EnhancedPackForm({
         productIds,
         packPrice:
           initialData.default_price &&
-          typeof initialData.default_price === "object" &&
-          initialData.default_price.unit_amount !== null
+            typeof initialData.default_price === "object" &&
+            initialData.default_price.unit_amount !== null
             ? initialData.default_price.unit_amount
             : 0,
         discount: initialData.metadata?.discount
@@ -97,7 +97,11 @@ export function EnhancedPackForm({
     }
   }, [initialData, form]);
 
-  const selectedProducts = form.watch("productIds");
+  // Get selected products - use form watch with fallback to initialData
+  const watchedProductIds = form.watch("productIds");
+  const selectedProducts = watchedProductIds?.length > 0
+    ? watchedProductIds
+    : (initialData?.metadata?.contents?.split(",").filter(Boolean) || []);
   const packPrice = form.watch("packPrice");
   const discount = form.watch("discount");
   const isEditing = !!initialData;
@@ -282,6 +286,35 @@ export function EnhancedPackForm({
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">Pricing</h3>
 
+                {/* Preset Discount Buttons */}
+                {suggestedPrice > 0 && (
+                  <div className="space-y-2">
+                    <FormLabel className="text-sm font-medium">
+                      Quick Discount Presets
+                    </FormLabel>
+                    <div className="flex flex-wrap gap-2">
+                      {[10, 15, 20, 25, 30].map((percent) => {
+                        const discountedPrice = Math.round(suggestedPrice * (1 - percent / 100));
+                        return (
+                          <Button
+                            key={percent}
+                            type="button"
+                            variant={packPrice === discountedPrice ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              form.setValue("packPrice", discountedPrice);
+                              form.setValue("discount", percent);
+                            }}
+                            className="text-xs"
+                          >
+                            {percent}% off ({formatPrice(discountedPrice)})
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -298,18 +331,25 @@ export function EnhancedPackForm({
                               placeholder="2400"
                               className="h-11 border-2 focus:border-blue-500 transition-colors"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(
-                                  Number.parseInt(e.target.value) || 0
-                                )
-                              }
+                              onChange={(e) => {
+                                const newPrice = Number.parseInt(e.target.value) || 0;
+                                field.onChange(newPrice);
+                                // Auto-calculate discount percentage
+                                if (suggestedPrice > 0 && newPrice > 0) {
+                                  const autoDiscount = Math.round(((suggestedPrice - newPrice) / suggestedPrice) * 100);
+                                  form.setValue("discount", Math.max(0, autoDiscount));
+                                }
+                              }}
                             />
                             {suggestedPrice > 0 && (
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() => field.onChange(suggestedPrice)}
+                                onClick={() => {
+                                  field.onChange(suggestedPrice);
+                                  form.setValue("discount", 0);
+                                }}
                                 className="w-full text-xs"
                               >
                                 Use Individual Total (
@@ -332,25 +372,34 @@ export function EnhancedPackForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm font-medium">
-                          Discount Percentage (Optional)
+                          Discount Percentage
+                          {savings > 0 && (
+                            <span className="ml-2 text-green-600 font-normal">
+                              (Save {formatPrice(savings)})
+                            </span>
+                          )}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             placeholder="10"
                             min="0"
-                            max="1000000"
+                            max="100"
                             className="h-11 border-2 focus:border-blue-500 transition-colors"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(
-                                Number.parseInt(e.target.value) || 0
-                              )
-                            }
+                            onChange={(e) => {
+                              const newDiscount = Number.parseInt(e.target.value) || 0;
+                              field.onChange(newDiscount);
+                              // Auto-calculate pack price when discount changes
+                              if (suggestedPrice > 0) {
+                                const newPrice = Math.round(suggestedPrice * (1 - newDiscount / 100));
+                                form.setValue("packPrice", newPrice);
+                              }
+                            }}
                           />
                         </FormControl>
                         <FormDescription className="text-xs">
-                          Optional discount percentage for marketing purposes
+                          {savingsPercentage}% savings from individual prices
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -423,6 +472,118 @@ export function EnhancedPackForm({
                       )}
                     />
                   </div>
+
+                  {/* Build Your Own Pricing Configuration */}
+                  {form.watch("metadata.bundle_type") === "build_your_own" && (
+                    <div className="mt-6 p-4 border-2 border-dashed border-blue-200 rounded-lg bg-blue-50/50">
+                      <h4 className="font-semibold mb-4 text-blue-800">Build Your Own Configuration</h4>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="metadata.pricing_type"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-sm font-medium">Pricing Type</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="border-2">
+                                    <SelectValue placeholder="Select pricing type" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="percentage">Fixed Percentage Off</SelectItem>
+                                  <SelectItem value="tiered">Tiered Discounts</SelectItem>
+                                  <SelectItem value="fixed_price">Fixed Bundle Price</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <FormField
+                            control={form.control}
+                            name="metadata.min_items"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-medium">Min Items</FormLabel>
+                                <FormControl>
+                                  <Input type="number" min="1" placeholder="3" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="metadata.max_items"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-sm font-medium">Max Items</FormLabel>
+                                <FormControl>
+                                  <Input type="number" min="1" placeholder="5" {...field} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Conditional fields based on pricing type */}
+                      {form.watch("metadata.pricing_type") === "percentage" && (
+                        <FormField
+                          control={form.control}
+                          name="metadata.fixed_discount_percent"
+                          render={({ field }) => (
+                            <FormItem className="mt-4">
+                              <FormLabel className="text-sm font-medium">Discount Percentage</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="0" max="100" placeholder="15" {...field} />
+                              </FormControl>
+                              <FormDescription className="text-xs">Customers get this % off their selected items</FormDescription>
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
+                      {form.watch("metadata.pricing_type") === "fixed_price" && (
+                        <FormField
+                          control={form.control}
+                          name="metadata.fixed_bundle_price"
+                          render={({ field }) => (
+                            <FormItem className="mt-4">
+                              <FormLabel className="text-sm font-medium">Fixed Price (cents)</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="0" placeholder="2500" {...field} />
+                              </FormControl>
+                              <FormDescription className="text-xs">Customer pays this fixed amount regardless of items</FormDescription>
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
+                      {form.watch("metadata.pricing_type") === "tiered" && (
+                        <FormField
+                          control={form.control}
+                          name="metadata.tier_config"
+                          render={({ field }) => (
+                            <FormItem className="mt-4">
+                              <FormLabel className="text-sm font-medium">Tier Configuration (JSON)</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder='[{"min":3,"percent":10},{"min":5,"percent":15}]'
+                                  className="font-mono text-xs"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription className="text-xs">Discount increases with more items</FormDescription>
+                            </FormItem>
+                          )}
+                        />
+                      )}
+                    </div>
+                  )}
 
                   <div className="grid gap-6">
                     <FormField

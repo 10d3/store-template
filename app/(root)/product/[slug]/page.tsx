@@ -11,15 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   getPack,
   getProduct,
   getProductsByProductIds,
+  getRelatedProducts,
 } from "@/lib/product/crud";
 import { Star, Share2 } from "lucide-react";
+import RelatedProducts from "@/components/shared/related-products";
 import { Button } from "@/components/ui/button";
 // import MediaGallery from "@/components/shared/media-gallery";
 import PackCard from "@/components/shared/pack-card";
@@ -29,6 +31,74 @@ import { Markdown } from "@/components/shared/markdown";
 import CardAnyText from "@/components/shared/card-any-text";
 import { MarkdownNutrition } from "@/components/shared/nutrition-label";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
+import { getReviewsByProductId, getAverageRating } from "@/lib/review/crud";
+import StarRating from "@/components/shared/star-rating";
+import ReviewList from "@/components/shared/review-list";
+import ReviewSection from "@/components/shared/review-section-wrapper";
+import type { Metadata } from "next";
+
+// Generate metadata for SEO and OG
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const params = await props.params;
+  const variants = await getProduct(params.slug);
+
+  if (!variants || variants.length === 0) {
+    return {
+      title: "Product Not Found",
+    };
+  }
+
+  const product = variants[0];
+  const seoTitle = product.metadata?.seo_title || product.name;
+  const seoDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
+  const productImage = product.images?.[0];
+
+  // Get price for OG
+  const price = typeof product.default_price === "object" && product.default_price?.unit_amount
+    ? (product.default_price.unit_amount / 100).toFixed(2)
+    : "";
+
+  // Build OG image URL
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const ogImageUrl = new URL("/api/og", baseUrl);
+  ogImageUrl.searchParams.set("template", "modern-dark");
+  ogImageUrl.searchParams.set("title", product.name);
+  if (product.description) {
+    ogImageUrl.searchParams.set("description", product.description.slice(0, 100));
+  }
+  if (productImage) {
+    ogImageUrl.searchParams.set("image", productImage);
+  }
+  if (price) {
+    ogImageUrl.searchParams.set("category", `$${price}`);
+  }
+
+  return {
+    title: seoTitle,
+    description: seoDescription,
+    openGraph: {
+      title: seoTitle,
+      description: seoDescription,
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl.toString(),
+          width: 1200,
+          height: 630,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description: seoDescription,
+      images: [ogImageUrl.toString()],
+    },
+  };
+}
 
 interface MediaItem {
   id: string;
@@ -54,6 +124,13 @@ export default async function page(props: {
   // const selectedVariant = selectedVariants[0];
 
   const packs = await getPack(variants[0]?.id as string);
+
+  // Fetch related products
+  const relatedProducts = await getRelatedProducts(variants[0]?.id as string, 4);
+
+  // Fetch reviews and average rating
+  const reviews = await getReviewsByProductId(variants[0]?.id as string);
+  const { average: averageRating, count: reviewCount } = await getAverageRating(variants[0]?.id as string);
 
   // console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [
@@ -226,19 +303,12 @@ export default async function page(props: {
                   {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
                     {variants[0].description}
                   </CardDescription> */}
-                  <div className="flex items-center gap-4 pt-2">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
-                        />
-                      ))}
-                    </div>
+                  <a href="#reviews" className="flex items-center gap-4 pt-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <StarRating rating={averageRating} size="sm" />
                     <span className="text-sm text-muted-foreground">
-                      156 reviews
+                      {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
                     </span>
-                  </div>
+                  </a>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -289,27 +359,35 @@ export default async function page(props: {
 
               <Separator className="my-8" />
 
+              {/* Related Products Section */}
+              {relatedProducts.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold">You May Also Like</h2>
+                  <RelatedProducts
+                    products={relatedProducts}
+                    title=""
+                    className="py-0"
+                  />
+                </div>
+              )}
+
+              <Separator className="my-8" />
+
               {/* Reviews Section */}
-              <div className="space-y-4">
+              <div id="reviews" className="space-y-6 scroll-mt-24">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold">Customer Reviews</h2>
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-                        />
-                      ))}
-                    </div>
+                    <StarRating rating={averageRating} size="md" />
                     <span className="text-sm text-gray-600">
-                      (4.2 out of 5)
+                      ({averageRating.toFixed(1)} out of 5 · {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
                     </span>
                   </div>
                 </div>
-                {/* <ScrollArea className="">
-                  <VideoReviewMasonry />
-                </ScrollArea> */}
+
+                <ReviewSection productId={variants[0]?.id as string} />
+
+                <ReviewList reviews={reviews} />
               </div>
             </div>
           </div>
@@ -346,19 +424,12 @@ export default async function page(props: {
                     {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
                     {variants[0].description}
                   </CardDescription> */}
-                    <div className="flex items-center gap-4 pt-2">
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-muted-foreground"}`}
-                          />
-                        ))}
-                      </div>
+                    <a href="#reviews" className="flex items-center gap-4 pt-2 cursor-pointer hover:opacity-80 transition-opacity">
+                      <StarRating rating={averageRating} size="sm" />
                       <span className="text-sm text-muted-foreground">
-                        156 reviews
+                        {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
                       </span>
-                    </div>
+                    </a>
                   </CardHeader>
 
                   <CardContent className="space-y-6">
@@ -422,24 +493,6 @@ export default async function page(props: {
                   </CardContent>
                 </Card>
 
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-gray-900">
-                      Product Collections
-                    </CardTitle>
-                    <CardDescription>
-                      Part of curated collections
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-32">
-                      <div className="text-sm text-gray-600">
-                        Collections and related product packs will be displayed
-                        here.
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </div>

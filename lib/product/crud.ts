@@ -638,3 +638,126 @@ export async function getPack(productId: string) {
   );
   return pack;
 }
+
+// ============ COLLECTION FUNCTIONS ============
+
+/**
+ * Get all products in a specific collection
+ */
+export async function getProductsByCollection(
+  collectionSlug: string
+): Promise<StripeProduct[]> {
+  try {
+    const products = await listProducts();
+    const collectionProducts = products
+      .filter(
+        (product) =>
+          product.metadata?.collection === collectionSlug &&
+          product.metadata?.type !== "bundle" // Exclude bundles
+      )
+      .sort((a, b) => {
+        const orderA = parseInt(a.metadata?.collection_order || "999");
+        const orderB = parseInt(b.metadata?.collection_order || "999");
+        return orderA - orderB;
+      });
+    return collectionProducts;
+  } catch (error) {
+    console.error("Error fetching collection products:", error);
+    return [];
+  }
+}
+
+/**
+ * Get related products for a specific product
+ * Falls back to same-category products if no related_products metadata is set
+ */
+export async function getRelatedProducts(
+  productId: string,
+  limit: number = 4
+): Promise<StripeProduct[]> {
+  try {
+    const products = await listProducts();
+    const currentProduct = products.find((p) => p.id === productId);
+
+    if (!currentProduct) return [];
+
+    // First try to get explicitly set related products
+    if (currentProduct.metadata?.related_products) {
+      const relatedIds = currentProduct.metadata.related_products
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+
+      const relatedProducts = products.filter(
+        (p) => relatedIds.includes(p.id) && p.id !== productId
+      );
+
+      if (relatedProducts.length > 0) {
+        return relatedProducts.slice(0, limit);
+      }
+    }
+
+    // Fallback: get products from same category
+    const category = currentProduct.metadata?.category;
+    if (category) {
+      const sameCategoryProducts = products.filter(
+        (p) =>
+          p.metadata?.category === category &&
+          p.id !== productId &&
+          p.metadata?.type !== "bundle"
+      );
+      return sameCategoryProducts.slice(0, limit);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Error fetching related products:", error);
+    return [];
+  }
+}
+
+/**
+ * Get featured products
+ */
+export async function getFeaturedProducts(
+  limit: number = 8
+): Promise<StripeProduct[]> {
+  try {
+    const products = await listProducts();
+    const featured = products.filter(
+      (p) =>
+        p.metadata?.featured === "true" && p.metadata?.type !== "bundle"
+    );
+    return featured.slice(0, limit);
+  } catch (error) {
+    console.error("Error fetching featured products:", error);
+    return [];
+  }
+}
+
+/**
+ * Get all unique collections from product metadata
+ */
+export async function getCollections(): Promise<
+  { slug: string; productCount: number }[]
+> {
+  try {
+    const products = await listProducts();
+    const collectionMap = new Map<string, number>();
+
+    products.forEach((product) => {
+      const collection = product.metadata?.collection;
+      if (collection && product.metadata?.type !== "bundle") {
+        collectionMap.set(collection, (collectionMap.get(collection) || 0) + 1);
+      }
+    });
+
+    return Array.from(collectionMap.entries()).map(([slug, productCount]) => ({
+      slug,
+      productCount,
+    }));
+  } catch (error) {
+    console.error("Error fetching collections:", error);
+    return [];
+  }
+}

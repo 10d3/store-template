@@ -43,11 +43,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
 import { uploadThemes } from "@/lib/theme/upload-theme";
+import RelatedProductsSelector from "@/components/shared/related-products-selector";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
   initialData?: StripeProduct;
   isLoading?: boolean;
+  products?: StripeProduct[]; // All products for related products selector
 }
 
 // Define the form variant type
@@ -91,10 +93,11 @@ function createFormVariantFromStripe(
   };
 }
 
-export function ProductForm({
+export default function ProductForm({
   onSubmit,
   initialData,
   isLoading,
+  products = [],
 }: ProductFormProps) {
   const [showVariant, setShowVariant] = useState(false);
   const [expandedVariants, setExpandedVariants] = useState<Set<string>>(
@@ -111,16 +114,16 @@ export function ProductForm({
       currency: "usd",
       images: [],
       metadata: transformMetadataFromStripe({
-         slug: "",
-         category: "",
-         gender: "",
-         pack_size: "",
-         seo_title: "",
-         seo_description: "",
-         tags: "",
-         digital: "false",
-         nutrition: ""
-       }, "product"),
+        slug: "",
+        category: "",
+        gender: "",
+        pack_size: "",
+        seo_title: "",
+        seo_description: "",
+        tags: "",
+        digital: "false",
+        nutrition: ""
+      }, "product"),
       variants: [],
     },
   });
@@ -134,14 +137,14 @@ export function ProductForm({
         description: initialData.description || "",
         price:
           initialData.default_price &&
-          typeof initialData.default_price === "object" &&
-          initialData.default_price.unit_amount !== null
+            typeof initialData.default_price === "object" &&
+            initialData.default_price.unit_amount !== null
             ? initialData.default_price.unit_amount
             : 1000,
         currency:
           initialData.default_price &&
-          typeof initialData.default_price === "object" &&
-          initialData.default_price.currency
+            typeof initialData.default_price === "object" &&
+            initialData.default_price.currency
             ? initialData.default_price.currency
             : "usd",
         images: initialData.images || [],
@@ -552,11 +555,10 @@ export function ProductForm({
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                       <ChevronDown
-                                        className={`h-4 w-4 transition-transform duration-200 ${
-                                          expandedVariants.has(variant.id!)
+                                        className={`h-4 w-4 transition-transform duration-200 ${expandedVariants.has(variant.id!)
                                             ? "rotate-180"
                                             : ""
-                                        }`}
+                                          }`}
                                       />
                                       <CardTitle className="text-base">
                                         {variant.name || `Variant ${index + 1}`}
@@ -632,7 +634,7 @@ export function ProductForm({
                                               variant.id!,
                                               "price",
                                               Number.parseInt(e.target.value) ||
-                                                0
+                                              0
                                             )
                                           }
                                           className="border-2 focus:border-blue-500 transition-colors"
@@ -733,8 +735,8 @@ export function ProductForm({
                                                         const newImages =
                                                           variant.images
                                                             ? [
-                                                                ...variant.images,
-                                                              ]
+                                                              ...variant.images,
+                                                            ]
                                                             : [];
                                                         newImages.splice(
                                                           index,
@@ -1016,6 +1018,22 @@ export function ProductForm({
                         </FormItem>
                       )}
                     />
+
+                    {/* Related Products Selector */}
+                    {products.length > 0 && (
+                      <FormField
+                        control={form.control}
+                        name="metadata.related_products"
+                        render={({ field }) => (
+                          <RelatedProductsSelector
+                            products={products}
+                            value={field.value || ""}
+                            onChange={field.onChange}
+                            currentProductId={initialData?.id}
+                          />
+                        )}
+                      />
+                    )}
 
                     <FormField
                       control={form.control}

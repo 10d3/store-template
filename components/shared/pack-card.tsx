@@ -77,11 +77,10 @@ export default function PackCard({
       ? currentTotal * (1 - bundleDiscount / 100)
       : currentTotal;
 
-  // Get discount in %
-  const discountInPercent = Math.floor(
-    (bundleDiscount * 100) /
-      (typeof price === "object" && price?.unit_amount ? price.unit_amount : 0)
-  );
+  // bundleDiscount is already a percentage value (e.g., 10 for 10%)
+  // Calculate actual savings amount based on the difference between original total and pack price
+  const packPriceAmount = typeof price === "object" && price?.unit_amount ? price.unit_amount : 0;
+  const savingsAmount = originalTotal - packPriceAmount;
 
   // Get maximum individual discount
   // const maxDiscount = Math.max(
@@ -115,7 +114,7 @@ export default function PackCard({
         quantity: 1, // Add missing quantity
         maxQuantity: 5, // Add missing maxQuantity
         items: bundleItems, // Use 'items' instead of 'bundleItems' to match interface
-        discount: discountInPercent, // Ensure it's a number
+        discount: bundleDiscount, // bundleDiscount is already a percentage
         originalPrice: originalTotal,
         discountType: "percent" as const, // Add missing discountType - adjust based on your logic
       });
@@ -168,7 +167,7 @@ export default function PackCard({
           variant="destructive"
           className="absolute top-3 right-3 z-30 bg-red-500 text-white font-semibold px-3 py-1 text-xs rounded-lg shadow-lg"
         >
-          {discountInPercent}% {t("discount")}
+          {bundleDiscount}% {t("discount")}
         </Badge>
       )}
 
@@ -304,7 +303,7 @@ export default function PackCard({
         </div>
 
         {/* Savings Information */}
-        {originalTotal > finalTotal && (
+        {savingsAmount > 0 && (
           <div
             className={cn(
               "absolute bottom-3 left-3 right-3 text-center transition-all duration-300",
@@ -314,7 +313,7 @@ export default function PackCard({
             )}
           >
             <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold inline-block">
-              Save {formatPrice(bundleDiscount)}
+              Save {formatPrice(savingsAmount)}
             </div>
           </div>
         )}

@@ -13,7 +13,7 @@ import {
   listCoupons,
 } from "@/lib/product/crud"
 import { toast } from "sonner"
-import { ProductForm } from "../_components/form/product-form"
+import ProductForm from "../_components/form/product-form"
 import { StripeProduct } from "@/types/product"
 import { ProductFormData } from "@/lib/product/product.schema"
 import { ProductOnlyList } from "../_components/product-only-list";
@@ -111,6 +111,7 @@ export default function ProductManagementPage() {
             onSubmit={onProductSubmit}
             initialData={editingProduct || undefined}
             isLoading={creatingProduct || updatingProduct}
+            products={products}
           />
           {editingProduct && (
             <div className="mt-4">

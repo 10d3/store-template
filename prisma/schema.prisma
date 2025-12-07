@@ -46,7 +46,7 @@ model Review {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId   String
-  rating      Int
+  rating      Float
   comment     String?
   otherRating Json?
   createdAt   DateTime
