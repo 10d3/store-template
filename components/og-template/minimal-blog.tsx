@@ -1,11 +1,11 @@
-import { OGTemplateProps } from "@/lib/og";
+import type { OGTemplateProps } from "@/lib/og"
 
 export function MinimalBlogTemplate({
   title,
-  author,
+  // author,
   date,
-  readingTime,
-  category,
+  // readingTime,
+  // category,
   accentColor = "#f97316",
   bgColor = "#ffffff",
   logo,
@@ -42,14 +42,15 @@ export function MinimalBlogTemplate({
               display: "flex",
               alignItems: "center",
               height: "60px",
+              width: "150px",
             }}
           >
             <img
               src={logo || "/placeholder.svg"}
               alt="Logo"
               style={{
-                height: "60px",
-                width: "auto",
+                width: "150px",
+                height: "100%",
                 objectFit: "contain",
               }}
             />
@@ -80,7 +81,7 @@ export function MinimalBlogTemplate({
               margin: 0,
             }}
           >
-            {new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            {new Date(date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
           </div>
         )}
 
@@ -114,14 +115,15 @@ export function MinimalBlogTemplate({
             position: "relative",
           }}
         >
-          {/* Decorative Orange Rectangle */}
+          {/* Decorative Rectangle */}
           <div
             style={{
               position: "absolute",
-              top: "0",
+              top: "-30px",
               left: "-50px",
-              width: "200px",
-              height: "150px",
+              width: "250px",
+              height: "250px",
+              borderRadius: "24px",
               backgroundColor: accentColor,
               zIndex: 1,
             }}

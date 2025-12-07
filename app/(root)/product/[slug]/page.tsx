@@ -38,6 +38,24 @@ import ReviewSection from "@/components/shared/review-section-wrapper";
 import type { Metadata } from "next";
 
 // Generate metadata for SEO and OG
+// Helper to strip markdown formatting
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/#{1,6}\s?/g, '') // Remove headers
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Bold
+    .replace(/\*([^*]+)\*/g, '$1') // Italic
+    .replace(/__([^_]+)__/g, '$1') // Bold alt
+    .replace(/_([^_]+)_/g, '$1') // Italic alt
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+    .replace(/`([^`]+)`/g, '$1') // Inline code
+    .replace(/```[\s\S]*?```/g, '') // Code blocks
+    .replace(/>\s?/g, '') // Blockquotes
+    .replace(/[-*+]\s/g, '') // List items
+    .replace(/\n{2,}/g, ' ') // Multiple newlines
+    .replace(/\n/g, ' ') // Single newlines
+    .trim();
+}
+
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
@@ -52,27 +70,29 @@ export async function generateMetadata(props: {
 
   const product = variants[0];
   const seoTitle = product.metadata?.seo_title || product.name;
-  const seoDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
+
+  // Strip markdown from description
+  const rawDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
+  const seoDescription = stripMarkdown(rawDescription).slice(0, 160);
+
   const productImage = product.images?.[0];
 
-  // Get price for OG
-  const price = typeof product.default_price === "object" && product.default_price?.unit_amount
-    ? (product.default_price.unit_amount / 100).toFixed(2)
-    : "";
+  // Get tags from metadata
+  const tags = product.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
 
   // Build OG image URL
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const ogImageUrl = new URL("/api/og", baseUrl);
-  ogImageUrl.searchParams.set("template", "modern-dark");
+  ogImageUrl.searchParams.set("template", "ecommerce-product");
   ogImageUrl.searchParams.set("title", product.name);
-  if (product.description) {
-    ogImageUrl.searchParams.set("description", product.description.slice(0, 100));
+  if (rawDescription) {
+    ogImageUrl.searchParams.set("description", stripMarkdown(rawDescription).slice(0, 80));
   }
   if (productImage) {
     ogImageUrl.searchParams.set("image", productImage);
   }
-  if (price) {
-    ogImageUrl.searchParams.set("category", `$${price}`);
+  if (tags.length > 0) {
+    ogImageUrl.searchParams.set("tags", tags.slice(0, 3).join(","));
   }
 
   return {
