@@ -1,4 +1,4 @@
-import type { OGTemplateProps } from "@/lib/og";
+import type { OGTemplateProps } from "@/lib/og"
 
 export function EcommerceProductTemplate({
   title,
@@ -7,8 +7,12 @@ export function EcommerceProductTemplate({
   accentColor = "#dc2626",
   bgColor = "#ffffff",
   image,
+  images,
   tags,
 }: OGTemplateProps) {
+  // Use images array if provided, otherwise fallback to single image
+  const productImages = images?.length ? images.slice(0, 3) : image ? [image] : []
+
   return (
     <div
       style={{
@@ -17,32 +21,113 @@ export function EcommerceProductTemplate({
         display: "flex",
         backgroundColor: bgColor,
         padding: "0",
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif",
         position: "relative",
       }}
     >
-      {/* Left Image Section */}
-      {image && (
+      {/* Left Image Section - Stacked Cards */}
+      {productImages.length > 0 && (
         <div
           style={{
             display: "flex",
             width: "50%",
-            backgroundColor: "#f9fafb",
             alignItems: "center",
             justifyContent: "center",
-            padding: "60px",
+            position: "relative",
           }}
         >
-          <img
-            src={image || "/placeholder.svg"}
-            alt="Product"
+          {/* Stacked images container */}
+          <div
             style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              maxHeight: "500px",
+              display: "flex",
+              position: "relative",
+              width: "500px",
+              height: "580px",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          />
+          >
+            {/* Back left card (index 2) - rotated left */}
+            {productImages[2] && (
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  width: "380px",
+                  height: "480px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "24px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.12)",
+                  overflow: "hidden",
+                  transform: "rotate(-8deg) translateX(-50px)",
+                }}
+              >
+                <img
+                  src={productImages[2]}
+                  alt="Product 3"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Back right card (index 1) - rotated right */}
+            {productImages[1] && (
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  width: "380px",
+                  height: "480px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "24px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.12)",
+                  overflow: "hidden",
+                  transform: "rotate(8deg) translateX(50px)",
+                }}
+              >
+                <img
+                  src={productImages[1]}
+                  alt="Product 2"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Front card (index 0) - centered on top */}
+            {productImages[0] && (
+              <div
+                style={{
+                  display: "flex",
+                  position: "absolute",
+                  width: "420px",
+                  height: "540px",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "28px",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+                  overflow: "hidden",
+                  zIndex: 10,
+                }}
+              >
+                <img
+                  src={productImages[0]}
+                  alt="Product 1"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -55,34 +140,39 @@ export function EcommerceProductTemplate({
           width: "50%",
           padding: "80px",
           gap: "32px",
+          position: "relative",
         }}
       >
-        {/* Sale Badge */}
+        {/* Sale Badge - Minimalist Positioning */}
         <div
           style={{
-            display: "inline-flex",
-            alignSelf: "flex-start",
+            display: "flex",
+            position: "absolute",
+            top: "40px",
+            right: "80px",
             backgroundColor: accentColor,
             color: "#ffffff",
-            fontSize: "28px",
-            fontWeight: "900",
-            padding: "16px 40px",
-            borderRadius: "8px",
+            fontSize: "12px",
+            fontWeight: "600",
+            padding: "6px 16px",
+            borderRadius: "4px",
             textTransform: "uppercase",
-            letterSpacing: "1px",
+            letterSpacing: "1.2px",
           }}
         >
-          SALE
+          Sale
         </div>
 
         {/* Title */}
         <h1
           style={{
-            fontSize: 64,
-            fontWeight: "900",
+            fontSize: 80,
+            fontWeight: 900,
             color: "#111827",
             lineHeight: 1.1,
             margin: 0,
+            letterSpacing: "-1.5px",
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif",
           }}
         >
           {title}
@@ -94,8 +184,9 @@ export function EcommerceProductTemplate({
             style={{
               fontSize: "26px",
               color: "#6b7280",
-              lineHeight: 1.5,
+              lineHeight: 1.6,
               margin: 0,
+              fontWeight: "400",
             }}
           >
             {description}
@@ -115,11 +206,13 @@ export function EcommerceProductTemplate({
               <div
                 key={i}
                 style={{
-                  fontSize: "20px",
-                  color: "#4b5563",
-                  backgroundColor: "#f3f4f6",
-                  padding: "8px 20px",
-                  borderRadius: "20px",
+                  fontSize: "16px",
+                  color: "#6b7280",
+                  backgroundColor: "#f9fafb",
+                  padding: "8px 18px",
+                  borderRadius: "6px",
+                  fontWeight: "500",
+                  border: "1px solid #e5e7eb",
                 }}
               >
                 {tag}
@@ -159,5 +252,5 @@ export function EcommerceProductTemplate({
         )} */}
       </div>
     </div>
-  );
+  )
 }

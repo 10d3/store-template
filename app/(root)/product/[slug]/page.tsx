@@ -20,7 +20,8 @@ import {
   getProductsByProductIds,
   getRelatedProducts,
 } from "@/lib/product/crud";
-import { Star, Share2 } from "lucide-react";
+import { Share2 } from "lucide-react";
+import { getBaseURL } from "@/lib/utils";
 import RelatedProducts from "@/components/shared/related-products";
 import { Button } from "@/components/ui/button";
 // import MediaGallery from "@/components/shared/media-gallery";
@@ -75,26 +76,25 @@ export async function generateMetadata(props: {
   const rawDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
   const seoDescription = stripMarkdown(rawDescription).slice(0, 160);
 
-  const productImage = product.images?.[0];
+  // Get up to 3 product images for stacked display
+  const productImages = product.images?.slice(0, 3) || [];
 
   // Get tags from metadata
   const tags = product.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
 
-  // Build OG image URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const ogImageUrl = new URL("/api/og", baseUrl);
-  ogImageUrl.searchParams.set("template", "ecommerce-product");
-  ogImageUrl.searchParams.set("title", product.name);
-  if (rawDescription) {
-    ogImageUrl.searchParams.set("description", stripMarkdown(rawDescription).slice(0, 80));
-  }
-  if (productImage) {
-    ogImageUrl.searchParams.set("image", productImage);
-  }
-  if (tags.length > 0) {
-    ogImageUrl.searchParams.set("tags", tags.slice(0, 3).join(","));
-  }
+  // Build OG image URL with separate image params
+  let ogImageUrl = `${getBaseURL()}/api/og?template=ecommerce-product&title=${encodeURIComponent(product.name)}&description=${encodeURIComponent(stripMarkdown(rawDescription).slice(0, 80))}`;
 
+  // Add each image as a separate param
+  if (productImages[0]) ogImageUrl += `&image1=${encodeURIComponent(productImages[0])}`;
+  if (productImages[1]) ogImageUrl += `&image2=${encodeURIComponent(productImages[1])}`;
+  if (productImages[2]) ogImageUrl += `&image3=${encodeURIComponent(productImages[2])}`;
+
+  // Add tags
+  if (tags.length > 0) ogImageUrl += `&tags=${encodeURIComponent(tags.slice(0, 3).join(","))}`;
+
+  console.log("ogImageUrl", ogImageUrl);
+  console.log("productImages", productImages);
   return {
     title: seoTitle,
     description: seoDescription,
@@ -104,7 +104,7 @@ export async function generateMetadata(props: {
       type: "website",
       images: [
         {
-          url: ogImageUrl.toString(),
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: product.name,
@@ -115,7 +115,7 @@ export async function generateMetadata(props: {
       card: "summary_large_image",
       title: seoTitle,
       description: seoDescription,
-      images: [ogImageUrl.toString()],
+      images: [ogImageUrl],
     },
   };
 }

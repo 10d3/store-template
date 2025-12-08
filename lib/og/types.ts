@@ -9,6 +9,7 @@ export interface OGTemplateProps {
   tags?: string[]
   category?: string
   image?: string
+  images?: string[] // Array of images for stacked display
   logo?: string
   accentColor?: string
   bgColor?: string

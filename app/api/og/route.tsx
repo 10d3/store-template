@@ -22,6 +22,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Parse all possible parameters
+    const image1 = searchParams.get("image1") || searchParams.get("image");
+    const image2 = searchParams.get("image2");
+    const image3 = searchParams.get("image3");
+
+    // Build images array from individual params
+    const imagesArray = [image1, image2, image3].filter(Boolean) as string[];
+
     const props = {
       title: searchParams.get("title") || "Untitled Blog Post",
       description: searchParams.get("description") || undefined,
@@ -30,7 +37,8 @@ export async function GET(request: NextRequest) {
       readingTime: searchParams.get("readingTime") || undefined,
       category: searchParams.get("category") || undefined,
       tags: searchParams.get("tags")?.split(",") || undefined,
-      image: searchParams.get("image") || undefined,
+      image: image1 || undefined,
+      images: imagesArray.length > 0 ? imagesArray : undefined,
       logo: searchParams.get("logo") || undefined,
       accentColor: searchParams.get("accentColor") || undefined,
       bgColor: searchParams.get("bgColor") || undefined,
