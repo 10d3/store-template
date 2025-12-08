@@ -48,7 +48,7 @@ export function EcommerceProductTemplate({
             }}
           >
             {/* Back left card (index 2) - rotated left */}
-            {productImages[2] && (
+            {productImages[0] && (
               <div
                 style={{
                   display: "flex",
@@ -63,7 +63,7 @@ export function EcommerceProductTemplate({
                 }}
               >
                 <img
-                  src={productImages[2]}
+                  src={productImages[0]}
                   alt="Product 3"
                   style={{
                     width: "100%",
@@ -75,7 +75,7 @@ export function EcommerceProductTemplate({
             )}
 
             {/* Back right card (index 1) - rotated right */}
-            {productImages[1] && (
+            {productImages[0] && (
               <div
                 style={{
                   display: "flex",
@@ -90,7 +90,7 @@ export function EcommerceProductTemplate({
                 }}
               >
                 <img
-                  src={productImages[1]}
+                  src={productImages[0]}
                   alt="Product 2"
                   style={{
                     width: "100%",
@@ -108,7 +108,7 @@ export function EcommerceProductTemplate({
                   display: "flex",
                   position: "absolute",
                   width: "420px",
-                  height: "540px",
+                  height: "500px",
                   backgroundColor: "#ffffff",
                   borderRadius: "28px",
                   boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
@@ -166,8 +166,8 @@ export function EcommerceProductTemplate({
         {/* Title */}
         <h1
           style={{
-            fontSize: 80,
-            fontWeight: 900,
+            fontSize: "80px",
+            fontWeight: "extra-bold",
             color: "#111827",
             lineHeight: 1.1,
             margin: 0,

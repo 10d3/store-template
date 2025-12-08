@@ -10,6 +10,7 @@ export interface OGTemplateProps {
   category?: string
   image?: string
   images?: string[] // Array of images for stacked display
+  price?: string
   logo?: string
   accentColor?: string
   bgColor?: string

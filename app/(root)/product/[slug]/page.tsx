@@ -74,27 +74,32 @@ export async function generateMetadata(props: {
 
   // Strip markdown from description
   const rawDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
-  const seoDescription = stripMarkdown(rawDescription).slice(0, 160);
+  const seoDescription = stripMarkdown(rawDescription).slice(0, 180);
 
-  // Get up to 3 product images for stacked display
-  const productImages = product.images?.slice(0, 3) || [];
+  // Get product image
+  const productImage = product.images?.[0] || "";
 
   // Get tags from metadata
   const tags = product.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
 
-  // Build OG image URL with separate image params
-  let ogImageUrl = `${getBaseURL()}/api/og?template=ecommerce-product&title=${encodeURIComponent(product.name)}&description=${encodeURIComponent(stripMarkdown(rawDescription).slice(0, 80))}`;
+  // Get price
+  const price = typeof product.default_price === "object" && product.default_price?.unit_amount
+    ? `$${(product.default_price.unit_amount / 100).toFixed(2)}`
+    : "";
 
-  // Add each image as a separate param
-  if (productImages[0]) ogImageUrl += `&image1=${encodeURIComponent(productImages[0])}`;
-  if (productImages[1]) ogImageUrl += `&image2=${encodeURIComponent(productImages[1])}`;
-  if (productImages[2]) ogImageUrl += `&image3=${encodeURIComponent(productImages[2])}`;
+  // Build OG image URL
+  let ogImageUrl = `${getBaseURL()}/api/og?template=ecommerce-product&title=${encodeURIComponent(product.name)}&description=${encodeURIComponent(stripMarkdown(rawDescription).slice(0, 100))}`;
+
+  // Add image
+  if (productImage) ogImageUrl += `&image=${encodeURIComponent(productImage)}`;
+
+  // Add price
+  if (price) ogImageUrl += `&price=${encodeURIComponent(price)}`;
 
   // Add tags
   if (tags.length > 0) ogImageUrl += `&tags=${encodeURIComponent(tags.slice(0, 3).join(","))}`;
 
   console.log("ogImageUrl", ogImageUrl);
-  console.log("productImages", productImages);
   return {
     title: seoTitle,
     description: seoDescription,
