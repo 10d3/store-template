@@ -34,11 +34,13 @@ export function createMetadataValidator(
 /**
  * Transform metadata for submission to Stripe
  * Converts all values to strings, numbers, or null as required by Stripe
+ * Also truncates values to 500 chars (Stripe's limit)
  */
 export function transformMetadataForSubmission(
   metadata: Record<string, any>
 ): Record<string, string | number | null> {
   const transformed: Record<string, string | number | null> = {};
+  const STRIPE_METADATA_VALUE_LIMIT = 500;
 
   for (const [key, value] of Object.entries(metadata)) {
     if (value === undefined) {
@@ -52,9 +54,17 @@ export function transformMetadataForSubmission(
     } else if (typeof value === "number") {
       transformed[key] = value;
     } else if (Array.isArray(value)) {
-      transformed[key] = value.join(",");
+      const joined = value.join(",");
+      // Truncate if exceeds Stripe limit
+      transformed[key] = joined.length > STRIPE_METADATA_VALUE_LIMIT
+        ? joined.slice(0, STRIPE_METADATA_VALUE_LIMIT)
+        : joined;
     } else {
-      transformed[key] = String(value);
+      const strValue = String(value);
+      // Truncate if exceeds Stripe limit
+      transformed[key] = strValue.length > STRIPE_METADATA_VALUE_LIMIT
+        ? strValue.slice(0, STRIPE_METADATA_VALUE_LIMIT)
+        : strValue;
     }
   }
 

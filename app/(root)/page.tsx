@@ -5,6 +5,22 @@ import ProductCard from "@/components/shared/product-card";
 // import { getTranslations } from "@/i18n/server";
 import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
 import type { StripeProduct } from "@/types/product";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shop Premium Products | Our Store",
+  description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles with fast shipping.",
+  openGraph: {
+    title: "Shop Premium Products | Our Store",
+    description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shop Premium Products | Our Store",
+    description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles.",
+  },
+};
 
 export default async function Home() {
   // const t = await getTranslations("home");
@@ -50,9 +66,9 @@ export default async function Home() {
       image: product.images?.[0] || "/placeholder.svg",
       hoverMedia: product.images?.[1]
         ? {
-            type: "image" as const,
-            src: product.images[1],
-          }
+          type: "image" as const,
+          src: product.images[1],
+        }
         : undefined,
       stripePriceId:
         defaultPrice?.id ||
@@ -77,7 +93,7 @@ export default async function Home() {
           contentProducts.forEach((contentProduct, index) => {
             const defaultPrice =
               typeof contentProduct.default_price === "object" &&
-              contentProduct.default_price
+                contentProduct.default_price
                 ? contentProduct.default_price
                 : null;
 
@@ -91,9 +107,9 @@ export default async function Home() {
                 "/placeholder.svg",
               hoverMedia: contentProduct.images?.[1]
                 ? {
-                    type: "image" as const,
-                    src: contentProduct.images[1],
-                  }
+                  type: "image" as const,
+                  src: contentProduct.images[1],
+                }
                 : undefined,
               stripePriceId: defaultPrice?.id || contentIds[index]?.trim(),
             });

@@ -197,6 +197,7 @@ export async function updateProduct(
 
     return transformProduct(productWithNutrition);
   } catch (error) {
+    console.error("updateProduct error:", error);
     if (error instanceof ProductCrudError) {
       throw error;
     }
@@ -207,7 +208,8 @@ export async function updateProduct(
         { stripeError: error }
       );
     }
-    throw new ProductCrudError("Failed to update product", "UNKNOWN_ERROR", {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    throw new ProductCrudError(`Failed to update product: ${errorMessage}`, "UNKNOWN_ERROR", {
       originalError: error,
     });
   }

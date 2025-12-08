@@ -40,7 +40,7 @@ export default function MediaProductGallery({
             key={index}
             className={cn(
               "relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-background transition-all flex-shrink-0 w-16 h-16 md:w-full md:h-auto",
-              //   selectedImage === image && "ring-2 ring-primary"
+              selectedImage === image && "border-primary border-2"
             )}
             onClick={() => setSelectedImage(image)}
           >

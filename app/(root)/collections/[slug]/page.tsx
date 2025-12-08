@@ -5,6 +5,7 @@ import { ArrowLeft, Package } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 // Collection display names
 const COLLECTION_NAMES: Record<string, { name: string; description: string }> = {
@@ -35,6 +36,32 @@ export async function generateStaticParams() {
     return collections.map((collection) => ({
         slug: collection.slug,
     }));
+}
+
+export async function generateMetadata(props: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const params = await props.params;
+    const slug = params.slug;
+
+    const collectionInfo = COLLECTION_NAMES[slug];
+    const collectionName = collectionInfo?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const collectionDescription = collectionInfo?.description || `Browse our ${collectionName} collection`;
+
+    return {
+        title: `${collectionName} | Our Store`,
+        description: collectionDescription,
+        openGraph: {
+            title: `${collectionName} | Our Store`,
+            description: collectionDescription,
+            type: "website",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${collectionName} | Our Store`,
+            description: collectionDescription,
+        },
+    };
 }
 
 export default async function CollectionPage(props: {

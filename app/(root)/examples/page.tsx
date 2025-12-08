@@ -1,6 +1,12 @@
 import CardHero from "@/components/shared/card-hero";
 import CardPromo from "@/components/shared/card-promo";
 import { FileIcon } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Examples | Our Store",
+  description: "Browse example components and layouts. See how different elements can be used.",
+};
 
 export default function ExamplesPage() {
   return (
