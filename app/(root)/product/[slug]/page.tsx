@@ -96,7 +96,7 @@ export async function generateMetadata(props: {
   // Add price
   if (price) ogImageUrl += `&price=${encodeURIComponent(price)}`;
 
-  // Add tags
+  // Add tag
   if (tags.length > 0) ogImageUrl += `&tags=${encodeURIComponent(tags.slice(0, 3).join(","))}`;
 
   console.log("ogImageUrl", ogImageUrl);
