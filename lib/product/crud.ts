@@ -479,7 +479,6 @@ export async function listProducts(): Promise<StripeProduct[]> {
         };
       })
     );
-    // console.log(products.data[0]);
     return productsWithNutrition.map(transformProduct);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {

@@ -20,10 +20,9 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
   {
     key: "category",
     label: "Category",
-    type: "select",
-    options: ["coffee", "tea", "accessories", "merchandise", "men", "women"],
+    type: "text",
     description: "Navigation & filters",
-    placeholder: "Select category",
+    placeholder: "e.g. coffee, apparel",
   },
   {
     key: "gender",

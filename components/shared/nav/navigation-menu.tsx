@@ -32,40 +32,17 @@ import { NavUserMenu } from "./nav-user-menu";
 import Image from "next/image";
 import { CartSummaryNav } from "./cart-summary-nav";
 
-const categories = [
-  {
-    title: "Men's Fashion",
-    href: "/men",
-    description: "Discover the latest trends in men's clothing and accessories",
-  },
-  {
-    title: "Women's Fashion",
-    href: "/women",
-    description: "Explore our curated collection of women's fashion",
-  },
-  {
-    title: "Electronics",
-    href: "/electronics",
-    description: "Latest gadgets and electronic devices",
-  },
-  {
-    title: "Home & Living",
-    href: "/home",
-    description: "Beautiful items for your home and lifestyle",
-  },
-  {
-    title: "Sports & Outdoors",
-    href: "/sports",
-    description: "Gear up for your next adventure",
-  },
-  {
-    title: "Beauty & Health",
-    href: "/beauty",
-    description: "Premium beauty and wellness products",
-  },
-];
+export interface Category {
+  title: string;
+  href: string;
+  description: string;
+}
 
-export default function Navbar() {
+interface NavbarProps {
+  shopCategories?: Category[];
+}
+
+export default function Navbar({ shopCategories = [] }: NavbarProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   const session = useSession();
@@ -102,7 +79,7 @@ export default function Navbar() {
                 <NavigationMenuTrigger>Shop</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[600px] gap-3 p-4 md:grid-cols-2">
-                    {categories.map((category) => (
+                    {shopCategories.map((category: Category) => (
                       <ListItem
                         key={category.title}
                         title={category.title}
@@ -115,14 +92,14 @@ export default function Navbar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              <NavigationMenuItem>
+              {/* <NavigationMenuItem>
                 <NavigationMenuLink
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
                   <Link href="/collections">Collections</Link>
                 </NavigationMenuLink>
-              </NavigationMenuItem>
+              </NavigationMenuItem> */}
 
               <NavigationMenuItem>
                 <NavigationMenuLink
@@ -229,7 +206,7 @@ export default function Navbar() {
                         </CollapsibleTrigger>
                         <CollapsibleContent className="mt-1">
                           <div className="ml-3 pl-3 border-l-2 border-muted space-y-1">
-                            {categories.map((category) => (
+                            {shopCategories.map((category: Category) => (
                               <Link
                                 key={category.title}
                                 href={category.href}
