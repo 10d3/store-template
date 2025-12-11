@@ -42,7 +42,6 @@ export function ProductCard({
 
   const router = useRouter();
   // const t = useTranslations("home");
-  const [isHovered, setIsHovered] = React.useState(false);
   const [mediaLoaded, setMediaLoaded] = React.useState(false);
 
   const handleAddToCart = () => {
@@ -57,8 +56,6 @@ export function ProductCard({
         "group relative overflow-hidden border-0 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer bg-white m-0 p-0",
         className
       )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(`/product/${slug}`)}
       {...props}
     >
@@ -81,10 +78,8 @@ export function ProductCard({
             alt={name}
             fill
             className={cn(
-              "object-cover transition-all duration-500 ease-in-out",
-              isHovered && hoverMedia
-                ? "opacity-0 scale-105"
-                : "opacity-100 scale-100"
+              "object-cover transition-all duration-500 ease-in-out opacity-100 scale-100",
+              hoverMedia && "md:group-hover:opacity-0 md:group-hover:scale-105"
             )}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
@@ -92,10 +87,7 @@ export function ProductCard({
           {/* Hover Media */}
           {hoverMedia && (
             <div
-              className={cn(
-                "absolute inset-0 transition-all duration-500 ease-in-out",
-                isHovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
-              )}
+              className="absolute inset-0 transition-all duration-500 ease-in-out opacity-0 scale-105 md:group-hover:opacity-100 md:group-hover:scale-100"
             >
               {hoverMedia.type === "video" ? (
                 <video

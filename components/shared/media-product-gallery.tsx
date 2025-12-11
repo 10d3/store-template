@@ -39,7 +39,7 @@ export default function MediaProductGallery({
           <Card
             key={index}
             className={cn(
-              "relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-background transition-all flex-shrink-0 w-16 h-16 md:w-full md:h-auto",
+              "relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-background transition-all flex-shrink-0 w-14 h-14 md:w-full md:h-auto",
               selectedImage === image && "border-primary border-2"
             )}
             onClick={() => setSelectedImage(image)}

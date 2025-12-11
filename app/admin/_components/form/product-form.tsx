@@ -556,8 +556,8 @@ export default function ProductForm({
                                     <div className="flex items-center gap-3">
                                       <ChevronDown
                                         className={`h-4 w-4 transition-transform duration-200 ${expandedVariants.has(variant.id!)
-                                            ? "rotate-180"
-                                            : ""
+                                          ? "rotate-180"
+                                          : ""
                                           }`}
                                       />
                                       <CardTitle className="text-base">
@@ -949,6 +949,7 @@ export default function ProductForm({
                               placeholder="SEO optimized title"
                               className="border-2 focus:border-blue-500 transition-colors"
                               {...field}
+                              value={field.value ?? ""}
                             />
                           </FormControl>
                           <FormMessage />
@@ -969,6 +970,7 @@ export default function ProductForm({
                               placeholder="Enter product description"
                               className="min-h-[100px] border-2 focus:border-blue-500 transition-colors resize-none"
                               {...field}
+                              value={field.value ?? ""}
                             />
                           </FormControl>
                           <FormMessage />
@@ -989,6 +991,7 @@ export default function ProductForm({
                               placeholder="SEO meta description"
                               className="border-2 focus:border-blue-500 transition-colors resize-none"
                               {...field}
+                              value={field.value ?? ""}
                             />
                           </FormControl>
                           <FormMessage />
@@ -1009,6 +1012,7 @@ export default function ProductForm({
                               placeholder="organic,fair-trade,premium"
                               className="border-2 focus:border-blue-500 transition-colors"
                               {...field}
+                              value={field.value ?? ""}
                             />
                           </FormControl>
                           <FormDescription className="text-xs">

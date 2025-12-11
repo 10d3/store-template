@@ -367,13 +367,13 @@ export default async function page(props: {
               <div className="prose prose-gray max-w-none flex flex-col gap-4">
                 {/* <h2 className="text-2xl font-semibold mb-4">Description</h2> */}
                 <div className="prose text-secondary-foreground">
-                  <CardAnyText title="Product Description">
+                  <CardAnyText className="m-0 py-2" title="Product Description">
                     <Markdown source={variants[0].description || ""} />
                   </CardAnyText>
                 </div>
                 {variants[0].metadata.nutrition && (
                   <div>
-                    <CardAnyText title="Product Information">
+                    <CardAnyText className="m-0 py-2" title="Product Information">
                       <MarkdownNutrition
                         source={variants[0].metadata.nutrition}
                       />
