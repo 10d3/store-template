@@ -6,7 +6,7 @@ import { Card } from "../ui/card"
 import { Button } from "../ui/button"
 
 const SupplementPanel = ({ children }: { children: React.ReactNode }) => (
-  <div className="max-w-5xl mx-auto rounded-xl overflow-hidden shadow-sm bg-card p-0">
+  <div className="max-w-5xl mx-auto rounded-xl overflow-hidden shadow-sm bg-card p-0 px-2 pb-2">
     {children}
   </div>
 )
@@ -190,7 +190,7 @@ const mdxComponents = {
     <h3 className="mt-6 mb-3 text-2xl font-medium text-foreground tracking-tight" {...props} />
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="mb-4 leading-relaxed text-foreground" {...props} />
+    <span className="block mb-4 leading-relaxed text-foreground" {...props} />
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul className="list-disc list-inside space-y-2 text-foreground ml-4" {...props} />

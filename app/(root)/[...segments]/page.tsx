@@ -13,10 +13,10 @@ const mdxComponents = {
     <h1 className="mt-8 mb-4 text-4xl font-bold" {...props} />
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className="mt-6 mb-3 text-3xl font-semibold text-gray-800" {...props} />
+    <h2 className="mt-6 mb-3 text-3xl font-semibold" {...props} />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className="mt-5 mb-2 text-2xl font-medium text-gray-700" {...props} />
+    <h3 className="mt-5 mb-2 text-2xl font-medium" {...props} />
   ),
   // Paragraphs
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
@@ -43,62 +43,80 @@ const mdxComponents = {
 const pages: Record<string, { content: string }> = {
   "/about": {
     content: `
-# À propos de Nexora
+# Our Mission
 
-**Nexora** est la nouvelle génération de solutions digitales conçue spécialement pour les entreprises haïtiennes. Nous donnons aux commerçants, aux PME et aux entrepreneurs les outils dont ils ont besoin pour travailler plus vite, vendre plus et gérer leur activité avec précision — le tout à un coût accessible.
+To help you reclaim your natural vitality with clean, plant-based support that respects your roots, your rhythm, and your reality.
 
-Chez **Nexora**, nous croyons qu’un commerce bien organisé peut transformer sa manière de vendre du jour au lendemain. C’est pourquoi nous avons créé une plateforme simple, intuitive et 100 % cloud, qui fonctionne partout en Haïti, sans matériel coûteux, sans complications, et surtout, sans stress.
+# Why Vitanou Exists
 
-Nexora, c’est la technologie au service des entrepreneurs haïtiens.
+It began with a question asked repeatedly:  
+**“Doctor, is there something natural I can take that doesn’t cause side effects?”**
 
-## Mission
+As a doctor and educator, I’ve spent years explaining how the body works — blood sugar, hormones, sexual health, energy, inflammation. But teaching revealed something deeper:
 
-Notre mission est claire : **rendre la digitalisation accessible à toutes les entreprises haïtiennes**, petites comme grandes.
+People were overwhelmed, frustrated, and underserved.  
+They needed solutions made **for them**, not generic advice.
 
-Nous aidons les entrepreneurs à :
+So I stopped only teaching… and I started listening.
 
-- gagner du temps,  
-- éviter les pertes,  
-- encaisser plus rapidement,  
-- suivre leurs produits sans erreur,  
-- prendre le contrôle total de leur business.
+# What We Heard
 
-Nous voulons que chaque commerce en Haïti puisse profiter de la puissance d’un système professionnel, sans devoir payer des milliers de dollars.
+We listened to women whose cycles were controlling their lives.  
+Men who had lost their energy, confidence, and drive.  
+People struggling with high blood sugar, feeling scared and alone.  
+Individuals searching for natural solutions that actually help.
 
-## Vision
+Their stories shaped the foundation of **Vitanou**.
 
-Nous rêvons d’un pays où toutes les PME — du plus petit commerce de quartier à l’hôtel le plus moderne — fonctionnent avec des outils performants, fiables et faciles à utiliser.
+# Our Name & Our Promise
 
-Notre vision est de créer **le premier grand écosystème digital haïtien**, capable d’accompagner des milliers d’entrepreneurs dans leur croissance.
+**Vitanou** means **“Our Vitality.”**  
+It represents health we build together — not alone.
 
-Nous voulons bâtir un Haïti où :
+Our promise is simple:
 
-- chaque facture est claire,  
-- chaque stock est maîtrisé,  
-- chaque vente est comptée,  
-- chaque entreprise peut se développer avec confiance.
+- Clean, plant-based formulas  
+- Research-supported ingredients  
+- No artificial fillers  
+- No exaggerated claims  
 
-Nexora ne veut pas seulement suivre l’évolution mondiale : **nous voulons donner aux PME haïtiennes les moyens d’en faire partie.**
+Wellness inspired by nature and confirmed by science.
 
-## Activités
+# What We Create
 
-Nexora accompagne les entreprises avec un ensemble complet de services conçus pour simplifier leur quotidien :
+Every product in the Vitanou line has a purpose:
 
-### ✔ Solutions de gestion intelligentes
-Un système complet de gestion des ventes, facturation, inventaire, réservations, prestations et opérations.  
-Adapté à tous les secteurs : restaurants, pharmacies, supermarchés, boutiques, salons, services, hôtels.
+- **Pidjanm** for male vitality and performance  
+- **FemmeFlow** for women’s hormonal balance  
+- **Blood Sugar Balance** for metabolic support  
+- And additional formulas designed to strengthen energy, resilience, and overall well-being  
 
-### ✔ Formations et accompagnement
-Nous formons vos équipes grâce à une plateforme e-learning moderne avec des vidéos, tutoriels, quiz et certifications. Votre équipe devient rapidement autonome et efficace.
+This isn’t about quick fixes.  
+This is meaningful wellness that respects your life.
 
-### ✔ Support client réactif
-WhatsApp, téléphone, visioconférence : nous sommes avec vous à chaque étape. Nous aidons à résoudre les problèmes rapidement pour éviter les interruptions de service.
+# How We Work
 
-### ✔ Fourniture de terminaux POS
-Nexora propose des machines POS modernes, configurées et prêtes à l’emploi. Encaissements rapides, synchronisation automatique, sécurité renforcée.
+We blend scientific clarity, cultural understanding, and traditional healing wisdom.  
+True health exists where **knowledge**, **nature**, and **experience** meet.
 
-### ✔ Sensibilisation & Événements
-Workshops, rencontres, cocktails professionnels, ateliers de digitalisation… Nous aidons les entrepreneurs haïtiens à comprendre l’importance de la transformation digitale et à y accéder facilement.
+Our approach:
+
+- Educate  
+- Empower  
+- Support  
+
+# A Wellness Movement
+
+Vitanou is more than a supplement brand.  
+It’s a return to what works.  
+A reminder to trust nature again — without turning away from science.
+
+A community built on honesty, clarity, and real transformation.
+
+I’m here to guide you.  
+I’m here to walk this journey with you.
+
+# We Are Life, We Are Health
 `,
   },
   "/privacy": {
