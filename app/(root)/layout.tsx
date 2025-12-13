@@ -2,6 +2,7 @@ import CartModal from "@/components/shared/cart/cart-modal";
 import Footer from "@/components/footer";
 import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
 import Navbar, { Category } from "@/components/shared/nav/navigation-menu";
+import SocialProofProvider from "@/components/shared/social-proof-provider";
 import { listProducts } from "@/lib/product/crud";
 import { Metadata } from "next";
 import React from "react";
@@ -70,12 +71,26 @@ export default async function Rootlayout({
 
   const shopCategories = Array.from(categoryMap.values());
 
+  // Transform products for social proof notifications
+  const socialProofProducts = products
+    .filter((p) => p.images && p.images.length > 0)
+    .map((p) => ({
+      name: p.name,
+      image: p.images?.[0] || "/placeholder.svg",
+    }));
+
   return (
     <>
       <Navbar shopCategories={shopCategories} />
       <main className="flex-1 flex-col mt-4 md:px-24 px-4">
         {children}
         <CartModal />
+        <SocialProofProvider
+          products={socialProofProducts}
+          position="bottom-left"
+          intervalMin={20000}
+          intervalMax={45000}
+        />
       </main>
       <FooterWrapperCta>
         <Footer />
