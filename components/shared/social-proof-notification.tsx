@@ -73,12 +73,12 @@ export default function SocialProofNotification({
                 >
                     <Card className="group relative overflow-hidden border-border/40 bg-background/80 backdrop-blur-xl shadow-2xl shadow-black/5 p-2">
                         {/* Success indicator */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500" />
+                        {/* <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-500 to-teal-500" /> */}
 
                         <div className="flex items-start gap-4 p-2">
                             {/* Product Image with refined styling */}
                             <motion.div
-                                className="relative h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-muted ring-1 ring-border/50"
+                                className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted ring-1 ring-border/50"
                                 initial={{ scale: 0.8, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ delay: 0.1, duration: 0.4 }}
