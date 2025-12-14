@@ -2,10 +2,27 @@
 
 import { unstable_cache, revalidateTag } from "next/cache";
 import { listProducts as originalListProducts } from "./crud";
+import { listProductsFromDB } from "./db-queries";
+
+// Flag to enable database reads (set to true after initial sync)
+const USE_DATABASE = true;
 
 // Cache products for 5 minutes
 export const getCachedProducts = unstable_cache(
   async () => {
+    // Use database for fast reads, falls back to Stripe API if needed
+    if (USE_DATABASE) {
+      try {
+        const products = await listProductsFromDB();
+        // If we have products in DB, use them
+        if (products.length > 0) {
+          return products;
+        }
+      } catch (error) {
+        console.warn("Database read failed, falling back to Stripe API:", error);
+      }
+    }
+    // Fallback to Stripe API
     return await originalListProducts();
   },
   ["stripe-products"],
@@ -18,6 +35,17 @@ export const getCachedProducts = unstable_cache(
 // Helper to revalidate product cache
 export async function revalidateProductCache() {
   revalidateTag("products", "max");
+}
+
+// Cached version of getProduct - uses cached products list
+// This is MUCH faster than the uncached version since it doesn't
+// make Stripe API + Prisma calls on every page load
+export async function getCachedProduct(slug: string) {
+  const products = await getCachedProducts();
+  const variants = products.filter(
+    (product) => product.metadata.slug === slug
+  );
+  return variants;
 }
 
 export async function getProductByCategory(slug: string) {

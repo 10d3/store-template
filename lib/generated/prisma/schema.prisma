@@ -35,9 +35,53 @@ model BlogView {
   @@unique([blogId, viewerIdentifier]) // Ensures a unique view per blog per viewer
 }
 
+// ============ PRODUCT STORAGE ============
+// Products synced from Stripe for fast database reads
+
+model Product {
+  id          String   @id // Stripe product ID (prod_xxx)
+  name        String
+  description String?  @db.Text
+  images      String[] // Array of image URLs
+  active      Boolean  @default(true)
+
+  // All Stripe metadata stored as JSON
+  metadata Json?
+
+  // Relations
+  prices Price[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+  @@map("products")
+}
+
+model Price {
+  id        String  @id // Stripe price ID (price_xxx)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  unitAmount Int // Amount in cents
+  currency   String  @default("usd")
+  active     Boolean @default(true)
+  isDefault  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([active])
+  @@map("prices")
+}
+
 model ProductNutrition {
   id        String @id @default(uuid())
   productId String @unique
+  // Note: No FK constraint - productId references Stripe product ID
+  // which may or may not exist in our products table
   nutrition String
 }
 

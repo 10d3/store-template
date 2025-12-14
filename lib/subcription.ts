@@ -2,6 +2,12 @@
 import Stripe from "stripe";
 import { prisma } from "./prisma";
 import { trackPurchase } from "./affiliation/track-purshase";
+import {
+  syncProductToDatabase,
+  deleteProductFromDatabase,
+  syncPriceToDatabase,
+  deletePriceFromDatabase,
+} from "./product/product-sync";
 
 export default async function handleSubscription(payload: Stripe.Event) {
   const { type, data } = payload;
@@ -25,6 +31,25 @@ export default async function handleSubscription(payload: Stripe.Event) {
 
     case "payment_intent.payment_failed":
       await handlePaymentIntentFailed(data.object);
+      break;
+
+    // ============ PRODUCT SYNC WEBHOOKS ============
+    case "product.created":
+    case "product.updated":
+      await syncProductToDatabase(data.object as Stripe.Product);
+      break;
+
+    case "product.deleted":
+      await deleteProductFromDatabase((data.object as Stripe.Product).id);
+      break;
+
+    case "price.created":
+    case "price.updated":
+      await syncPriceToDatabase(data.object as Stripe.Price);
+      break;
+
+    case "price.deleted":
+      await deletePriceFromDatabase((data.object as Stripe.Price).id);
       break;
   }
 }

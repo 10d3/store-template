@@ -16,10 +16,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   getPack,
-  getProduct,
   getProductsByProductIds,
   getRelatedProducts,
 } from "@/lib/product/crud";
+import { getCachedProduct } from "@/lib/product/cache";
 import { Share2 } from "lucide-react";
 import { getBaseURL } from "@/lib/utils";
 import RelatedProducts from "@/components/shared/related-products";
@@ -61,7 +61,7 @@ export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const variants = await getProduct(params.slug);
+  const variants = await getCachedProduct(params.slug);
 
   if (!variants || variants.length === 0) {
     return {
@@ -141,7 +141,7 @@ export default async function page(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const variants = await getProduct(params.slug);
+  const variants = await getCachedProduct(params.slug);
   // console.log("variant form slug", variants);
   const selectedVariants = variants.filter((variant) =>
     variant.metadata?.variants?.includes(searchParams.variant as string)

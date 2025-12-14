@@ -124,7 +124,7 @@ export function ProductCard({
               //   : "opacity-0 -translate-y-2"
             )}
           >
-            <h2 className=" font-semibold text-white line-clamp-2 leading-tight drop-shadow-lg">
+            <h2 className=" font-semibold hidden md:block text-white line-clamp-2 leading-tight drop-shadow-lg">
               {name}
             </h2>
           </div>
@@ -148,9 +148,9 @@ export function ProductCard({
           </div> */}
 
           {/* Price - Always visible at bottom */}
-          <div className="absolute bottom-4 right-4 z-10">
+          <div className="absolute bottom-2 right-2 z-10">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-lg text-white drop-shadow-lg">
+              <span className="font-semibold md:text-lg text-white drop-shadow-lg">
                 {formatPrice(price)}
               </span>
               {originalPrice && originalPrice > price && (
