@@ -5,13 +5,13 @@ export interface StripeProduct {
   images?: string[];
   metadata: Record<string, string>;
   default_price?:
-    | {
-        id: string;
-        unit_amount: number | null;
-        currency: string;
-      }
-    | string
-    | null;
+  | {
+    id: string;
+    unit_amount: number | null;
+    currency: string;
+  }
+  | string
+  | null;
   active: boolean;
   variants?: StripeProductVariant[];
 }
@@ -24,13 +24,13 @@ export interface StripeProductVariant {
   price: number;
   currency: string;
   default_price?:
-    | {
-        id: string;
-        unit_amount: number | null;
-        currency: string;
-      }
-    | string
-    | null;
+  | {
+    id: string;
+    unit_amount: number | null;
+    currency: string;
+  }
+  | string
+  | null;
   active?: boolean;
   metadata: Record<string, string>;
 }
@@ -45,3 +45,39 @@ export interface StripeCoupon {
   valid: boolean;
   metadata: Record<string, string> | null;
 }
+
+export interface PackOption {
+  value: string
+  label: string
+}
+
+export interface PricingTier {
+  price: number
+  total: number
+  original: number
+}
+
+export interface PricingData {
+  subscribe: Record<string, PricingTier>
+  onetime: Record<string, PricingTier>
+}
+
+export interface TrustIndicator {
+  value: string
+  label: string
+}
+
+export interface ProductData {
+  id: string
+  name: string
+  description: string
+  image: string // Default/fallback image
+  images: Record<string, string> // Images per pack size, keyed by size (e.g., "2", "3")
+  imageAlt: string
+  packOptions: PackOption[]
+  pricing: PricingData
+  trustIndicators: TrustIndicator[]
+  subscriptionBenefits?: string[]
+}
+
+export type PurchaseType = "subscribe" | "onetime"

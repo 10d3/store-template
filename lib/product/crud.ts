@@ -354,21 +354,38 @@ export async function createPresetCoupon(preset: "4for3" | "15off3") {
 
 export async function createPack(data: PackFormData) {
   try {
-    const packMetadata = {
+    // Build pack metadata with new pack configuration
+    const packMetadata: Record<string, string> = {
       type: "bundle",
       contents: data.productIds.join(","),
       discount: data?.discount?.toString() || "0",
+    };
+
+    // Add pack type if specified
+    if (data.packType) {
+      packMetadata.pack_type = data.packType;
+    }
+
+    // Add pack sizes configuration as JSON string
+    if (data.packSizes && data.packSizes.length > 0) {
+      packMetadata.pack_sizes = JSON.stringify(data.packSizes);
+    }
+
+    // Merge with any additional metadata
+    const fullMetadata = {
+      ...packMetadata,
       ...data.metadata,
     };
 
     const validatedMetadata = validateAndTransformMetadata(
-      packMetadata,
+      fullMetadata,
       "product"
     );
 
     const product = await stripe.products.create({
       name: data.name,
       description: data.description,
+      images: data.images || [],
       metadata: validatedMetadata,
     });
 
@@ -399,12 +416,24 @@ export async function createPack(data: PackFormData) {
 export async function updatePack(id: string, data: PackFormData) {
   console.log(data);
   try {
-    const packMetadata = {
-      bundle_type: data.metadata?.bundle_type,
+    // Build pack metadata with new pack configuration
+    const packMetadata: Record<string, string> = {
+      type: "bundle",
+      bundle_type: data.metadata?.bundle_type || "",
       contents: data.productIds.join(","),
       discount: data?.discount?.toString() || "0",
-      category: data.metadata?.category,
+      category: data.metadata?.category || "",
     };
+
+    // Add pack type if specified
+    if (data.packType) {
+      packMetadata.pack_type = data.packType;
+    }
+
+    // Add pack sizes configuration as JSON string
+    if (data.packSizes && data.packSizes.length > 0) {
+      packMetadata.pack_sizes = JSON.stringify(data.packSizes);
+    }
 
     const validatedMetadata = validateAndTransformMetadata(
       packMetadata,
@@ -423,6 +452,7 @@ export async function updatePack(id: string, data: PackFormData) {
     const product = await stripe.products.update(id, {
       name: data.name,
       description: data.description,
+      images: data.images || [],
       metadata: validatedMetadata,
       default_price: newPrice.id, // Set the new price as default
     });

@@ -117,12 +117,15 @@ export default function FooterSection() {
                     <Image src="/apple-pay.svg" alt="Apple Pay" width={40} height={25} />
                     <Image src="/google-pay.svg" alt="Google Pay" width={40} height={25} />
                     {/* <span className="text-muted-foreground mx-2">|</span> */}
-                    {/* <Image src="/dhl.svg" alt="DHL" width={50} height={25} /> */}
+                    <Image src="/paypal.svg" alt="PayPal" width={40} height={25} />
                 </div>
                 <div className="my-4 flex flex-wrap items-center justify-center gap-4">
-                    <Image src="/dhl(1).svg" alt="DHL Express" width={40} height={25} />
-                    <Image src="/dhl.svg" alt="DHL Express" width={40} height={25} />
+                    {/* <Image src="/dhl(1).svg" alt="DHL Express" width={40} height={25} />
+                    <Image src="/dhl.svg" alt="DHL Express" width={40} height={25} /> */}
                     <Image src="/dhl-express.svg" alt="DHL Express" width={40} height={25} />
+                    <Image src="/ups.svg" alt="UPS" width={40} height={25} />
+                    <Image src="/american-express.svg" alt="American Express" width={40} height={25} />
+                    <Image src="/fedex.svg" alt="FedEx" width={40} height={25} />
                 </div>
 
                 <span className="text-muted-foreground block text-center text-sm"> © {new Date().getFullYear()} Vitanou, All rights reserved</span>

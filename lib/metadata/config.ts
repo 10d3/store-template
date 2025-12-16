@@ -209,6 +209,30 @@ export const PRODUCT_METADATA_FIELDS: MetadataField[] = [
     description: "Nutrition information",
     placeholder: "Calories: 200, Protein: 10g, Fat: 5g, Carbs: 30g",
   },
+  // Pack/Bundle specific fields
+  {
+    key: "type",
+    label: "Product Type",
+    type: "select",
+    options: ["product", "bundle"],
+    description: "Identifies if this is a regular product or a bundle/pack",
+    placeholder: "Select type",
+  },
+  {
+    key: "pack_type",
+    label: "Pack Type",
+    type: "select",
+    options: ["same_product", "mixed_products", "curated"],
+    description: "Type of pack: same product, mixed, or curated bundle",
+    placeholder: "Select pack type",
+  },
+  {
+    key: "pack_sizes",
+    label: "Pack Sizes Configuration",
+    type: "textarea",
+    description: "JSON array of pack size configs: [{\"size\":2,\"enabled\":true,\"discountPercent\":10}]",
+    placeholder: "[{\"size\":2,\"enabled\":true,\"discountPercent\":10}]",
+  },
 ];
 
 // Price-level metadata fields

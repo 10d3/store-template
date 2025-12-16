@@ -65,14 +65,27 @@ export const couponSchema = z.object({
   metadata: couponMetadataSchema,
 });
 
+// Pack size configuration schema - defines price/discount for each pack size (2-6)
+export const packSizeConfigSchema = z.object({
+  size: z.number().min(2).max(6),
+  enabled: z.boolean(),
+  discountPercent: z.number().min(0).max(100).optional(),
+  fixedPrice: z.number().min(0).optional(), // Fixed price in cents (overrides discount)
+  image: z.string().optional(), // Image URL for this specific pack size
+});
+
 export const packSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   productIds: z.array(z.string()).min(1, "At least one product required"),
   packPrice: z.number().min(0, "Pack price must be positive"),
-  discount: z.number().optional(), // Keep optional
+  discount: z.number().optional(), // Keep for legacy/simple bundles
   description: z.string().optional(),
+  images: z.array(z.string()).optional(), // Pack images
   metadata: productMetadataSchema, // Packs use product metadata + pack-specific fields
+  // New pack configuration
+  packType: z.enum(["same_product", "mixed_products", "curated"]).optional(),
+  packSizes: z.array(packSizeConfigSchema).optional(), // Config for sizes 2-6
 });
 
 // Price schema for price-level metadata
@@ -121,5 +134,7 @@ export {
 export type ProductFormData = z.infer<typeof productSchema>;
 export type CouponFormData = z.infer<typeof couponSchema>;
 export type PackFormData = z.infer<typeof packSchema>;
+export type PackSizeConfig = z.infer<typeof packSizeConfigSchema>;
 export type PriceFormData = z.infer<typeof priceSchema>;
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
+

@@ -206,3 +206,34 @@ export async function getProductsByCategoryFromDB(
         throw error;
     }
 }
+
+/**
+ * Get all pack/bundle products from the database
+ * Returns products where metadata.type === "bundle"
+ */
+export async function getPacksFromDB(): Promise<StripeProduct[]> {
+    try {
+        const products = await prisma.product.findMany({
+            where: {
+                active: true,
+                metadata: {
+                    path: ["type"],
+                    equals: "bundle",
+                },
+            },
+            include: {
+                prices: {
+                    where: { active: true },
+                    orderBy: { isDefault: "desc" },
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return products.map((product) => transformDbProduct(product, null));
+    } catch (error) {
+        console.error("Error getting packs from DB:", error);
+        throw error;
+    }
+}
+

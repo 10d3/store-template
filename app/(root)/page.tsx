@@ -2,10 +2,13 @@
 // import Hero from "@/components/shared/hero";
 import PackCard from "@/components/shared/pack-card";
 import ProductCard from "@/components/shared/product-card";
+import { PackCardNew } from "@/components/shared/product/product-card";
+import { transformPacksToProductData } from "@/lib/product/pack-transformer";
 // import { getTranslations } from "@/i18n/server";
 import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
-import type { StripeProduct } from "@/types/product";
+import type { StripeProduct, ProductData } from "@/types/product";
 import type { Metadata } from "next";
+import NewHero from "@/components/shared/new-hero";
 
 export const metadata: Metadata = {
   title: "Shop Premium Products | Our Store",
@@ -28,6 +31,7 @@ export default async function Home() {
   // Initialize arrays for products and packs
   let products: StripeProduct[] = [];
   let packs: StripeProduct[] = [];
+  let packProductData: ProductData[] = [];
 
   try {
     const allProducts = await listProducts();
@@ -37,10 +41,17 @@ export default async function Home() {
       (product) => !product.metadata?.type || product.metadata.type !== "bundle"
     );
 
-    packs = allProducts.filter(
+    // All bundles
+    const allPacks = allProducts.filter(
       (product) => product.metadata?.type === "bundle"
     );
-    // console.log(packs)
+
+    // Split: old-style packs (no pack_sizes) go to PackCard, new-style go to PackCardNew
+    packs = allPacks.filter((pack) => !pack.metadata?.pack_sizes);
+
+    // Transform packs WITH pack_sizes to ProductData format for PackCardNew
+    const packsWithSizes = allPacks.filter((pack) => pack.metadata?.pack_sizes);
+    packProductData = await transformPacksToProductData(packsWithSizes, products);
   } catch (error) {
     console.error("Failed to fetch products:", error);
   }
@@ -162,7 +173,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       <div className="w-full">
-        {/* <Hero/> */}
+        <NewHero />
         {/* Products Section */}
         {transformedProducts.length > 0 && (
           <div className="mb-16">
@@ -189,12 +200,12 @@ export default async function Home() {
         )}
 
         {/* Packs Section */}
-        {transformedPacks.length > 0 && (
+        {(transformedPacks.length > 0 || packProductData.length > 0) && (
           <div className="mb-16">
             <h2 className="text-2xl font-bold mb-8 text-center">
               Bundle Deals
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols- gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-6">
               {transformedPacks.map((pack) => (
                 <PackCard
                   key={pack.id}
@@ -205,6 +216,9 @@ export default async function Home() {
                   bundleDiscount={pack.bundleDiscount}
                   className="hover:scale-105 transition-transform duration-200"
                 />
+              ))}
+              {packProductData.map((packData) => (
+                <PackCardNew key={packData.id} product={packData} />
               ))}
             </div>
           </div>
