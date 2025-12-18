@@ -17,7 +17,7 @@ export const heroConfig: HeroSectionConfig = {
         {
             id: "flexibility",
             title: "Improved\nFlexibility",
-            imageSrc: "/woman-yoga-stretch-flexibility-exercise.jpg",
+            imageSrc: "/Gemini_Generated_Image_mjp7k2mjp7k2mjp7.png",
             imageAlt: "Yoga flexibility",
             gradientFrom: "#d4e8f0",
             gradientTo: "#a8cce0",
@@ -29,7 +29,7 @@ export const heroConfig: HeroSectionConfig = {
         {
             id: "stress-reduction",
             title: "Stress Reduction",
-            imageSrc: "/woman-yoga-side-bend-stretch-studio.jpg",
+            imageSrc: "/Gemini_Generated_Image_b0aanbb0aanbb0aa.png",
             imageAlt: "Yoga stress reduction",
             gradientFrom: "#e8ddd0",
             gradientTo: "#d4c4b0",
@@ -41,7 +41,7 @@ export const heroConfig: HeroSectionConfig = {
         {
             id: "join-class",
             title: "Join Us for a Yoga\nClass Today!",
-            imageSrc: "/yoga-class-studio-instructor-group.jpg",
+            imageSrc: "/Gemini_Generated_Image_td0jdjtd0jdjtd0j.png",
             imageAlt: "Yoga class",
             gradientFrom: "#c8b8a8",
             gradientTo: "#b0a090",

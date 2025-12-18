@@ -98,12 +98,27 @@ export type Commission = $Result.DefaultSelection<Prisma.$CommissionPayload>
  * 
  */
 export type Payout = $Result.DefaultSelection<Prisma.$PayoutPayload>
+/**
+ * Model SupportRequest
+ * 
+ */
+export type SupportRequest = $Result.DefaultSelection<Prisma.$SupportRequestPayload>
 
 /**
  * Enums
  */
 export namespace $Enums {
-  export const AffiliateStatus: {
+  export const SupportRequestStatus: {
+  PENDING: 'PENDING',
+  IN_REVIEW: 'IN_REVIEW',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+};
+
+export type SupportRequestStatus = (typeof SupportRequestStatus)[keyof typeof SupportRequestStatus]
+
+
+export const AffiliateStatus: {
   PENDING: 'PENDING',
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
@@ -172,6 +187,10 @@ export const Status: {
 export type Status = (typeof Status)[keyof typeof Status]
 
 }
+
+export type SupportRequestStatus = $Enums.SupportRequestStatus
+
+export const SupportRequestStatus: typeof $Enums.SupportRequestStatus
 
 export type AffiliateStatus = $Enums.AffiliateStatus
 
@@ -495,6 +514,16 @@ export class PrismaClient<
     * ```
     */
   get payout(): Prisma.PayoutDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.supportRequest`: Exposes CRUD operations for the **SupportRequest** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SupportRequests
+    * const supportRequests = await prisma.supportRequest.findMany()
+    * ```
+    */
+  get supportRequest(): Prisma.SupportRequestDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -951,7 +980,8 @@ export namespace Prisma {
     AffiliateClick: 'AffiliateClick',
     Referral: 'Referral',
     Commission: 'Commission',
-    Payout: 'Payout'
+    Payout: 'Payout',
+    SupportRequest: 'SupportRequest'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -970,7 +1000,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "blog" | "blogView" | "product" | "price" | "productNutrition" | "review" | "order" | "wishlist" | "user" | "session" | "account" | "verification" | "affiliate" | "affiliateClick" | "referral" | "commission" | "payout"
+      modelProps: "blog" | "blogView" | "product" | "price" | "productNutrition" | "review" | "order" | "wishlist" | "user" | "session" | "account" | "verification" | "affiliate" | "affiliateClick" | "referral" | "commission" | "payout" | "supportRequest"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2232,6 +2262,80 @@ export namespace Prisma {
           }
         }
       }
+      SupportRequest: {
+        payload: Prisma.$SupportRequestPayload<ExtArgs>
+        fields: Prisma.SupportRequestFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SupportRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SupportRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          findFirst: {
+            args: Prisma.SupportRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SupportRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          findMany: {
+            args: Prisma.SupportRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+          }
+          create: {
+            args: Prisma.SupportRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          createMany: {
+            args: Prisma.SupportRequestCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SupportRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+          }
+          delete: {
+            args: Prisma.SupportRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          update: {
+            args: Prisma.SupportRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          deleteMany: {
+            args: Prisma.SupportRequestDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SupportRequestUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SupportRequestUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>[]
+          }
+          upsert: {
+            args: Prisma.SupportRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SupportRequestPayload>
+          }
+          aggregate: {
+            args: Prisma.SupportRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSupportRequest>
+          }
+          groupBy: {
+            args: Prisma.SupportRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SupportRequestGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SupportRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<SupportRequestCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2333,6 +2437,7 @@ export namespace Prisma {
     referral?: ReferralOmit
     commission?: CommissionOmit
     payout?: PayoutOmit
+    supportRequest?: SupportRequestOmit
   }
 
   /* Types for Logging */
@@ -22411,6 +22516,1040 @@ export namespace Prisma {
 
 
   /**
+   * Model SupportRequest
+   */
+
+  export type AggregateSupportRequest = {
+    _count: SupportRequestCountAggregateOutputType | null
+    _min: SupportRequestMinAggregateOutputType | null
+    _max: SupportRequestMaxAggregateOutputType | null
+  }
+
+  export type SupportRequestMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    subject: string | null
+    message: string | null
+    status: $Enums.SupportRequestStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SupportRequestMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    subject: string | null
+    message: string | null
+    status: $Enums.SupportRequestStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SupportRequestCountAggregateOutputType = {
+    id: number
+    name: number
+    email: number
+    subject: number
+    message: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SupportRequestMinAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SupportRequestMaxAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SupportRequestCountAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    subject?: true
+    message?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SupportRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SupportRequest to aggregate.
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SupportRequests to fetch.
+     */
+    orderBy?: SupportRequestOrderByWithRelationInput | SupportRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SupportRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SupportRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SupportRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SupportRequests
+    **/
+    _count?: true | SupportRequestCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SupportRequestMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SupportRequestMaxAggregateInputType
+  }
+
+  export type GetSupportRequestAggregateType<T extends SupportRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateSupportRequest]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSupportRequest[P]>
+      : GetScalarType<T[P], AggregateSupportRequest[P]>
+  }
+
+
+
+
+  export type SupportRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SupportRequestWhereInput
+    orderBy?: SupportRequestOrderByWithAggregationInput | SupportRequestOrderByWithAggregationInput[]
+    by: SupportRequestScalarFieldEnum[] | SupportRequestScalarFieldEnum
+    having?: SupportRequestScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SupportRequestCountAggregateInputType | true
+    _min?: SupportRequestMinAggregateInputType
+    _max?: SupportRequestMaxAggregateInputType
+  }
+
+  export type SupportRequestGroupByOutputType = {
+    id: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status: $Enums.SupportRequestStatus
+    createdAt: Date
+    updatedAt: Date
+    _count: SupportRequestCountAggregateOutputType | null
+    _min: SupportRequestMinAggregateOutputType | null
+    _max: SupportRequestMaxAggregateOutputType | null
+  }
+
+  type GetSupportRequestGroupByPayload<T extends SupportRequestGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SupportRequestGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SupportRequestGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SupportRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], SupportRequestGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SupportRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["supportRequest"]>
+
+  export type SupportRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["supportRequest"]>
+
+  export type SupportRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["supportRequest"]>
+
+  export type SupportRequestSelectScalar = {
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    subject?: boolean
+    message?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SupportRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "subject" | "message" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["supportRequest"]>
+
+  export type $SupportRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SupportRequest"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      email: string
+      subject: string
+      message: string
+      status: $Enums.SupportRequestStatus
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["supportRequest"]>
+    composites: {}
+  }
+
+  type SupportRequestGetPayload<S extends boolean | null | undefined | SupportRequestDefaultArgs> = $Result.GetResult<Prisma.$SupportRequestPayload, S>
+
+  type SupportRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SupportRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SupportRequestCountAggregateInputType | true
+    }
+
+  export interface SupportRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SupportRequest'], meta: { name: 'SupportRequest' } }
+    /**
+     * Find zero or one SupportRequest that matches the filter.
+     * @param {SupportRequestFindUniqueArgs} args - Arguments to find a SupportRequest
+     * @example
+     * // Get one SupportRequest
+     * const supportRequest = await prisma.supportRequest.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SupportRequestFindUniqueArgs>(args: SelectSubset<T, SupportRequestFindUniqueArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SupportRequest that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SupportRequestFindUniqueOrThrowArgs} args - Arguments to find a SupportRequest
+     * @example
+     * // Get one SupportRequest
+     * const supportRequest = await prisma.supportRequest.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SupportRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, SupportRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SupportRequest that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestFindFirstArgs} args - Arguments to find a SupportRequest
+     * @example
+     * // Get one SupportRequest
+     * const supportRequest = await prisma.supportRequest.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SupportRequestFindFirstArgs>(args?: SelectSubset<T, SupportRequestFindFirstArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SupportRequest that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestFindFirstOrThrowArgs} args - Arguments to find a SupportRequest
+     * @example
+     * // Get one SupportRequest
+     * const supportRequest = await prisma.supportRequest.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SupportRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, SupportRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SupportRequests that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SupportRequests
+     * const supportRequests = await prisma.supportRequest.findMany()
+     * 
+     * // Get first 10 SupportRequests
+     * const supportRequests = await prisma.supportRequest.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const supportRequestWithIdOnly = await prisma.supportRequest.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SupportRequestFindManyArgs>(args?: SelectSubset<T, SupportRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SupportRequest.
+     * @param {SupportRequestCreateArgs} args - Arguments to create a SupportRequest.
+     * @example
+     * // Create one SupportRequest
+     * const SupportRequest = await prisma.supportRequest.create({
+     *   data: {
+     *     // ... data to create a SupportRequest
+     *   }
+     * })
+     * 
+     */
+    create<T extends SupportRequestCreateArgs>(args: SelectSubset<T, SupportRequestCreateArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SupportRequests.
+     * @param {SupportRequestCreateManyArgs} args - Arguments to create many SupportRequests.
+     * @example
+     * // Create many SupportRequests
+     * const supportRequest = await prisma.supportRequest.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SupportRequestCreateManyArgs>(args?: SelectSubset<T, SupportRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SupportRequests and returns the data saved in the database.
+     * @param {SupportRequestCreateManyAndReturnArgs} args - Arguments to create many SupportRequests.
+     * @example
+     * // Create many SupportRequests
+     * const supportRequest = await prisma.supportRequest.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SupportRequests and only return the `id`
+     * const supportRequestWithIdOnly = await prisma.supportRequest.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SupportRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, SupportRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SupportRequest.
+     * @param {SupportRequestDeleteArgs} args - Arguments to delete one SupportRequest.
+     * @example
+     * // Delete one SupportRequest
+     * const SupportRequest = await prisma.supportRequest.delete({
+     *   where: {
+     *     // ... filter to delete one SupportRequest
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SupportRequestDeleteArgs>(args: SelectSubset<T, SupportRequestDeleteArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SupportRequest.
+     * @param {SupportRequestUpdateArgs} args - Arguments to update one SupportRequest.
+     * @example
+     * // Update one SupportRequest
+     * const supportRequest = await prisma.supportRequest.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SupportRequestUpdateArgs>(args: SelectSubset<T, SupportRequestUpdateArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SupportRequests.
+     * @param {SupportRequestDeleteManyArgs} args - Arguments to filter SupportRequests to delete.
+     * @example
+     * // Delete a few SupportRequests
+     * const { count } = await prisma.supportRequest.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SupportRequestDeleteManyArgs>(args?: SelectSubset<T, SupportRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SupportRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SupportRequests
+     * const supportRequest = await prisma.supportRequest.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SupportRequestUpdateManyArgs>(args: SelectSubset<T, SupportRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SupportRequests and returns the data updated in the database.
+     * @param {SupportRequestUpdateManyAndReturnArgs} args - Arguments to update many SupportRequests.
+     * @example
+     * // Update many SupportRequests
+     * const supportRequest = await prisma.supportRequest.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SupportRequests and only return the `id`
+     * const supportRequestWithIdOnly = await prisma.supportRequest.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SupportRequestUpdateManyAndReturnArgs>(args: SelectSubset<T, SupportRequestUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SupportRequest.
+     * @param {SupportRequestUpsertArgs} args - Arguments to update or create a SupportRequest.
+     * @example
+     * // Update or create a SupportRequest
+     * const supportRequest = await prisma.supportRequest.upsert({
+     *   create: {
+     *     // ... data to create a SupportRequest
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SupportRequest we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SupportRequestUpsertArgs>(args: SelectSubset<T, SupportRequestUpsertArgs<ExtArgs>>): Prisma__SupportRequestClient<$Result.GetResult<Prisma.$SupportRequestPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SupportRequests.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestCountArgs} args - Arguments to filter SupportRequests to count.
+     * @example
+     * // Count the number of SupportRequests
+     * const count = await prisma.supportRequest.count({
+     *   where: {
+     *     // ... the filter for the SupportRequests we want to count
+     *   }
+     * })
+    **/
+    count<T extends SupportRequestCountArgs>(
+      args?: Subset<T, SupportRequestCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SupportRequestCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SupportRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SupportRequestAggregateArgs>(args: Subset<T, SupportRequestAggregateArgs>): Prisma.PrismaPromise<GetSupportRequestAggregateType<T>>
+
+    /**
+     * Group by SupportRequest.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SupportRequestGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SupportRequestGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SupportRequestGroupByArgs['orderBy'] }
+        : { orderBy?: SupportRequestGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SupportRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSupportRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SupportRequest model
+   */
+  readonly fields: SupportRequestFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SupportRequest.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SupportRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SupportRequest model
+   */
+  interface SupportRequestFieldRefs {
+    readonly id: FieldRef<"SupportRequest", 'String'>
+    readonly name: FieldRef<"SupportRequest", 'String'>
+    readonly email: FieldRef<"SupportRequest", 'String'>
+    readonly subject: FieldRef<"SupportRequest", 'String'>
+    readonly message: FieldRef<"SupportRequest", 'String'>
+    readonly status: FieldRef<"SupportRequest", 'SupportRequestStatus'>
+    readonly createdAt: FieldRef<"SupportRequest", 'DateTime'>
+    readonly updatedAt: FieldRef<"SupportRequest", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SupportRequest findUnique
+   */
+  export type SupportRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which SupportRequest to fetch.
+     */
+    where: SupportRequestWhereUniqueInput
+  }
+
+  /**
+   * SupportRequest findUniqueOrThrow
+   */
+  export type SupportRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which SupportRequest to fetch.
+     */
+    where: SupportRequestWhereUniqueInput
+  }
+
+  /**
+   * SupportRequest findFirst
+   */
+  export type SupportRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which SupportRequest to fetch.
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SupportRequests to fetch.
+     */
+    orderBy?: SupportRequestOrderByWithRelationInput | SupportRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SupportRequests.
+     */
+    cursor?: SupportRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SupportRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SupportRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SupportRequests.
+     */
+    distinct?: SupportRequestScalarFieldEnum | SupportRequestScalarFieldEnum[]
+  }
+
+  /**
+   * SupportRequest findFirstOrThrow
+   */
+  export type SupportRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which SupportRequest to fetch.
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SupportRequests to fetch.
+     */
+    orderBy?: SupportRequestOrderByWithRelationInput | SupportRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SupportRequests.
+     */
+    cursor?: SupportRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SupportRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SupportRequests.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SupportRequests.
+     */
+    distinct?: SupportRequestScalarFieldEnum | SupportRequestScalarFieldEnum[]
+  }
+
+  /**
+   * SupportRequest findMany
+   */
+  export type SupportRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter, which SupportRequests to fetch.
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SupportRequests to fetch.
+     */
+    orderBy?: SupportRequestOrderByWithRelationInput | SupportRequestOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SupportRequests.
+     */
+    cursor?: SupportRequestWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SupportRequests from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SupportRequests.
+     */
+    skip?: number
+    distinct?: SupportRequestScalarFieldEnum | SupportRequestScalarFieldEnum[]
+  }
+
+  /**
+   * SupportRequest create
+   */
+  export type SupportRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SupportRequest.
+     */
+    data: XOR<SupportRequestCreateInput, SupportRequestUncheckedCreateInput>
+  }
+
+  /**
+   * SupportRequest createMany
+   */
+  export type SupportRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SupportRequests.
+     */
+    data: SupportRequestCreateManyInput | SupportRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SupportRequest createManyAndReturn
+   */
+  export type SupportRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * The data used to create many SupportRequests.
+     */
+    data: SupportRequestCreateManyInput | SupportRequestCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SupportRequest update
+   */
+  export type SupportRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SupportRequest.
+     */
+    data: XOR<SupportRequestUpdateInput, SupportRequestUncheckedUpdateInput>
+    /**
+     * Choose, which SupportRequest to update.
+     */
+    where: SupportRequestWhereUniqueInput
+  }
+
+  /**
+   * SupportRequest updateMany
+   */
+  export type SupportRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SupportRequests.
+     */
+    data: XOR<SupportRequestUpdateManyMutationInput, SupportRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which SupportRequests to update
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * Limit how many SupportRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SupportRequest updateManyAndReturn
+   */
+  export type SupportRequestUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * The data used to update SupportRequests.
+     */
+    data: XOR<SupportRequestUpdateManyMutationInput, SupportRequestUncheckedUpdateManyInput>
+    /**
+     * Filter which SupportRequests to update
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * Limit how many SupportRequests to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SupportRequest upsert
+   */
+  export type SupportRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SupportRequest to update in case it exists.
+     */
+    where: SupportRequestWhereUniqueInput
+    /**
+     * In case the SupportRequest found by the `where` argument doesn't exist, create a new SupportRequest with this data.
+     */
+    create: XOR<SupportRequestCreateInput, SupportRequestUncheckedCreateInput>
+    /**
+     * In case the SupportRequest was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SupportRequestUpdateInput, SupportRequestUncheckedUpdateInput>
+  }
+
+  /**
+   * SupportRequest delete
+   */
+  export type SupportRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+    /**
+     * Filter which SupportRequest to delete.
+     */
+    where: SupportRequestWhereUniqueInput
+  }
+
+  /**
+   * SupportRequest deleteMany
+   */
+  export type SupportRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SupportRequests to delete
+     */
+    where?: SupportRequestWhereInput
+    /**
+     * Limit how many SupportRequests to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SupportRequest without action
+   */
+  export type SupportRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SupportRequest
+     */
+    select?: SupportRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SupportRequest
+     */
+    omit?: SupportRequestOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22691,6 +23830,20 @@ export namespace Prisma {
   export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
 
 
+  export const SupportRequestScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    subject: 'subject',
+    message: 'message',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SupportRequestScalarFieldEnum = (typeof SupportRequestScalarFieldEnum)[keyof typeof SupportRequestScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -22902,6 +24055,20 @@ export namespace Prisma {
    * Reference to a field of type 'PayoutStatus[]'
    */
   export type ListEnumPayoutStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayoutStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SupportRequestStatus'
+   */
+  export type EnumSupportRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportRequestStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SupportRequestStatus[]'
+   */
+  export type ListEnumSupportRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SupportRequestStatus[]'>
     
   /**
    * Deep Input Types
@@ -24309,6 +25476,73 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Payout"> | Date | string
     processedAt?: DateTimeNullableWithAggregatesFilter<"Payout"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"Payout"> | Date | string | null
+  }
+
+  export type SupportRequestWhereInput = {
+    AND?: SupportRequestWhereInput | SupportRequestWhereInput[]
+    OR?: SupportRequestWhereInput[]
+    NOT?: SupportRequestWhereInput | SupportRequestWhereInput[]
+    id?: StringFilter<"SupportRequest"> | string
+    name?: StringFilter<"SupportRequest"> | string
+    email?: StringFilter<"SupportRequest"> | string
+    subject?: StringFilter<"SupportRequest"> | string
+    message?: StringFilter<"SupportRequest"> | string
+    status?: EnumSupportRequestStatusFilter<"SupportRequest"> | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFilter<"SupportRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"SupportRequest"> | Date | string
+  }
+
+  export type SupportRequestOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SupportRequestWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SupportRequestWhereInput | SupportRequestWhereInput[]
+    OR?: SupportRequestWhereInput[]
+    NOT?: SupportRequestWhereInput | SupportRequestWhereInput[]
+    name?: StringFilter<"SupportRequest"> | string
+    email?: StringFilter<"SupportRequest"> | string
+    subject?: StringFilter<"SupportRequest"> | string
+    message?: StringFilter<"SupportRequest"> | string
+    status?: EnumSupportRequestStatusFilter<"SupportRequest"> | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFilter<"SupportRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"SupportRequest"> | Date | string
+  }, "id">
+
+  export type SupportRequestOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SupportRequestCountOrderByAggregateInput
+    _max?: SupportRequestMaxOrderByAggregateInput
+    _min?: SupportRequestMinOrderByAggregateInput
+  }
+
+  export type SupportRequestScalarWhereWithAggregatesInput = {
+    AND?: SupportRequestScalarWhereWithAggregatesInput | SupportRequestScalarWhereWithAggregatesInput[]
+    OR?: SupportRequestScalarWhereWithAggregatesInput[]
+    NOT?: SupportRequestScalarWhereWithAggregatesInput | SupportRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SupportRequest"> | string
+    name?: StringWithAggregatesFilter<"SupportRequest"> | string
+    email?: StringWithAggregatesFilter<"SupportRequest"> | string
+    subject?: StringWithAggregatesFilter<"SupportRequest"> | string
+    message?: StringWithAggregatesFilter<"SupportRequest"> | string
+    status?: EnumSupportRequestStatusWithAggregatesFilter<"SupportRequest"> | $Enums.SupportRequestStatus
+    createdAt?: DateTimeWithAggregatesFilter<"SupportRequest"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SupportRequest"> | Date | string
   }
 
   export type BlogCreateInput = {
@@ -25874,6 +27108,83 @@ export namespace Prisma {
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type SupportRequestCreateInput = {
+    id?: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status?: $Enums.SupportRequestStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SupportRequestUncheckedCreateInput = {
+    id?: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status?: $Enums.SupportRequestStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SupportRequestUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumSupportRequestStatusFieldUpdateOperationsInput | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SupportRequestUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumSupportRequestStatusFieldUpdateOperationsInput | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SupportRequestCreateManyInput = {
+    id?: string
+    name: string
+    email: string
+    subject: string
+    message: string
+    status?: $Enums.SupportRequestStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SupportRequestUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumSupportRequestStatusFieldUpdateOperationsInput | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SupportRequestUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    subject?: StringFieldUpdateOperationsInput | string
+    message?: StringFieldUpdateOperationsInput | string
+    status?: EnumSupportRequestStatusFieldUpdateOperationsInput | $Enums.SupportRequestStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -27194,6 +28505,56 @@ export namespace Prisma {
     _max?: NestedEnumPayoutStatusFilter<$PrismaModel>
   }
 
+  export type EnumSupportRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportRequestStatus | EnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSupportRequestStatusFilter<$PrismaModel> | $Enums.SupportRequestStatus
+  }
+
+  export type SupportRequestCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SupportRequestMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SupportRequestMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumSupportRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportRequestStatus | EnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSupportRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.SupportRequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSupportRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumSupportRequestStatusFilter<$PrismaModel>
+  }
+
   export type UserCreateNestedOneWithoutBlogInput = {
     create?: XOR<UserCreateWithoutBlogInput, UserUncheckedCreateWithoutBlogInput>
     connectOrCreate?: UserCreateOrConnectWithoutBlogInput
@@ -28218,6 +29579,10 @@ export namespace Prisma {
     deleteMany?: CommissionScalarWhereInput | CommissionScalarWhereInput[]
   }
 
+  export type EnumSupportRequestStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SupportRequestStatus
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -28584,6 +29949,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPayoutStatusFilter<$PrismaModel>
     _max?: NestedEnumPayoutStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSupportRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportRequestStatus | EnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSupportRequestStatusFilter<$PrismaModel> | $Enums.SupportRequestStatus
+  }
+
+  export type NestedEnumSupportRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SupportRequestStatus | EnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SupportRequestStatus[] | ListEnumSupportRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSupportRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.SupportRequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSupportRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumSupportRequestStatusFilter<$PrismaModel>
   }
 
   export type UserCreateWithoutBlogInput = {

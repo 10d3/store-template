@@ -368,6 +368,30 @@ model Payout {
   @@map("payouts")
 }
 
+// Support Requests
+model SupportRequest {
+  id        String               @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String               @db.Text
+  status    SupportRequestStatus @default(PENDING)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("support_requests")
+}
+
+enum SupportRequestStatus {
+  PENDING // New request, not yet reviewed
+  IN_REVIEW // Currently being reviewed
+  RESOLVED // Issue resolved
+  CLOSED // Request closed
+}
+
 // Enums
 enum AffiliateStatus {
   PENDING // Waiting for admin approval
