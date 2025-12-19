@@ -7,7 +7,7 @@ import { FeatureCard } from "./hero/featured-card";
 export default function NewHero() {
     return (
         <div className="flex flex-col md:justify-center gap-4 h-fit">
-            <Card className="w-full bg-[url('/banner@3x.png')] bg-contain bg-center h-[600px]">
+            <Card className="w-full bg-[url('/Untitled-3@3x.png')] md:bg-[url('/banner@3x.png')] bg-contain bg-no-repeat bg-center md:bg-contain h-[600px]">
                 <CardContent className="md:my-auto gap-4 flex flex-col w-full md:w-2/5">
                     <Badge className="">Mind-Body-Soul Balance</Badge>
                     <CardTitle className=" text-3xl md:text-6xl">Achieve balance in mind, body, and soul</CardTitle>
