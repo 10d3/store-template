@@ -5,6 +5,9 @@ import { admin, haveIBeenPwned, magicLink } from "better-auth/plugins";
 import { stripe } from "@better-auth/stripe";
 import { stripeClient } from "./stripe";
 import handleSubscription from "./subcription";
+import { sendEmail } from "./action/send-email";
+import { MagicLinkEmail } from "@/components/mails/magic-link-email";
+import { ReactElement } from "react";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -30,8 +33,12 @@ export const auth = betterAuth({
     }),
     admin(),
     magicLink({
-      sendMagicLink: ({ email, token, url }, request) => {
-        console.log(email, token, url, request);
+      sendMagicLink: ({ email, url }) => {
+        sendEmail({
+          to: email,
+          subject: "Magic Link",
+          react: MagicLinkEmail({ email, url }) as ReactElement,
+        });
       },
     }),
   ],

@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/ui/toggle-theme";
+import { authClient } from "@/lib/auth-client";
 
 export function NavUserMenu({
   user,
@@ -26,6 +27,17 @@ export function NavUserMenu({
   };
 }) {
   const router = useRouter();
+
+  async function handleLogout() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        },
+      },
+    });
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -79,7 +91,7 @@ export function NavUserMenu({
           {/* <span>Notifications</span> */}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
