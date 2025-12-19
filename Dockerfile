@@ -15,9 +15,11 @@ COPY package.json bun.lock ./
 RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache \
     bun install --frozen-lockfile
 
-# Builder stage  
-FROM base AS builder
+# Builder stage - Use Node.js for build to avoid Bun compatibility issues with UploadThing
+FROM node:20-alpine AS builder
 WORKDIR /app
+# Install system dependencies needed for build
+RUN apk add --no-cache openssl libc6-compat
 # Copy package.json and installed dependencies
 COPY package.json bun.lock ./
 COPY --from=deps /app/node_modules ./node_modules
@@ -26,14 +28,13 @@ COPY prisma ./prisma/
 # Set Prisma environment variables for Alpine
 ENV PRISMA_SCHEMA_ENGINE_TYPE=binary
 ENV PRISMA_QUERY_ENGINE_TYPE=binary
-# Generate Prisma client with cache mount
-RUN --mount=type=cache,id=prisma,target=/root/.cache/prisma \
-    bun prisma generate
+# Generate Prisma client
+RUN npx prisma generate
 # Copy source code
 COPY . .
-# Build the application
+# Build the application with Node.js (avoids Bun CommonJS compatibility issues)
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN bun run build
+RUN npm run build
 
 # Production stage
 FROM base AS runner
