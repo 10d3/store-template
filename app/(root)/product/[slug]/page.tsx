@@ -150,12 +150,13 @@ export default async function page(props: {
 
   const packs = await getPack(variants[0]?.id as string);
 
-  // Fetch related products
-  const relatedProducts = await getRelatedProducts(variants[0]?.id as string, 4);
-
-  // Fetch reviews and average rating
-  const reviews = await getReviewsByProductId(variants[0]?.id as string);
-  const { average: averageRating, count: reviewCount } = await getAverageRating(variants[0]?.id as string);
+  // Fetch related products, reviews, and ratings in parallel for better performance
+  const [relatedProducts, reviews, ratingData] = await Promise.all([
+    getRelatedProducts(variants[0]?.id as string, 4),
+    getReviewsByProductId(variants[0]?.id as string),
+    getAverageRating(variants[0]?.id as string),
+  ]);
+  const { average: averageRating, count: reviewCount } = ratingData;
 
   // console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [

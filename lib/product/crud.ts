@@ -11,6 +11,8 @@ import { validateMetadata } from "@/lib/metadata/config";
 import { transformMetadataForSubmission } from "@/lib/metadata/form-utils";
 import { ProductCrudError } from "./errors";
 import { prisma } from "../prisma";
+import { getCachedProducts } from "./cache";
+import { getProductsByIdsFromDB } from "./db-queries";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
@@ -617,45 +619,19 @@ export async function getProductsByProductIds(
   productIds: string[]
 ): Promise<StripeProduct[]> {
   try {
-    const products: StripeProduct[] = [];
-
-    // Fetch each product by its ID
-    for (const productId of productIds) {
-      try {
-        const product = await stripe.products.retrieve(productId.trim(), {
-          expand: ["default_price"],
-        });
-
-        if (product) {
-          products.push(transformProduct(product));
-        }
-      } catch (productError) {
-        console.warn(`Failed to fetch product ${productId}:`, productError);
-        // Continue with other products even if one fails
-      }
-    }
-
-    return products;
+    // Use database for fast reads instead of individual Stripe API calls
+    const trimmedIds = productIds.map(id => id.trim()).filter(Boolean);
+    return await getProductsByIdsFromDB(trimmedIds);
   } catch (error) {
-    if (error instanceof Stripe.errors.StripeError) {
-      throw new ProductCrudError(
-        `Stripe error: ${error.message}`,
-        "STRIPE_ERROR",
-        { stripeError: error }
-      );
-    }
-    throw new ProductCrudError(
-      "Failed to get products by product IDs",
-      "UNKNOWN_ERROR",
-      {
-        originalError: error,
-      }
-    );
+    console.error("Error fetching products by IDs from DB:", error);
+    // Return empty array on error to not break the page
+    return [];
   }
 }
 
 export async function getPacks() {
-  const products = await listProducts();
+  // Use cached products instead of making direct Stripe API calls
+  const products = await getCachedProducts();
   const packs = products.filter(
     (product) => product.metadata.type === "bundle"
   );
@@ -663,11 +639,14 @@ export async function getPacks() {
 }
 
 export async function getPack(productId: string) {
-  const packs = await getPacks();
-  const pack = packs.filter((pack) =>
-    pack.metadata.contents.includes(productId)
+  // Use cached products for faster loading
+  const products = await getCachedProducts();
+  const packs = products.filter(
+    (product) =>
+      product.metadata.type === "bundle" &&
+      product.metadata.contents?.includes(productId)
   );
-  return pack;
+  return packs;
 }
 
 // ============ COLLECTION FUNCTIONS ============
@@ -707,7 +686,8 @@ export async function getRelatedProducts(
   limit: number = 4
 ): Promise<StripeProduct[]> {
   try {
-    const products = await listProducts();
+    // Use cached products instead of making direct Stripe API calls
+    const products = await getCachedProducts();
     const currentProduct = products.find((p) => p.id === productId);
 
     if (!currentProduct) return [];
