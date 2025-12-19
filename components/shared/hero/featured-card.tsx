@@ -35,9 +35,9 @@ export function FeatureCard({ card }: FeatureCardProps) {
                 <Image height={1000} width={1000} src={card.imageSrc || "/placeholder.svg"} alt={card.imageAlt} className="w-full h-full object-cover" />
             </div>
 
-            <div className="relative h-full p-6 flex flex-col justify-between">
+            <div className="relative h-full p-6 flex flex-col">
                 {/* Top Button */}
-                {card.button.action !== "form" && (
+                {card.button && card.button.action !== "form" && (
                     <Button
                         variant="secondary"
                         size="sm"
@@ -48,14 +48,14 @@ export function FeatureCard({ card }: FeatureCardProps) {
                     </Button>
                 )}
 
-                {card.button.action === "form" && (
+                {card.button?.action === "form" && (
                     <Button variant="secondary" size="sm" className="w-fit bg-white/90 hover:bg-white text-gray-900 rounded-full">
                         {card.button.label}
                     </Button>
                 )}
 
                 {/* Bottom Content */}
-                <div className="space-y-4">
+                <div className="space-y-4 mt-auto">
                     <h3 className="text-2xl font-bold text-white drop-shadow-lg">
                         {card.title.split("\n").map((line, i) => (
                             <span key={i}>

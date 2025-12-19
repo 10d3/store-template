@@ -19,7 +19,7 @@ export interface FeatureCard {
     imageAlt: string
     gradientFrom: string
     gradientTo: string
-    button: {
+    button?: {
         label: string
         action: "video" | "cta" | "form"
     }

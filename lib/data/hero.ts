@@ -16,39 +16,39 @@ export const heroConfig: HeroSectionConfig = {
     featureCards: [
         {
             id: "flexibility",
-            title: "Improved\nFlexibility",
+            title: "Wellness that fits your life",
             imageSrc: "/Gemini_Generated_Image_mjp7k2mjp7k2mjp7.png",
-            imageAlt: "Yoga flexibility",
+            imageAlt: "Wellness that fits your life",
             gradientFrom: "#d4e8f0",
             gradientTo: "#a8cce0",
-            button: {
-                label: "View video",
-                action: "video",
-            },
+            // button: {
+            //     label: "View video",
+            //     action: "video",
+            // },
         },
         {
             id: "stress-reduction",
-            title: "Stress Reduction",
+            title: "Restore your natural balance",
             imageSrc: "/Gemini_Generated_Image_b0aanbb0aanbb0aa.png",
-            imageAlt: "Yoga stress reduction",
+            imageAlt: "Restore your natural balance",
             gradientFrom: "#e8ddd0",
             gradientTo: "#d4c4b0",
-            button: {
-                label: "View video",
-                action: "video",
-            },
+            // button: {
+            //     label: "View video",
+            //     action: "video",
+            // },
         },
         {
             id: "join-class",
-            title: "Join Us for a Yoga\nClass Today!",
+            title: "Join the wellness journey",
             imageSrc: "/Gemini_Generated_Image_td0jdjtd0jdjtd0j.png",
             imageAlt: "Yoga class",
             gradientFrom: "#c8b8a8",
             gradientTo: "#b0a090",
-            button: {
-                label: "Join our class",
-                action: "form",
-            },
+            // button: {
+            //     label: "Join our class",
+            //     action: "form",
+            // },
             form: {
                 placeholder: "Your email",
                 submitLabel: "Get Started",
