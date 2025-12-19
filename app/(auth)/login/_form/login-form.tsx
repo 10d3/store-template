@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { authClient, signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
@@ -26,6 +27,7 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -33,7 +35,6 @@ export function LoginForm({
   } = useForm<Inputs>();
 
   const onSubmit = async (data: Inputs) => {
-    // const email = data.email;
     setIsLoading(true);
     try {
       await authClient.signIn.magicLink({
@@ -41,7 +42,8 @@ export function LoginForm({
         name: data.email,
         callbackURL: "/",
       });
-      setIsLoading(false);
+      // Redirect to check-email page with email in query param
+      router.push(`/login/check-email?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
       setIsLoading(false);
       console.error("Error signing in:", error);

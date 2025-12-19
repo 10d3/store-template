@@ -59,7 +59,8 @@ export default function Navbar({ shopCategories = [] }: NavbarProps) {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2 size-32">
-              <Image src={"/logo.png"} alt="logo" width={1000} height={1000} />
+              <Image src={"/logo_blanc_png.png"} className="hidden dark:block" alt="logo" width={1000} height={1000} />
+              <Image src={"/logo_noir_png.png"} className="block dark:hidden" alt="logo" width={1000} height={1000} />
             </Link>
           </div>
 
