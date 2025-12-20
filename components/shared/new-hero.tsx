@@ -4,6 +4,7 @@ import { Badge } from "../ui/badge";
 import { Card, CardContent, CardDescription, CardTitle } from "../ui/card";
 import { FeatureCard } from "./hero/featured-card";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function NewHero() {
     return (
@@ -13,7 +14,9 @@ export default function NewHero() {
                     <Badge className="">Simple. Natural. Effective.</Badge>
                     <CardTitle className=" text-3xl md:text-6xl">Your vitality. Your rhythm. Your life.</CardTitle>
                     <CardDescription className="text-lg md:text-xl md:w-3/5 w-full text-pretty">Natural support for energy, balance, and confidence — without compromise.</CardDescription>
-                    <Button className="md:w-2/5">Start your wellness journey</Button>
+                    <Button asChild className="md:w-2/5">
+                        <Link href="#products">Start your wellness journey</Link>
+                    </Button>
                 </CardContent>
             </Card>
             <div className="grid md:grid-cols-3 gap-6">

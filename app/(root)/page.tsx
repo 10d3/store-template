@@ -182,7 +182,7 @@ export default async function Home() {
         />
         {/* Products Section */}
         {transformedProducts.length > 0 && (
-          <div className="mb-16">
+          <div id="products" className="mb-16 scroll-mt-24">
             <h2 className="text-2xl font-bold mb-8 text-center">
               Featured Products
             </h2>
