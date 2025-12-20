@@ -385,6 +385,27 @@ model SupportRequest {
   @@map("support_requests")
 }
 
+// Newsletter Subscriptions
+model NewsletterSubscription {
+  id        String                       @id @default(cuid())
+  email     String                       @unique
+  source    String? // Where the subscription came from (e.g., "hero", "footer", "popup")
+  status    NewsletterSubscriptionStatus @default(ACTIVE)
+  createdAt DateTime                     @default(now())
+  updatedAt DateTime                     @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("newsletter_subscriptions")
+}
+
+enum NewsletterSubscriptionStatus {
+  ACTIVE // Subscribed and receiving emails
+  UNSUBSCRIBED // User unsubscribed
+  BOUNCED // Email bounced
+}
+
 enum SupportRequestStatus {
   PENDING // New request, not yet reviewed
   IN_REVIEW // Currently being reviewed

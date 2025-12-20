@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { FeatureCard as FeatureCardType } from "@/types/hero"
 import Image from "next/image"
+import { subscribeToNewsletter } from "@/lib/actions/newsletter"
 
 interface FeatureCardProps {
     card: FeatureCardType
@@ -15,12 +16,27 @@ interface FeatureCardProps {
 
 export function FeatureCard({ card }: FeatureCardProps) {
     const [email, setEmail] = useState("")
+    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+    const [message, setMessage] = useState("")
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setStatus("loading")
+
+        const result = await subscribeToNewsletter(email, "hero")
+
+        if (result.success) {
+            setStatus("success")
+            setMessage(result.message)
+            setEmail("")
+        } else {
+            setStatus("error")
+            setMessage(result.message)
+        }
+
+        // Also call the original onSubmit if provided
         if (card.form?.onSubmit) {
             card.form.onSubmit(email)
-            setEmail("")
         }
     }
 
@@ -67,19 +83,34 @@ export function FeatureCard({ card }: FeatureCardProps) {
 
                     {/* Email Form for CTA Card */}
                     {card.form && (
-                        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2">
-                            <Input
-                                type="email"
-                                placeholder={card.form.placeholder}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="bg-white/90 border-0 rounded-full md:h-11"
-                            />
-                            <Button type="submit" className="bg-white hover:bg-white/90 text-gray-900 rounded-full px-6 md:h-11">
-                                {card.form.submitLabel}
-                            </Button>
-                        </form>
+                        status === "success" ? (
+                            <p className="text-white font-medium bg-white/20 rounded-full py-2 px-4">
+                                {message} 🎉
+                            </p>
+                        ) : status === "error" ? (
+                            <p className="text-white font-medium bg-red-500/50 rounded-full py-2 px-4">
+                                {message}
+                            </p>
+                        ) : (
+                            <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-2">
+                                <Input
+                                    type="email"
+                                    placeholder={card.form.placeholder}
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    disabled={status === "loading"}
+                                    className="bg-white/90 border-0 rounded-full md:h-11"
+                                />
+                                <Button
+                                    type="submit"
+                                    disabled={status === "loading"}
+                                    className="bg-white hover:bg-white/90 text-gray-900 rounded-full px-6 md:h-11"
+                                >
+                                    {status === "loading" ? "..." : card.form.submitLabel}
+                                </Button>
+                            </form>
+                        )
                     )}
                 </div>
             </div>

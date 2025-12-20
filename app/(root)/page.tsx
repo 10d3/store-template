@@ -9,6 +9,8 @@ import { listProducts, getProductsByProductIds } from "@/lib/product/crud";
 import type { StripeProduct, ProductData } from "@/types/product";
 import type { Metadata } from "next";
 import NewHero from "@/components/shared/new-hero";
+import { StoryText } from "@/components/shared/story-text";
+import { Newsletter } from "@/components/shared/newsletter";
 
 export const metadata: Metadata = {
   title: "Shop Premium Products | Our Store",
@@ -174,6 +176,10 @@ export default async function Home() {
     <div className="min-h-screen">
       <div className="w-full">
         <NewHero />
+        <StoryText
+          headline="Every body has a story."
+          description="We create natural support for the realities people live every day."
+        />
         {/* Products Section */}
         {transformedProducts.length > 0 && (
           <div className="mb-16">
@@ -239,6 +245,10 @@ export default async function Home() {
             </a>
           </div>
         )}
+
+        <StoryText headline="You’re not alone in this."
+          description="We’re here to educate, support, and walk this journey with you." />
+        <Newsletter />
       </div>
     </div>
   );
