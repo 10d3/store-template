@@ -9502,10 +9502,12 @@ export namespace Prisma {
 
   export type OrderAvgAggregateOutputType = {
     total: number | null
+    orderNumber: number | null
   }
 
   export type OrderSumAggregateOutputType = {
     total: number | null
+    orderNumber: number | null
   }
 
   export type OrderMinAggregateOutputType = {
@@ -9516,6 +9518,7 @@ export namespace Prisma {
     status: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    orderNumber: number | null
   }
 
   export type OrderMaxAggregateOutputType = {
@@ -9526,6 +9529,7 @@ export namespace Prisma {
     status: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    orderNumber: number | null
   }
 
   export type OrderCountAggregateOutputType = {
@@ -9538,16 +9542,19 @@ export namespace Prisma {
     status: number
     createdAt: number
     updatedAt: number
+    orderNumber: number
     _all: number
   }
 
 
   export type OrderAvgAggregateInputType = {
     total?: true
+    orderNumber?: true
   }
 
   export type OrderSumAggregateInputType = {
     total?: true
+    orderNumber?: true
   }
 
   export type OrderMinAggregateInputType = {
@@ -9558,6 +9565,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    orderNumber?: true
   }
 
   export type OrderMaxAggregateInputType = {
@@ -9568,6 +9576,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    orderNumber?: true
   }
 
   export type OrderCountAggregateInputType = {
@@ -9580,6 +9589,7 @@ export namespace Prisma {
     status?: true
     createdAt?: true
     updatedAt?: true
+    orderNumber?: true
     _all?: true
   }
 
@@ -9679,6 +9689,7 @@ export namespace Prisma {
     status: string
     createdAt: Date
     updatedAt: Date
+    orderNumber: number
     _count: OrderCountAggregateOutputType | null
     _avg: OrderAvgAggregateOutputType | null
     _sum: OrderSumAggregateOutputType | null
@@ -9710,6 +9721,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    orderNumber?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -9723,6 +9735,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    orderNumber?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -9736,6 +9749,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    orderNumber?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -9749,9 +9763,10 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    orderNumber?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "total" | "lineItems" | "shippingAddress" | "metadata" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "total" | "lineItems" | "shippingAddress" | "metadata" | "status" | "createdAt" | "updatedAt" | "orderNumber", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -9777,6 +9792,7 @@ export namespace Prisma {
       status: string
       createdAt: Date
       updatedAt: Date
+      orderNumber: number
     }, ExtArgs["result"]["order"]>
     composites: {}
   }
@@ -10210,6 +10226,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Order", 'String'>
     readonly createdAt: FieldRef<"Order", 'DateTime'>
     readonly updatedAt: FieldRef<"Order", 'DateTime'>
+    readonly orderNumber: FieldRef<"Order", 'Int'>
   }
     
 
@@ -24763,7 +24780,8 @@ export namespace Prisma {
     metadata: 'metadata',
     status: 'status',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    orderNumber: 'orderNumber'
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -25628,6 +25646,7 @@ export namespace Prisma {
     status?: StringFilter<"Order"> | string
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
+    orderNumber?: IntFilter<"Order"> | number
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
@@ -25641,11 +25660,13 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    orderNumber?: SortOrder
     user?: UserOrderByWithRelationInput
   }
 
   export type OrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    orderNumber?: number
     AND?: OrderWhereInput | OrderWhereInput[]
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
@@ -25658,7 +25679,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "orderNumber">
 
   export type OrderOrderByWithAggregationInput = {
     id?: SortOrder
@@ -25670,6 +25691,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    orderNumber?: SortOrder
     _count?: OrderCountOrderByAggregateInput
     _avg?: OrderAvgOrderByAggregateInput
     _max?: OrderMaxOrderByAggregateInput
@@ -25690,6 +25712,7 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"Order"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
+    orderNumber?: IntWithAggregatesFilter<"Order"> | number
   }
 
   export type WishlistWhereInput = {
@@ -27180,6 +27203,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
     user: UserCreateNestedOneWithoutOrdersInput
   }
 
@@ -27193,6 +27217,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
   }
 
   export type OrderUpdateInput = {
@@ -27217,6 +27242,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: IntFieldUpdateOperationsInput | number
   }
 
   export type OrderCreateManyInput = {
@@ -27229,6 +27255,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
   }
 
   export type OrderUpdateManyMutationInput = {
@@ -27252,6 +27279,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: IntFieldUpdateOperationsInput | number
   }
 
   export type WishlistCreateInput = {
@@ -28937,10 +28965,12 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
     total?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
@@ -28951,6 +28981,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type OrderMinOrderByAggregateInput = {
@@ -28961,10 +28992,12 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    orderNumber?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
     total?: SortOrder
+    orderNumber?: SortOrder
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -32048,6 +32081,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
   }
 
   export type OrderUncheckedCreateWithoutUserInput = {
@@ -32059,6 +32093,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
   }
 
   export type OrderCreateOrConnectWithoutUserInput = {
@@ -32386,6 +32421,7 @@ export namespace Prisma {
     status?: StringFilter<"Order"> | string
     createdAt?: DateTimeFilter<"Order"> | Date | string
     updatedAt?: DateTimeFilter<"Order"> | Date | string
+    orderNumber?: IntFilter<"Order"> | number
   }
 
   export type ReviewUpsertWithWhereUniqueWithoutUserInput = {
@@ -34275,6 +34311,7 @@ export namespace Prisma {
     status: string
     createdAt: Date | string
     updatedAt: Date | string
+    orderNumber?: number
   }
 
   export type ReviewCreateManyUserInput = {
@@ -34406,6 +34443,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: IntFieldUpdateOperationsInput | number
   }
 
   export type OrderUncheckedUpdateManyWithoutUserInput = {
@@ -34417,6 +34455,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReviewUpdateWithoutUserInput = {

@@ -107,7 +107,7 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="space-y-3">
                           <CardTitle className="text-2xl font-semibold">
-                            Order #{order.id}
+                            Order #{(order as any).orderNumber || order.id.slice(-8)}
                           </CardTitle>
                           <div className="flex flex-wrap items-center gap-6 text-sm">
                             <div className="flex items-center gap-2">
@@ -189,13 +189,13 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                             <Truck className="w-4 h-4 mr-2" />
                             Track Order
                           </Button>
-                          <Button
+                          {/* <Button
                             variant="outline"
                             size="sm"
                           >
                             <Download className="w-4 h-4 mr-2" />
                             Download Invoice
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
                     </CardContent>

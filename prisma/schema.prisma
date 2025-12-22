@@ -108,6 +108,7 @@ model Order {
   status          String
   createdAt       DateTime
   updatedAt       DateTime
+  orderNumber     Int      @unique @default(autoincrement())
 
   @@map("order")
 }
