@@ -56,7 +56,7 @@ export const OrderCancellationEmail: React.FC<Readonly<OrderCancellationEmailPro
                     >
                         <h3 style={{ marginTop: 0 }}>Cancelled Order Details</h3>
                         <p>
-                            <strong>Order ID:</strong> #{orderId}
+                            <strong>Order Number:</strong> #{orderId}
                         </p>
                         <p>
                             <strong>Order Total:</strong> ${orderTotal.toFixed(2)}

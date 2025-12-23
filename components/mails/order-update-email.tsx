@@ -58,7 +58,7 @@ export const OrderUpdateEmail: React.FC<Readonly<OrderUpdateEmailProps>> = ({
                     >
                         <h3 style={{ marginTop: 0 }}>Order Details</h3>
                         <p>
-                            <strong>Order ID:</strong> #{orderId}
+                            <strong>Order Number:</strong> #{orderId}
                         </p>
                         <p>
                             <strong>Current Status:</strong>{" "}

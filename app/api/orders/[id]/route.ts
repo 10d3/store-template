@@ -30,6 +30,7 @@ export async function PATCH(
 
         // Get customer email for notification with robust fallback
         let customerEmail = result.receipt_email;
+        let localOrder;
 
         // 1. If no receipt email, try fetching from Stripe Customer object
         if (!customerEmail && result.customer) {
@@ -47,26 +48,42 @@ export async function PATCH(
           }
         }
 
-        // 2. If still no email, try fetching from local database
-        if (!customerEmail) {
-          try {
-            const localOrder = await prisma.order.findUnique({
+        // 2. Fetch local database order - needed for orderNumber and as email fallback
+        try {
+          // Primary: Try to find session via Stripe API linkage
+          // PaymentIntent ID -> Checkout Session -> Local Order (ID=SessionID)
+          const sessions = await stripe.checkout.sessions.list({
+            payment_intent: orderId,
+            limit: 1
+          });
+
+          if (sessions.data.length > 0) {
+            const sessionId = sessions.data[0].id;
+            localOrder = await prisma.order.findUnique({
+              where: { id: sessionId },
+              include: { user: true }
+            });
+          }
+
+          // Fallback: Try to find order by Payment Intent ID directly (if schema differs)
+          if (!localOrder) {
+            localOrder = await prisma.order.findUnique({
               where: { id: orderId },
               include: { user: true }
             });
-
-            if (localOrder?.user?.email) {
-              customerEmail = localOrder.user.email;
-            }
-          } catch (err) {
-            console.warn("Failed to fetch local DB email:", err);
           }
+
+          if (!customerEmail && localOrder?.user?.email) {
+            customerEmail = localOrder.user.email;
+          }
+        } catch (err) {
+          console.warn("Failed to fetch local DB order:", err);
         }
 
         if (customerEmail) {
           emailData = {
             customerEmail,
-            orderId: result.id,
+            orderId: localOrder?.orderNumber?.toString() || result.id,
             orderTotal: result.amount / 100,
             orderStatus: fulfillmentStatus
           };

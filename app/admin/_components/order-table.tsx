@@ -117,9 +117,9 @@ export function OrderTable({ className }: OrderTableProps) {
     setMounted(true);
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: "10",
@@ -138,7 +138,7 @@ export function OrderTable({ className }: OrderTableProps) {
       console.error("Error fetching orders:", error);
       toast.error("Failed to fetch orders");
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -162,7 +162,8 @@ export function OrderTable({ className }: OrderTableProps) {
       if (!response.ok) throw new Error(`Failed to ${action} order`);
 
       toast.success(`Order ${action} successful`);
-      fetchOrders(); // Refresh the list
+      toast.success(`Order ${action} successful`);
+      fetchOrders(false); // Refresh the list without loading state
     } catch (error) {
       console.error(`Error ${action} order:`, error);
       toast.error(`Failed to ${action} order`);
@@ -191,7 +192,8 @@ export function OrderTable({ className }: OrderTableProps) {
       setShowStatusDialog(false);
       setStatusChangeOrder(null);
       setNewStatus("");
-      fetchOrders(); // Refresh the list
+      setNewStatus("");
+      fetchOrders(false); // Refresh the list without loading state
     } catch (error) {
       console.error("Error updating order status:", error);
       toast.error("Failed to update order status");
@@ -259,7 +261,7 @@ export function OrderTable({ className }: OrderTableProps) {
       setCarrier("");
 
       // Refresh orders to show updated tracking info
-      fetchOrders();
+      fetchOrders(false);
     } catch (error) {
       console.error("Error sending tracking email:", error);
       toast.error(error instanceof Error ? error.message : "Failed to send tracking email");
@@ -491,12 +493,11 @@ export function OrderTable({ className }: OrderTableProps) {
                       {order.paymentMethod}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
+                      <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             className="h-8 w-8 p-0"
-                            disabled={actionLoading === order.id}
                           >
                             {actionLoading === order.id ? (
                               <RefreshCw className="h-4 w-4 animate-spin" />

@@ -109,7 +109,7 @@ export async function sendTrackingEmail(data: {
     const reactComponent: any = TrackingEmail(emailData);
 
     const { data: result, error } = await resend.emails.send({
-      from: "Store Ricardo <orders@storerecardo.com>",
+      from: "Vitanou <noreply@vitanou.com>",
       to: [data.customerEmail],
       subject: `Your Order Has Shipped - Order #${data.orderId}`,
       react: reactComponent,

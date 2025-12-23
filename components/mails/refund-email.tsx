@@ -58,7 +58,7 @@ export const RefundEmail: React.FC<Readonly<RefundEmailProps>> = ({
                     >
                         <h3 style={{ marginTop: 0 }}>Refund Details</h3>
                         <p>
-                            <strong>Order ID:</strong> #{orderId}
+                            <strong>Order Number:</strong> #{orderId}
                         </p>
                         <p>
                             <strong>Original Order Total:</strong> ${orderTotal.toFixed(2)}
