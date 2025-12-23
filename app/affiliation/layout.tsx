@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { sideBarCentralizedNav } from "@/lib/const/sidebar";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export default async function Layout({
   children,
@@ -14,14 +15,18 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
+    headers: await headers(),
   });
 
   if (!session) {
     redirect("/login");
   }
 
-  if (session.user.role !== "admin") {
+  const affiliate = await prisma.affiliate.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  if (!affiliate || affiliate.status !== "ACTIVE") {
     redirect("/");
   }
 

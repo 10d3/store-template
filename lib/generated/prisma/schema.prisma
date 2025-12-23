@@ -217,6 +217,12 @@ model Affiliate {
   bankAccount   String?
   paymentMethod PaymentMethod?
 
+  // Social Media
+  tiktok    String?
+  instagram String?
+  twitter   String?
+  youtube   String?
+
   // Statistics
   totalClicks      Int   @default(0)
   totalConversions Int   @default(0)

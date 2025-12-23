@@ -16412,6 +16412,10 @@ export namespace Prisma {
     paypalEmail: string | null
     bankAccount: string | null
     paymentMethod: $Enums.PaymentMethod | null
+    tiktok: string | null
+    instagram: string | null
+    twitter: string | null
+    youtube: string | null
     totalClicks: number | null
     totalConversions: number | null
     totalEarnings: number | null
@@ -16433,6 +16437,10 @@ export namespace Prisma {
     paypalEmail: string | null
     bankAccount: string | null
     paymentMethod: $Enums.PaymentMethod | null
+    tiktok: string | null
+    instagram: string | null
+    twitter: string | null
+    youtube: string | null
     totalClicks: number | null
     totalConversions: number | null
     totalEarnings: number | null
@@ -16454,6 +16462,10 @@ export namespace Prisma {
     paypalEmail: number
     bankAccount: number
     paymentMethod: number
+    tiktok: number
+    instagram: number
+    twitter: number
+    youtube: number
     totalClicks: number
     totalConversions: number
     totalEarnings: number
@@ -16495,6 +16507,10 @@ export namespace Prisma {
     paypalEmail?: true
     bankAccount?: true
     paymentMethod?: true
+    tiktok?: true
+    instagram?: true
+    twitter?: true
+    youtube?: true
     totalClicks?: true
     totalConversions?: true
     totalEarnings?: true
@@ -16516,6 +16532,10 @@ export namespace Prisma {
     paypalEmail?: true
     bankAccount?: true
     paymentMethod?: true
+    tiktok?: true
+    instagram?: true
+    twitter?: true
+    youtube?: true
     totalClicks?: true
     totalConversions?: true
     totalEarnings?: true
@@ -16537,6 +16557,10 @@ export namespace Prisma {
     paypalEmail?: true
     bankAccount?: true
     paymentMethod?: true
+    tiktok?: true
+    instagram?: true
+    twitter?: true
+    youtube?: true
     totalClicks?: true
     totalConversions?: true
     totalEarnings?: true
@@ -16645,6 +16669,10 @@ export namespace Prisma {
     paypalEmail: string | null
     bankAccount: string | null
     paymentMethod: $Enums.PaymentMethod | null
+    tiktok: string | null
+    instagram: string | null
+    twitter: string | null
+    youtube: string | null
     totalClicks: number
     totalConversions: number
     totalEarnings: number
@@ -16685,6 +16713,10 @@ export namespace Prisma {
     paypalEmail?: boolean
     bankAccount?: boolean
     paymentMethod?: boolean
+    tiktok?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    youtube?: boolean
     totalClicks?: boolean
     totalConversions?: boolean
     totalEarnings?: boolean
@@ -16712,6 +16744,10 @@ export namespace Prisma {
     paypalEmail?: boolean
     bankAccount?: boolean
     paymentMethod?: boolean
+    tiktok?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    youtube?: boolean
     totalClicks?: boolean
     totalConversions?: boolean
     totalEarnings?: boolean
@@ -16734,6 +16770,10 @@ export namespace Prisma {
     paypalEmail?: boolean
     bankAccount?: boolean
     paymentMethod?: boolean
+    tiktok?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    youtube?: boolean
     totalClicks?: boolean
     totalConversions?: boolean
     totalEarnings?: boolean
@@ -16756,6 +16796,10 @@ export namespace Prisma {
     paypalEmail?: boolean
     bankAccount?: boolean
     paymentMethod?: boolean
+    tiktok?: boolean
+    instagram?: boolean
+    twitter?: boolean
+    youtube?: boolean
     totalClicks?: boolean
     totalConversions?: boolean
     totalEarnings?: boolean
@@ -16767,7 +16811,7 @@ export namespace Prisma {
     approvedAt?: boolean
   }
 
-  export type AffiliateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "commissionRate" | "commissionType" | "paypalEmail" | "bankAccount" | "paymentMethod" | "totalClicks" | "totalConversions" | "totalEarnings" | "availableBalance" | "lifetimeEarnings" | "notes" | "createdAt" | "updatedAt" | "approvedAt", ExtArgs["result"]["affiliate"]>
+  export type AffiliateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "commissionRate" | "commissionType" | "paypalEmail" | "bankAccount" | "paymentMethod" | "tiktok" | "instagram" | "twitter" | "youtube" | "totalClicks" | "totalConversions" | "totalEarnings" | "availableBalance" | "lifetimeEarnings" | "notes" | "createdAt" | "updatedAt" | "approvedAt", ExtArgs["result"]["affiliate"]>
   export type AffiliateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     referrals?: boolean | Affiliate$referralsArgs<ExtArgs>
@@ -16802,6 +16846,10 @@ export namespace Prisma {
       paypalEmail: string | null
       bankAccount: string | null
       paymentMethod: $Enums.PaymentMethod | null
+      tiktok: string | null
+      instagram: string | null
+      twitter: string | null
+      youtube: string | null
       totalClicks: number
       totalConversions: number
       totalEarnings: number
@@ -17248,6 +17296,10 @@ export namespace Prisma {
     readonly paypalEmail: FieldRef<"Affiliate", 'String'>
     readonly bankAccount: FieldRef<"Affiliate", 'String'>
     readonly paymentMethod: FieldRef<"Affiliate", 'PaymentMethod'>
+    readonly tiktok: FieldRef<"Affiliate", 'String'>
+    readonly instagram: FieldRef<"Affiliate", 'String'>
+    readonly twitter: FieldRef<"Affiliate", 'String'>
+    readonly youtube: FieldRef<"Affiliate", 'String'>
     readonly totalClicks: FieldRef<"Affiliate", 'Int'>
     readonly totalConversions: FieldRef<"Affiliate", 'Int'>
     readonly totalEarnings: FieldRef<"Affiliate", 'Float'>
@@ -24873,6 +24925,10 @@ export namespace Prisma {
     paypalEmail: 'paypalEmail',
     bankAccount: 'bankAccount',
     paymentMethod: 'paymentMethod',
+    tiktok: 'tiktok',
+    instagram: 'instagram',
+    twitter: 'twitter',
+    youtube: 'youtube',
     totalClicks: 'totalClicks',
     totalConversions: 'totalConversions',
     totalEarnings: 'totalEarnings',
@@ -26129,6 +26185,10 @@ export namespace Prisma {
     paypalEmail?: StringNullableFilter<"Affiliate"> | string | null
     bankAccount?: StringNullableFilter<"Affiliate"> | string | null
     paymentMethod?: EnumPaymentMethodNullableFilter<"Affiliate"> | $Enums.PaymentMethod | null
+    tiktok?: StringNullableFilter<"Affiliate"> | string | null
+    instagram?: StringNullableFilter<"Affiliate"> | string | null
+    twitter?: StringNullableFilter<"Affiliate"> | string | null
+    youtube?: StringNullableFilter<"Affiliate"> | string | null
     totalClicks?: IntFilter<"Affiliate"> | number
     totalConversions?: IntFilter<"Affiliate"> | number
     totalEarnings?: FloatFilter<"Affiliate"> | number
@@ -26155,6 +26215,10 @@ export namespace Prisma {
     paypalEmail?: SortOrderInput | SortOrder
     bankAccount?: SortOrderInput | SortOrder
     paymentMethod?: SortOrderInput | SortOrder
+    tiktok?: SortOrderInput | SortOrder
+    instagram?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    youtube?: SortOrderInput | SortOrder
     totalClicks?: SortOrder
     totalConversions?: SortOrder
     totalEarnings?: SortOrder
@@ -26184,6 +26248,10 @@ export namespace Prisma {
     paypalEmail?: StringNullableFilter<"Affiliate"> | string | null
     bankAccount?: StringNullableFilter<"Affiliate"> | string | null
     paymentMethod?: EnumPaymentMethodNullableFilter<"Affiliate"> | $Enums.PaymentMethod | null
+    tiktok?: StringNullableFilter<"Affiliate"> | string | null
+    instagram?: StringNullableFilter<"Affiliate"> | string | null
+    twitter?: StringNullableFilter<"Affiliate"> | string | null
+    youtube?: StringNullableFilter<"Affiliate"> | string | null
     totalClicks?: IntFilter<"Affiliate"> | number
     totalConversions?: IntFilter<"Affiliate"> | number
     totalEarnings?: FloatFilter<"Affiliate"> | number
@@ -26210,6 +26278,10 @@ export namespace Prisma {
     paypalEmail?: SortOrderInput | SortOrder
     bankAccount?: SortOrderInput | SortOrder
     paymentMethod?: SortOrderInput | SortOrder
+    tiktok?: SortOrderInput | SortOrder
+    instagram?: SortOrderInput | SortOrder
+    twitter?: SortOrderInput | SortOrder
+    youtube?: SortOrderInput | SortOrder
     totalClicks?: SortOrder
     totalConversions?: SortOrder
     totalEarnings?: SortOrder
@@ -26239,6 +26311,10 @@ export namespace Prisma {
     paypalEmail?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
     bankAccount?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
     paymentMethod?: EnumPaymentMethodNullableWithAggregatesFilter<"Affiliate"> | $Enums.PaymentMethod | null
+    tiktok?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
+    instagram?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
+    twitter?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
+    youtube?: StringNullableWithAggregatesFilter<"Affiliate"> | string | null
     totalClicks?: IntWithAggregatesFilter<"Affiliate"> | number
     totalConversions?: IntWithAggregatesFilter<"Affiliate"> | number
     totalEarnings?: FloatWithAggregatesFilter<"Affiliate"> | number
@@ -27746,6 +27822,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -27772,6 +27852,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -27796,6 +27880,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -27822,6 +27910,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -27847,6 +27939,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -27867,6 +27963,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -27888,6 +27988,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -29386,6 +29490,10 @@ export namespace Prisma {
     paypalEmail?: SortOrder
     bankAccount?: SortOrder
     paymentMethod?: SortOrder
+    tiktok?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    youtube?: SortOrder
     totalClicks?: SortOrder
     totalConversions?: SortOrder
     totalEarnings?: SortOrder
@@ -29416,6 +29524,10 @@ export namespace Prisma {
     paypalEmail?: SortOrder
     bankAccount?: SortOrder
     paymentMethod?: SortOrder
+    tiktok?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    youtube?: SortOrder
     totalClicks?: SortOrder
     totalConversions?: SortOrder
     totalEarnings?: SortOrder
@@ -29437,6 +29549,10 @@ export namespace Prisma {
     paypalEmail?: SortOrder
     bankAccount?: SortOrder
     paymentMethod?: SortOrder
+    tiktok?: SortOrder
+    instagram?: SortOrder
+    twitter?: SortOrder
+    youtube?: SortOrder
     totalClicks?: SortOrder
     totalConversions?: SortOrder
     totalEarnings?: SortOrder
@@ -32209,6 +32325,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -32233,6 +32353,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -32535,6 +32659,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -32559,6 +32687,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33294,6 +33426,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33319,6 +33455,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33358,6 +33498,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33383,6 +33527,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33406,6 +33554,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33431,6 +33583,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33617,6 +33773,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33642,6 +33802,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33773,6 +33937,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33798,6 +33966,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -33915,6 +34087,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -33940,6 +34116,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -34053,6 +34233,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -34078,6 +34262,10 @@ export namespace Prisma {
     paypalEmail?: string | null
     bankAccount?: string | null
     paymentMethod?: $Enums.PaymentMethod | null
+    tiktok?: string | null
+    instagram?: string | null
+    twitter?: string | null
+    youtube?: string | null
     totalClicks?: number
     totalConversions?: number
     totalEarnings?: number
@@ -34157,6 +34345,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number
@@ -34182,6 +34374,10 @@ export namespace Prisma {
     paypalEmail?: NullableStringFieldUpdateOperationsInput | string | null
     bankAccount?: NullableStringFieldUpdateOperationsInput | string | null
     paymentMethod?: NullableEnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod | null
+    tiktok?: NullableStringFieldUpdateOperationsInput | string | null
+    instagram?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    youtube?: NullableStringFieldUpdateOperationsInput | string | null
     totalClicks?: IntFieldUpdateOperationsInput | number
     totalConversions?: IntFieldUpdateOperationsInput | number
     totalEarnings?: FloatFieldUpdateOperationsInput | number

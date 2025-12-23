@@ -9,6 +9,10 @@ const links = [
         href: '/about',
     },
     {
+        title: 'Affiliate Program',
+        href: '/affiliate-program',
+    },
+    {
         title: 'Terms & Conditions',
         href: '/terms',
     },

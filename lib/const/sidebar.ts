@@ -27,6 +27,11 @@ export const sideBarCentralizedNav = {
         icon: "Users",
       },
       {
+        title: "Affiliate",
+        url: "/admin/affiliation",
+        icon: "Users",
+      },
+      {
         title: "Blog",
         url: "/admin/blog",
         icon: "PiArticleNyTimesDuotone",
