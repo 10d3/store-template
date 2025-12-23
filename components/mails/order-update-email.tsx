@@ -74,7 +74,7 @@ export const OrderUpdateEmail: React.FC<Readonly<OrderUpdateEmailProps>> = ({
                         support team.
                     </p>
 
-                    <p>Thank you for choosing Store Ricardo!</p>
+                    <p>Thank you for choosing Vitanou!</p>
                 </div>
 
                 <div

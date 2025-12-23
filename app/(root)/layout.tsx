@@ -6,6 +6,9 @@ import SocialProofProvider from "@/components/shared/social-proof-provider";
 import { listProducts } from "@/lib/product/crud";
 import { Metadata } from "next";
 import React from "react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Vitanou Store",
@@ -20,6 +23,21 @@ export default async function Rootlayout({
   children: React.ReactNode;
 }) {
   const products = await listProducts();
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const isAdmin = session?.user?.role === "admin";
+  let isAffiliate = false;
+
+  if (session?.user?.id) {
+    const affiliate = await prisma.affiliate.findUnique({
+      where: { userId: session.user.id },
+      select: { status: true },
+    });
+    isAffiliate = affiliate?.status === "ACTIVE";
+  }
 
   // Extract unique categories and target audiences
   const categoryMap = new Map<string, Category>();
@@ -81,7 +99,7 @@ export default async function Rootlayout({
 
   return (
     <>
-      <Navbar shopCategories={shopCategories} />
+      <Navbar shopCategories={shopCategories} isAdmin={isAdmin} isAffiliate={isAffiliate} />
       <main className="flex-1 flex-col mt-4 md:px-24 px-4">
         {children}
         <CartModal />

@@ -40,9 +40,11 @@ export interface Category {
 
 interface NavbarProps {
   shopCategories?: Category[];
+  isAdmin?: boolean;
+  isAffiliate?: boolean;
 }
 
-export default function Navbar({ shopCategories = [] }: NavbarProps) {
+export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: NavbarProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   const session = useSession();
@@ -158,7 +160,7 @@ export default function Navbar({ shopCategories = [] }: NavbarProps) {
 
             {/* Login Button */}
             {session.data?.user ? (
-              <NavUserMenu user={user} />
+              <NavUserMenu user={user} isAdmin={isAdmin} isAffiliate={isAffiliate} />
             ) : (
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/login">

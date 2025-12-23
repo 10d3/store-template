@@ -19,12 +19,16 @@ import { authClient } from "@/lib/auth-client";
 
 export function NavUserMenu({
   user,
+  isAdmin,
+  isAffiliate,
 }: {
   user: {
     name: string;
     email: string;
     avatar: string;
   };
+  isAdmin?: boolean;
+  isAffiliate?: boolean;
 }) {
   const router = useRouter();
 
@@ -65,6 +69,24 @@ export function NavUserMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          {isAdmin && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => router.push("/admin")}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Admin Dashboard</span>
+            </DropdownMenuItem>
+          )}
+          {isAffiliate && (
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => router.push("/affiliation")}
+            >
+              <Package className="mr-2 h-4 w-4" />
+              <span>Affiliate Dashboard</span>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => router.push("/orders")}
@@ -79,16 +101,10 @@ export function NavUserMenu({
             <Heart className="mr-2 h-4 w-4" />
             <span>WishList</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
           <ModeToggle isNav className="w-full justify-around" />
-          {/* <Bell className="mr-2 h-4 w-4" /> */}
-          {/* <span>Notifications</span> */}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>

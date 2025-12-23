@@ -102,7 +102,7 @@ export const OrderConfirmationEmail: React.FC<Readonly<OrderConfirmationEmailPro
                         contact our customer support team.
                     </p>
 
-                    <p>Thank you for choosing Store Ricardo!</p>
+                    <p>Thank you for choosing Vitanou!</p>
                 </div>
 
                 <div
