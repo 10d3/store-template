@@ -41,7 +41,7 @@ export function AppSidebar({
                   width={1000}
                   height={1000}
                   alt={""}
-                  className="!size-8"
+                  className="!size-4"
                 />
                 <span className="text-base font-semibold">{`Vitanou`}</span>
               </Link>
