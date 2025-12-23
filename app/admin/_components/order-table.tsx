@@ -257,7 +257,7 @@ export function OrderTable({ className }: OrderTableProps) {
       setTrackingNumber("");
       setTrackingUrl("");
       setCarrier("");
-      
+
       // Refresh orders to show updated tracking info
       fetchOrders();
     } catch (error) {
@@ -362,7 +362,7 @@ export function OrderTable({ className }: OrderTableProps) {
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    
+
     return `${month}/${day}/${year} ${hours}:${minutes}`;
   };
 
@@ -469,7 +469,8 @@ export function OrderTable({ className }: OrderTableProps) {
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {formatCurrency(order.amount, order.currency)}
+                      {/* {formatCurrency(order.amount, order.currency)} */}
+                      {order.amount}$
                     </TableCell>
                     <TableCell>{getStatusBadge(order.status)}</TableCell>
                     <TableCell>
@@ -545,15 +546,15 @@ export function OrderTable({ className }: OrderTableProps) {
                           )}
                           {(order.status === "requires_capture" ||
                             order.status === "requires_action") && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleOrderAction(order.id, "cancel")
-                              }
-                            >
-                              <X className="mr-2 h-4 w-4" />
-                              Cancel
-                            </DropdownMenuItem>
-                          )}
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleOrderAction(order.id, "cancel")
+                                }
+                              >
+                                <X className="mr-2 h-4 w-4" />
+                                Cancel
+                              </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -755,53 +756,53 @@ export function OrderTable({ className }: OrderTableProps) {
               {/* Charges and Refunds */}
               {(selectedOrder.charges.length > 0 ||
                 selectedOrder.refunds.length > 0) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Payment History</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {selectedOrder.charges.map((charge: any, index: number) => (
-                      <div key={index} className="p-3 border rounded">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">Charge</div>
-                            <div className="text-sm text-gray-500">
-                              {mounted ? formatDate(charge.created) : charge.created.split('T')[0]}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Payment History</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {selectedOrder.charges.map((charge: any, index: number) => (
+                        <div key={index} className="p-3 border rounded">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">Charge</div>
+                              <div className="text-sm text-gray-500">
+                                {mounted ? formatDate(charge.created) : charge.created.split('T')[0]}
+                              </div>
+                            </div>
+                            <div className="text-green-600 font-medium">
+                              +
+                              {formatCurrency(
+                                charge.amount,
+                                selectedOrder.currency
+                              )}
                             </div>
                           </div>
-                          <div className="text-green-600 font-medium">
-                            +
-                            {formatCurrency(
-                              charge.amount,
-                              selectedOrder.currency
-                            )}
-                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
 
-                    {selectedOrder.refunds.map((refund: any, index: number) => (
-                      <div key={index} className="p-3 border rounded">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-medium">Refund</div>
-                            <div className="text-sm text-gray-500">
-                              {mounted ? formatDate(refund.created) : refund.created.split('T')[0]} • {refund.reason}
+                      {selectedOrder.refunds.map((refund: any, index: number) => (
+                        <div key={index} className="p-3 border rounded">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">Refund</div>
+                              <div className="text-sm text-gray-500">
+                                {mounted ? formatDate(refund.created) : refund.created.split('T')[0]} • {refund.reason}
+                              </div>
+                            </div>
+                            <div className="text-red-600 font-medium">
+                              -
+                              {formatCurrency(
+                                refund.amount,
+                                selectedOrder.currency
+                              )}
                             </div>
                           </div>
-                          <div className="text-red-600 font-medium">
-                            -
-                            {formatCurrency(
-                              refund.amount,
-                              selectedOrder.currency
-                            )}
-                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
             </div>
           )}
         </DialogContent>
@@ -828,11 +829,11 @@ export function OrderTable({ className }: OrderTableProps) {
                   getFulfillmentStatusBadge(
                     statusChangeOrder.fulfillmentStatus
                   )) || (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    Pending
-                  </Badge>
-                )}
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      Pending
+                    </Badge>
+                  )}
               </div>
             </div>
 

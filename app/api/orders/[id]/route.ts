@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 import { sendOrderStatusEmail } from "@/lib/email/order-emails";
 import Stripe from "stripe";
+import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   request: NextRequest,
@@ -27,8 +28,41 @@ export async function PATCH(
           }
         });
 
-        // Get customer email for notification
-        const customerEmail = result.receipt_email || "";
+        // Get customer email for notification with robust fallback
+        let customerEmail = result.receipt_email;
+
+        // 1. If no receipt email, try fetching from Stripe Customer object
+        if (!customerEmail && result.customer) {
+          try {
+            const customerId = typeof result.customer === 'string'
+              ? result.customer
+              : result.customer.id;
+
+            const customer = await stripe.customers.retrieve(customerId);
+            if (!customer.deleted && customer.email) {
+              customerEmail = customer.email;
+            }
+          } catch (err) {
+            console.warn("Failed to fetch Stripe customer email:", err);
+          }
+        }
+
+        // 2. If still no email, try fetching from local database
+        if (!customerEmail) {
+          try {
+            const localOrder = await prisma.order.findUnique({
+              where: { id: orderId },
+              include: { user: true }
+            });
+
+            if (localOrder?.user?.email) {
+              customerEmail = localOrder.user.email;
+            }
+          } catch (err) {
+            console.warn("Failed to fetch local DB email:", err);
+          }
+        }
+
         if (customerEmail) {
           emailData = {
             customerEmail,
@@ -43,7 +77,7 @@ export async function PATCH(
         result = await stripe.paymentIntents.cancel(orderId, {
           cancellation_reason: "requested_by_customer"
         });
-        
+
         emailData = {
           customerEmail: result.receipt_email || "",
           orderId: result.id,
@@ -83,7 +117,7 @@ export async function PATCH(
 
       case "capture":
         result = await stripe.paymentIntents.capture(orderId);
-        
+
         emailData = {
           customerEmail: result.receipt_email || "",
           orderId: result.id,
@@ -117,7 +151,7 @@ export async function PATCH(
 
   } catch (error: any) {
     console.error(`Error processing order ${orderId || 'unknown'}:`, error);
-    
+
     if (error.type === "StripeCardError") {
       return NextResponse.json(
         { error: error.message },

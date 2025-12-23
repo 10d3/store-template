@@ -43,7 +43,7 @@ const statusConfig = {
 
 export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
   return (
-    <div className="min-h-fit">
+    <div className="min-h-screen">
       <div className="container mx-auto py-4 md:py-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-12">

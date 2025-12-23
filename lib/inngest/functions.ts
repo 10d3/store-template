@@ -1,5 +1,5 @@
 import { sendMoney } from "../affiliation/send-money";
-import { generatePayoutConfirmationEmail } from "../email/order-emails";
+import PayoutConfirmationEmail from "@/components/mails/payout-confirmation-email";
 import { emailService } from "../email/payout";
 import { prisma } from "../prisma";
 import { inngest } from "./client";
@@ -61,7 +61,9 @@ export const sendWeeklyDigest = inngest.createFunction(
     );
 
     // 4️⃣ Finally, we send the email itself:
-    const emailHtml = generatePayoutConfirmationEmail({
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const emailComponent = PayoutConfirmationEmail({
       affiliateName: event.data.user?.name || "Affiliate",
       amount: event.data.availableBalance,
       bankAccount: event.data.bankAccount,
@@ -74,7 +76,7 @@ export const sendWeeklyDigest = inngest.createFunction(
     await emailService.send({
       to: email,
       subject: "💸 Your Payout Has Been Processed!",
-      data: emailHtml,
+      react: emailComponent,
     });
 
     // 🎇 That's it! - We've used two functions to reliably perform a scheduled
