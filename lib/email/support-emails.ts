@@ -7,7 +7,7 @@ import { ReactElement } from "react";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const SUPPORT_ALERT_EMAIL = "ffast2000@gmail.com";
+const SUPPORT_ALERT_EMAIL = "rickyroselyn72@gmail.com";
 
 interface SupportEmailData {
     name: string;
@@ -69,7 +69,7 @@ export async function sendSupportAlertEmail(data: SupportEmailData) {
         });
 
         const { data: emailData, error } = await resend.emails.send({
-            from: "Support Vitanou <support@storerecardo.com>",
+            from: "Support Vitanou <support@vitanou.com>",
             to: [SUPPORT_ALERT_EMAIL],
             replyTo: email,
             subject: `🔔 New Support Request: ${subject} - ${requestId}`,

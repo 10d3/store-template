@@ -11,6 +11,12 @@ import { formatPrice } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Affiliate Payments",
+  description: "View your affiliate earnings and payments.",
+};
 
 export default async function PaymentsPage() {
   const session = await auth.api.getSession({ headers: await headers() });

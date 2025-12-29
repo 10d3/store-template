@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { AffiliateTable } from "../_components/affiliate-table";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Affiliate Management",
+    description: "Manage your affiliates.",
+};
 
 export default async function AdminAffiliationPage() {
     const affiliates = await prisma.affiliate.findMany({

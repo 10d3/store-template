@@ -6,6 +6,13 @@ interface PageProps {
   searchParams: Promise<{ blogId?: string }>;
 }
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog Editor",
+  description: "Create or edit a blog post.",
+};
+
 export default async function page({ searchParams }: PageProps) {
   const params = await searchParams;
   const blogId = params.blogId;

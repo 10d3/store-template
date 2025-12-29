@@ -6,6 +6,13 @@ import Link from "next/link";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { FaTwitter, FaX } from "react-icons/fa6";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Coming Soon",
+  description: "Get notified when we launch.",
+};
+
 export default function Page() {
   const socials = [{ icon: FaInstagram, href: "" }, { icon: FaFacebook, href: "" }, { icon: FaTwitter, href: "" }];
 

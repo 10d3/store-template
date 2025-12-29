@@ -7,6 +7,13 @@ import { getAffiliationData } from "@/lib/affiliation/affiliate-data";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Affiliate Dashboard",
+  description: "Track your affiliate performance.",
+};
+
 export default async function Page() {
   const data = await getAffiliationData();
   const { affiliate } = data;
@@ -59,8 +66,8 @@ export default async function Page() {
         .map((ref) => ({
           month: ref.convertedAt
             ? new Date(ref.convertedAt).toLocaleString("default", {
-                month: "short",
-              })
+              month: "short",
+            })
             : "",
           desktop: ref.commissions.reduce(
             (sum, commission) => sum + (commission.amount || 0),
@@ -95,8 +102,8 @@ export default async function Page() {
         .map((ref) => ({
           month: ref.convertedAt
             ? new Date(ref.convertedAt).toLocaleString("default", {
-                month: "short",
-              })
+              month: "short",
+            })
             : "",
           desktop:
             (ref.commissions.reduce(
@@ -137,8 +144,8 @@ export default async function Page() {
         .map((ref) => ({
           month: ref.convertedAt
             ? new Date(ref.convertedAt).toLocaleString("default", {
-                month: "short",
-              })
+              month: "short",
+            })
             : "",
           desktop: ref.quantity || 0,
         }))

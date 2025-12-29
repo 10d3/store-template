@@ -3,6 +3,12 @@ import Image from "next/image"
 import { CopyLinkButton } from "./_components/copy-link-button"
 import { getBaseURL } from "@/lib/utils"
 import { getRefferalCode } from "@/lib/affiliation/affiliate-data"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Affiliate Links",
+  description: "Get your affiliate links for products.",
+};
 
 export default async function page() {
   const refferalCode = await getRefferalCode()

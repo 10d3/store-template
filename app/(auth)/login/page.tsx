@@ -1,6 +1,13 @@
 import Image from "next/image";
 import { LoginForm } from "./_form/login-form";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login",
+  description: "Sign in to your account.",
+};
+
 export default function LoginPage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">

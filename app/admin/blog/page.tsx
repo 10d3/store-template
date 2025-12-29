@@ -19,6 +19,12 @@ import {
 } from "lucide-react";
 import { findBlogs } from "@/lib/action";
 import PublishButton from "./_components/publish-button";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog Management",
+  description: "Manage your blog posts.",
+};
 
 export default async function BlogAdminPage() {
   const blogs = await findBlogs();
