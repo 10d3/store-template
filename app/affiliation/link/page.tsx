@@ -13,13 +13,15 @@ export const metadata: Metadata = {
 export default async function page() {
   const refferalCode = await getRefferalCode()
   const products = await listProducts()
-  const transformedDataProduct = products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    description: product?.description || "",
-    image: product?.images?.[0] as string,
-    metadata: product.metadata,
-  }))
+  const transformedDataProduct = products
+    .filter((product) => product.metadata?.type !== "bundle")
+    .map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product?.description || "",
+      image: product?.images?.[0] as string,
+      metadata: product.metadata,
+    }))
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 flex flex-col gap-6 sm:gap-8">
