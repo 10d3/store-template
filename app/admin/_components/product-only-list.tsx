@@ -73,7 +73,7 @@ export function ProductOnlyList({
                     <Badge variant="outline">Product</Badge>
                   </div>
                   {product.description && (
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-sm text-muted-foreground truncate max-w-[200px]">
                       {product.description}
                     </p>
                   )}

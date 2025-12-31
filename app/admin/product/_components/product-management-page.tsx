@@ -17,10 +17,17 @@ import ProductForm from "../../_components/form/product-form"
 import { StripeProduct } from "@/types/product"
 import { ProductFormData } from "@/lib/product/product.schema"
 import { ProductOnlyList } from "../../_components/product-only-list";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function ProductManagementPage() {
     const queryClient = useQueryClient()
     const [editingProduct, setEditingProduct] = useState<StripeProduct | null>(null)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -37,6 +44,7 @@ export default function ProductManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
             toast.success("Product created successfully")
+            setIsDialogOpen(false)
         },
         onError: (error) => {
             toast.error("Failed to create product")
@@ -49,6 +57,7 @@ export default function ProductManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
             setEditingProduct(null)
+            setIsDialogOpen(false)
             toast.success("Product updated successfully")
         },
         onError: (error) => {
@@ -79,52 +88,64 @@ export default function ProductManagementPage() {
 
     const onEditProduct = (product: StripeProduct) => {
         setEditingProduct(product)
+        setIsDialogOpen(true)
+    }
+
+    const startCreateProduct = () => {
+        setEditingProduct(null)
+        setIsDialogOpen(true)
     }
 
     const onCancelEdit = () => {
         setEditingProduct(null)
+        setIsDialogOpen(false)
     }
 
     return (
         <div className="container mx-auto py-8 px-4">
-            <div className="mb-8">
-                <div className="flex items-center gap-4 mb-4">
-                    <Link href="/admin">
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
-                    </Link>
+            <div className="mb-8 flex items-center justify-between">
+                <div>
+                    <div className="flex items-center gap-4 mb-4">
+                        <Link href="/admin">
+                            <Button variant="outline" size="sm">
+                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                Back to Dashboard
+                            </Button>
+                        </Link>
+                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
+                    <p className="text-muted-foreground">Create, edit, and manage your products</p>
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
-                <p className="text-muted-foreground">Create, edit, and manage your products</p>
+                <Button onClick={startCreateProduct}>
+                    Create New Product
+                </Button>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-                <div>
-                    <ProductForm
-                        onSubmit={onProductSubmit}
-                        initialData={editingProduct || undefined}
-                        isLoading={creatingProduct || updatingProduct}
-                        products={products}
-                    />
-                    {editingProduct && (
-                        <div className="mt-4">
-                            <Button onClick={onCancelEdit} className="text-sm text-muted-foreground hover:text-foreground">
-                                Cancel editing
-                            </Button>
-                        </div>
-                    )}
-                </div>
+            <div className="grid gap-6">
                 <ProductOnlyList
                     products={products || []}
                     onEdit={onEditProduct}
                     onArchive={handleArchiveProduct}
                     isLoading={creatingProduct || updatingProduct}
-                    title="Product Management"
+                    title="Product List"
                     description="Manage your individual products here"
                 />
             </div>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{editingProduct ? "Edit Product" : "Create New Product"}</DialogTitle>
+                    </DialogHeader>
+                    <ProductForm
+                        onSubmit={onProductSubmit}
+                        initialData={editingProduct || undefined}
+                        isLoading={creatingProduct || updatingProduct}
+                        products={products}
+                        embed
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
