@@ -141,7 +141,7 @@ export default function AdminDashboard() {
                     <CardDescription>Manage different aspects of your store</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
                         {quickActions.map((action, index) => {
                             const Icon = action.icon
                             return (
@@ -154,8 +154,8 @@ export default function AdminDashboard() {
                                             <Icon className="h-6 w-6" />
                                         </div>
                                         <div className="text-center">
-                                            <div className="font-semibold">{action.title}</div>
-                                            <div className="text-xs text-muted-foreground">{action.description}</div>
+                                            <h3 className="font-semibold">{action.title}</h3>
+                                            <p className="text-[0.7em] text-muted-foreground line-clamp-1">{action.description}</p>
                                         </div>
                                     </Button>
                                 </Link>

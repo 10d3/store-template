@@ -15,7 +15,7 @@ import {
   FileText,
   Edit3,
   TrendingUp,
-  Eye,
+  // Eye,
 } from "lucide-react";
 import { findBlogs } from "@/lib/action";
 import PublishButton from "./_components/publish-button";
@@ -52,7 +52,7 @@ export default async function BlogAdminPage() {
           </Link>
         </div>
 
-        <div className="grid gap-6 mb-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 mb-12 sm:grid-cols-1 lg:grid-cols-3">
           <Card className="border-0 shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -89,7 +89,7 @@ export default async function BlogAdminPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-sm bg-card/50 backdrop-blur-sm">
+          {/* <Card className="border-0 shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
@@ -103,7 +103,7 @@ export default async function BlogAdminPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           <Card className="border-0 shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-6">
