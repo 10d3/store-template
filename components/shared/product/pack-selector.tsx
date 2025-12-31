@@ -18,9 +18,9 @@ export function PackSelector({ options, selected, onSelect, label = "Select quan
           <button
             key={option.value}
             onClick={() => onSelect(option.value)}
-            className={`py-3 px-4 rounded-lg border-2 transition-all font-medium ${selected === option.value
-                ? "border-foreground bg-foreground text-background"
-                : "border-border hover:border-foreground/40 text-foreground"
+            className={`py-2 px-2 rounded-lg cursor-pointer border-2 transition-all font-medium ${selected === option.value
+              ? "border-foreground bg-foreground text-background"
+              : "border-border hover:border-foreground/40 text-foreground"
               }`}
           >
             {option.label}

@@ -27,10 +27,10 @@ export function PurchaseOption({
   return (
     <button
       onClick={onClick}
-      className={`w-full p-3 rounded-xl border-2 transition-all text-left ${isSelected ? "border-foreground bg-accent" : "border-border hover:border-foreground/40"
+      className={`w-full p-2 rounded-xl border-2 transition-all text-left ${isSelected ? "border-foreground bg-accent" : "border-border hover:border-foreground/40"
         }`}
     >
-      <div className="flex relative items-start justify-between gap-4">
+      <div className="flex relative items-start justify-between gap-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-medium text-foreground">{title}</span>

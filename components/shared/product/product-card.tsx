@@ -76,7 +76,7 @@ export function PackCardNew({
     <div className={`bg-card border border-border rounded-2xl p-4 shadow-sm ${className}`}>
       <ProductHeader name={product.name} description={product.description} />
 
-      <div className="flex flex-row gap-2 items-center">
+      <div className="flex flex-row gap-2 items-center justify-between">
         <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} />
 
         <div className="space-y-3 mb-0 flex-1 items-center flex ">

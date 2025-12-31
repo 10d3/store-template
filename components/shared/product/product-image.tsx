@@ -12,7 +12,7 @@ export function ProductImage({ src, alt, savings }: ProductImageProps) {
   const imageSrc = src && src.length > 0 ? src : "/placeholder.svg"
 
   return (
-    <div className="relative mb-4 flex justify-center w-2/3 rounded-xl">
+    <div className="relative mb-4 flex justify-center items-center w-2/3 rounded-xl">
       <Image
         width={1000}
         height={1000}
