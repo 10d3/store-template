@@ -17,10 +17,17 @@ import { EnhancedPackForm } from "../../_components/form/pack-form";
 import { StripeProduct } from "@/types/product";
 import { PackFormData } from "@/lib/product/product.schema";
 import { BundleOnlyList } from "../../_components/bundle-only-list";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function BundleManagementPage() {
     const queryClient = useQueryClient();
     const [editingPack, setEditingPack] = useState<StripeProduct | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -37,6 +44,7 @@ export default function BundleManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
             toast.success("Bundle created successfully");
+            setIsDialogOpen(false);
         },
         onError: (error) => {
             toast.error("Failed to create bundle");
@@ -50,6 +58,7 @@ export default function BundleManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] });
             setEditingPack(null);
+            setIsDialogOpen(false);
             toast.success("Bundle updated successfully");
         },
         onError: (error) => {
@@ -81,57 +90,66 @@ export default function BundleManagementPage() {
 
     const handleEditPack = (pack: StripeProduct) => {
         setEditingPack(pack);
+        setIsDialogOpen(true);
+    };
+
+    const startCreatePack = () => {
+        setEditingPack(null);
+        setIsDialogOpen(true);
     };
 
     const onCancelEdit = () => {
         setEditingPack(null);
+        setIsDialogOpen(false);
     };
 
     return (
         <div className="container mx-auto py-8 px-4">
-            <div className="mb-8">
-                <div className="flex items-center gap-4 mb-4">
-                    <Link href="/admin">
-                        <Button variant="outline" size="sm">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Dashboard
-                        </Button>
-                    </Link>
+            <div className="mb-8 flex items-center justify-between">
+                <div>
+                    <div className="flex items-center gap-4 mb-4">
+                        <Link href="/admin">
+                            <Button variant="outline" size="sm">
+                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                Back to Dashboard
+                            </Button>
+                        </Link>
+                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight">Bundle Management</h1>
+                    <p className="text-muted-foreground">
+                        Create and manage product bundles with discounts
+                    </p>
                 </div>
-                <h1 className="text-3xl font-bold tracking-tight">Bundle Management</h1>
-                <p className="text-muted-foreground">
-                    Create and manage product bundles with discounts
-                </p>
+                <Button onClick={startCreatePack}>
+                    Create New Bundle
+                </Button>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-                <div>
-                    <EnhancedPackForm
-                        products={products}
-                        onSubmit={onPackSubmit}
-                        initialData={editingPack || undefined}
-                        isLoading={creatingPack || updatingPack}
-                    />
-                    {editingPack && (
-                        <div className="mt-4">
-                            <button
-                                onClick={onCancelEdit}
-                                className="text-sm text-muted-foreground hover:text-foreground"
-                            >
-                                Cancel editing
-                            </button>
-                        </div>
-                    )}
-                </div>
+            <div className="grid gap-6">
                 <BundleOnlyList
                     products={products || []}
                     onEdit={handleEditPack}
                     onArchive={handleArchivePack}
                     isLoading={creatingPack || updatingPack}
-                    title="Bundle Management"
+                    title="Bundle List"
                     description="Create and manage product bundles with discounts"
                 />
             </div>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="max-w-6xl min-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{editingPack ? "Edit Bundle" : "Create New Bundle"}</DialogTitle>
+                    </DialogHeader>
+                    <EnhancedPackForm
+                        products={products}
+                        onSubmit={onPackSubmit}
+                        initialData={editingPack || undefined}
+                        isLoading={creatingPack || updatingPack}
+                        embed
+                    />
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
