@@ -43,9 +43,12 @@ export function PackCardNew({
 
   const handleAddToCart = () => {
     // Add to cart store
+    // Determine if this is a multi-pack bundle
+    const hasMultiplePacks = product.packOptions.length > 1;
+
     addOrUpdateItem({
       id: product.id,
-      name: `${product.name} (${selectedPack} Pack)`,
+      name: hasMultiplePacks ? `${product.name} (${selectedPack} Pack)` : product.name,
       image: product.image,
       price: Math.round(currentPrice.total * 100), // Convert to cents
       quantity: 1, // 1 pack
@@ -72,36 +75,47 @@ export function PackCardNew({
   // Get image for current pack size, fallback to default image
   const currentImage = product.images?.[selectedPack] || product.image
 
+  // Check if this bundle has multiple pack options
+  const hasMultiplePacks = product.packOptions.length > 1
+
   return (
     <div className={`bg-card border border-border rounded-2xl p-4 shadow-sm ${className}`}>
       <ProductHeader name={product.name} description={product.description} />
 
-      <div className="flex flex-row gap-2 items-center justify-between">
-        <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} />
+      {hasMultiplePacks ? (
+        <div className="flex flex-row gap-2 items-center justify-between">
+          <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} className="w-full mb-0" />
 
-        <div className="space-y-3 mb-0 flex-1 items-center flex ">
-          {/* <PurchaseOption
-            type="subscribe"
-            title="Subscribe & Save"
-            price={product.pricing.subscribe[selectedPack].price}
-            // description="Cancel anytime • 10% off every order"
-            isRecommended
-            isSelected={purchaseType === "subscribe"}
-            onClick={() => setPurchaseType("subscribe")}
-          /> */}
+          <div className="space-y-3 mb-0 flex-1 items-center flex ">
+            {/* <PurchaseOption
+              type="subscribe"
+              title="Subscribe & Save"
+              price={product.pricing.subscribe[selectedPack].price}
+              // description="Cancel anytime • 10% off every order"
+              isRecommended
+              isSelected={purchaseType === "subscribe"}
+              onClick={() => setPurchaseType("subscribe")}
+            /> */}
 
-          <PurchaseOption
-            type="onetime"
-            title="One-time"
-            price={product.pricing.onetime[selectedPack].price}
-            isSelected={purchaseType === "onetime"}
-            isRecommended
-            onClick={() => setPurchaseType("onetime")}
-          />
+            {/* <PurchaseOption
+              type="onetime"
+              title="One-time"
+              price={product.pricing.onetime[selectedPack].price}
+              isSelected={purchaseType === "onetime"}
+              isRecommended
+              onClick={() => setPurchaseType("onetime")}
+            /> */}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full mb-4">
+          <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} className="w-full mb-0" />
+        </div>
+      )}
 
-      <PackSelector options={product.packOptions} selected={selectedPack} onSelect={setSelectedPack} />
+      {hasMultiplePacks && (
+        <PackSelector options={product.packOptions} selected={selectedPack} onSelect={setSelectedPack} />
+      )}
 
       {/* <PriceSummary total={currentPrice.total} original={currentPrice.original} /> */}
 

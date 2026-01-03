@@ -16,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   getPack,
-  getProductsByProductIds,
   getRelatedProducts,
 } from "@/lib/product/crud";
 import { getCachedProduct } from "@/lib/product/cache";
@@ -25,7 +24,8 @@ import { getBaseURL } from "@/lib/utils";
 import RelatedProducts from "@/components/shared/related-products";
 import { Button } from "@/components/ui/button";
 // import MediaGallery from "@/components/shared/media-gallery";
-import PackCard from "@/components/shared/pack-card";
+import { PackCardNew } from "@/components/shared/product/product-card";
+import { transformPacksToProductData } from "@/lib/product/pack-transformer";
 import WishlistButton from "@/components/shared/wishlist-button";
 import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { Markdown } from "@/components/shared/markdown";
@@ -150,13 +150,17 @@ export default async function page(props: {
 
   const packs = await getPack(variants[0]?.id as string);
 
-  // Fetch related products, reviews, and ratings in parallel for better performance
-  const [relatedProducts, reviews, ratingData] = await Promise.all([
+  // Fetch related products, reviews, ratings, and all products for pack transformation in parallel
+  const [relatedProducts, reviews, ratingData, allProducts] = await Promise.all([
     getRelatedProducts(variants[0]?.id as string, 4),
     getReviewsByProductId(variants[0]?.id as string),
     getAverageRating(variants[0]?.id as string),
+    import("@/lib/product/crud").then(m => m.listProducts()),
   ]);
   const { average: averageRating, count: reviewCount } = ratingData;
+
+  // Transform packs using the new transformer
+  const packProductData = await transformPacksToProductData(packs, allProducts);
 
   // console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [
@@ -207,84 +211,6 @@ export default async function page(props: {
   //   ];
   //   return positions[index] || "col-span-1 row-span-1";
   // };
-
-  const transformedPacks = await Promise.all(
-    packs.map(async (pack) => {
-      const packProducts = [];
-
-      // If pack has contents metadata, fetch actual products
-      if (pack.metadata?.contents) {
-        const contentIds = pack.metadata.contents.split(",");
-        try {
-          const contentProducts = await getProductsByProductIds(contentIds);
-
-          contentProducts.forEach((contentProduct, index) => {
-            const defaultPrice =
-              typeof contentProduct.default_price === "object" &&
-                contentProduct.default_price
-                ? contentProduct.default_price
-                : null;
-
-            packProducts.push({
-              id: `${pack.id}_${contentProduct.id}`,
-              name: contentProduct.name, // Use actual product name
-              price: defaultPrice?.unit_amount || 0,
-              image:
-                contentProduct.images?.[0] ||
-                pack.images?.[index] ||
-                "/placeholder.svg",
-              hoverMedia: contentProduct.images?.[1]
-                ? {
-                  type: "image" as const,
-                  src: contentProduct.images[1],
-                }
-                : undefined,
-              stripePriceId: defaultPrice?.id || contentIds[index]?.trim(),
-            });
-          });
-        } catch (error) {
-          console.error("Failed to fetch pack contents:", error);
-          // Fallback to placeholder names if fetching fails
-          contentIds.forEach((productId, index) => {
-            packProducts.push({
-              id: `${pack.id}_${index}`,
-              name: `Product ${index + 1}`,
-              price: Math.floor(Math.random() * 5000) + 1000,
-              image: pack.images?.[index] || "/placeholder.svg",
-              stripePriceId: productId.trim(),
-            });
-          });
-        }
-      } else {
-        // Default pack content if no metadata
-        const defaultPrice =
-          typeof pack.default_price === "object" && pack.default_price
-            ? pack.default_price
-            : null;
-
-        packProducts.push({
-          id: `${pack.id}_1`,
-          name: pack.name,
-          price: defaultPrice?.unit_amount || 0,
-          image: pack.images?.[0] || "/placeholder.svg",
-          stripePriceId:
-            defaultPrice?.id ||
-            (typeof pack.default_price === "string"
-              ? pack.default_price
-              : undefined),
-        });
-      }
-
-      return {
-        id: pack.id,
-        name: pack.name, // Use the pack name directly
-        products: packProducts,
-        bundleDiscount: pack.metadata?.discount
-          ? parseInt(pack.metadata.discount)
-          : 0,
-      };
-    })
-  );
 
   return (
     <div className="min-h-screen">
@@ -397,6 +323,25 @@ export default async function page(props: {
                 </div>
               )}
 
+              {/* Bundle Offers Section */}
+              {packProductData.length > 0 && (
+                <>
+                  <Separator className="my-8" />
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold">Bundle Offers</h2>
+                    <p className="text-muted-foreground">Save more when you buy together</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {packProductData.map((packData) => (
+                        <PackCardNew
+                          key={packData.id}
+                          product={packData}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
               <Separator className="my-8" />
 
               {/* Reviews Section */}
@@ -486,40 +431,7 @@ export default async function page(props: {
                 <AddToCartButton product={variants[0]} />
               </div>
 
-              {/* Additional Information */}
-              <div className="mt-8 space-y-6">
-                <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-                  <CardHeader>
-                    <CardTitle className="text-lg font-semibold text-gray-900">
-                      Bundle Offers
-                    </CardTitle>
-                    <CardDescription>
-                      Save more when you buy together
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {packs ? (
-                      transformedPacks.map((pack) => (
-                        <PackCard
-                          key={pack.id}
-                          id={pack.id}
-                          name={pack.name}
-                          products={pack.products}
-                          bundleDiscount={pack.bundleDiscount}
-                          className="hover:scale-105 transition-transform duration-200"
-                        // onAddToCart={()=> console.log("click")}
-                        />
-                      ))
-                    ) : (
-                      <div className="text-sm text-gray-600">
-                        Bundle deals and pack options will appear here when
-                        available.
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
 
-              </div>
             </div>
           </div>
         </div>

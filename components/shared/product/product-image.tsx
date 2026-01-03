@@ -5,14 +5,15 @@ interface ProductImageProps {
   src: string
   alt: string
   savings: number
+  className?: string
 }
 
-export function ProductImage({ src, alt, savings }: ProductImageProps) {
+export function ProductImage({ src, alt, savings, className = "" }: ProductImageProps) {
   // Fallback to placeholder if src is empty or undefined
   const imageSrc = src && src.length > 0 ? src : "/placeholder.svg"
 
   return (
-    <div className="relative mb-4 flex justify-center items-center w-2/3 rounded-xl">
+    <div className={`relative mb-4 flex justify-center items-center w-2/3 rounded-xl ${className}`}>
       <Image
         width={1000}
         height={1000}
