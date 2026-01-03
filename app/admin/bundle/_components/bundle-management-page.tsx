@@ -36,7 +36,7 @@ export default function BundleManagementPage() {
     });
 
     // Filter to show only packs
-    const packs = products.filter((p) => p.metadata?.type === "bundle");
+    // const packs = products.filter((p) => p.metadata?.type === "bundle");
 
     // Mutations
     const { mutate: handleCreatePack, isPending: creatingPack } = useMutation({
@@ -125,7 +125,7 @@ export default function BundleManagementPage() {
                 </Button>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid gap-6 w-full">
                 <BundleOnlyList
                     products={products || []}
                     onEdit={handleEditPack}

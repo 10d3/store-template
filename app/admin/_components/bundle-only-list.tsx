@@ -49,7 +49,7 @@ export function BundleOnlyList({
   const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && (
@@ -66,9 +66,9 @@ export function BundleOnlyList({
             packProducts.map((pack) => (
               <div
                 key={pack.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors w-full"
               >
-                <div className="flex-1 min-w-0">
+                <div className=" w-full">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-medium truncate">{pack.name}</h3>
                     <Badge variant="secondary">Bundle</Badge>
@@ -80,12 +80,12 @@ export function BundleOnlyList({
                       )}
                   </div>
                   {pack.description && (
-                    <p className="text-sm text-muted-foreground truncate">
+                    <p className="text-sm text-muted-foreground truncate line-clamp-2 w-full max-w-[20rem]">
                       {pack.description}
                     </p>
                   )}
                   {pack.metadata && pack.metadata.contents && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground w-full max-w-full">
                       Contains: {pack.metadata.contents.split(",").length}{" "}
                       items
                     </p>
