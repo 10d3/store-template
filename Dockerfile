@@ -36,9 +36,11 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-# Production stage
-FROM base AS runner
+# Production stage - Use Node.js to avoid Bun + Turbopack compatibility issues
+FROM node:20-alpine AS runner
 WORKDIR /app
+# Install curl for healthcheck
+RUN apk add --no-cache curl
 # Set production environment
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -63,5 +65,5 @@ HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:3000/api/health || exit 1
 # Expose port
 EXPOSE 3000
-# Start the application using Bun
-CMD ["bun", "server.js"]
+# Start the application using Node.js
+CMD ["node", "server.js"]
