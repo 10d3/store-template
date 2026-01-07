@@ -44,18 +44,26 @@ model Product {
   description String?  @db.Text
   images      String[] // Array of image URLs
   active      Boolean  @default(true)
+  slug        String?
+  category    String?
+  type        String?
+  gender      String?
 
   // All Stripe metadata stored as JSON
   metadata Json?
 
   // Relations
-  prices Price[]
+  prices    Price[]
+  nutrition ProductNutrition?
 
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([active])
+  @@index([slug])
+  @@index([category])
+  @@index([type])
   @@map("products")
 }
 
@@ -74,12 +82,15 @@ model Price {
 
   @@index([productId])
   @@index([active])
+  @@index([productId, active])
+  @@index([productId, isDefault])
   @@map("prices")
 }
 
 model ProductNutrition {
-  id        String @id @default(uuid())
-  productId String @unique
+  id        String  @id @default(uuid())
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   // Note: No FK constraint - productId references Stripe product ID
   // which may or may not exist in our products table
   nutrition String

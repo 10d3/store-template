@@ -44,42 +44,53 @@ model Product {
   description String?  @db.Text
   images      String[] // Array of image URLs
   active      Boolean  @default(true)
-  
+  slug        String?
+  category    String?
+  type        String?
+  gender      String?
+
   // All Stripe metadata stored as JSON
-  metadata    Json?
-  
+  metadata Json?
+
   // Relations
-  prices      Price[]
-  
+  prices    Price[]
+  nutrition ProductNutrition?
+
   // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([active])
+  @@index([slug])
+  @@index([category])
+  @@index([type])
   @@map("products")
 }
 
 model Price {
-  id         String  @id // Stripe price ID (price_xxx)
-  productId  String
-  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  unitAmount Int     // Amount in cents
+  id        String  @id // Stripe price ID (price_xxx)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  unitAmount Int // Amount in cents
   currency   String  @default("usd")
   active     Boolean @default(true)
   isDefault  Boolean @default(false)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([productId])
   @@index([active])
+  @@index([productId, active])
+  @@index([productId, isDefault])
   @@map("prices")
 }
 
 model ProductNutrition {
-  id        String @id @default(uuid())
-  productId String @unique
+  id        String  @id @default(uuid())
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   // Note: No FK constraint - productId references Stripe product ID
   // which may or may not exist in our products table
   nutrition String
@@ -123,18 +134,18 @@ model Wishlist {
 }
 
 model User {
-  id              String     @id
-  name            String
-  email           String
-  emailVerified   Boolean
-  image           String?
-  createdAt       DateTime
-  updatedAt       DateTime
-  sessions        Session[]
-  accounts        Account[]
-  orders          Order[]
-  reviews         Review[]
-  wishlist        Wishlist[]
+  id            String     @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      Wishlist[]
 
   stripeCustomerId String? @unique
 
@@ -216,7 +227,7 @@ model Affiliate {
   paypalEmail   String?
   bankAccount   String?
   paymentMethod PaymentMethod?
-  
+
   // Social Media
   tiktok    String?
   instagram String?
@@ -377,14 +388,14 @@ model Payout {
 
 // Support Requests
 model SupportRequest {
-  id        String              @id @default(cuid())
+  id        String               @id @default(cuid())
   name      String
   email     String
   subject   String
-  message   String              @db.Text
+  message   String               @db.Text
   status    SupportRequestStatus @default(PENDING)
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 
   @@index([email])
   @@index([status])
@@ -394,12 +405,12 @@ model SupportRequest {
 
 // Newsletter Subscriptions
 model NewsletterSubscription {
-  id        String                     @id @default(cuid())
-  email     String                     @unique
-  source    String?                    // Where the subscription came from (e.g., "hero", "footer", "popup")
+  id        String                       @id @default(cuid())
+  email     String                       @unique
+  source    String? // Where the subscription came from (e.g., "hero", "footer", "popup")
   status    NewsletterSubscriptionStatus @default(ACTIVE)
-  createdAt DateTime                   @default(now())
-  updatedAt DateTime                   @updatedAt
+  createdAt DateTime                     @default(now())
+  updatedAt DateTime                     @updatedAt
 
   @@index([email])
   @@index([status])
@@ -408,16 +419,16 @@ model NewsletterSubscription {
 }
 
 enum NewsletterSubscriptionStatus {
-  ACTIVE      // Subscribed and receiving emails
+  ACTIVE // Subscribed and receiving emails
   UNSUBSCRIBED // User unsubscribed
-  BOUNCED     // Email bounced
+  BOUNCED // Email bounced
 }
 
 enum SupportRequestStatus {
-  PENDING   // New request, not yet reviewed
+  PENDING // New request, not yet reviewed
   IN_REVIEW // Currently being reviewed
-  RESOLVED  // Issue resolved
-  CLOSED    // Request closed
+  RESOLVED // Issue resolved
+  CLOSED // Request closed
 }
 
 // Enums
