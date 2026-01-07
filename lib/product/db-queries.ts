@@ -81,10 +81,11 @@ export async function getProductBySlugFromDB(
     const products = await prisma.product.findMany({
         where: {
             active: true,
-            metadata: {
-                path: ["slug"],
-                equals: slug,
-            },
+            slug,
+            // metadata: {
+            //     path: ["slug"],
+            //     equals: slug,
+            // },
         },
         include: {
             prices: {
@@ -134,16 +135,18 @@ export async function getProductsByCategoryFromDB(
             active: true,
             OR: [
                 {
-                    metadata: {
-                        path: ["category"],
-                        string_contains: category,
-                    },
+                    category,
+                    // metadata: {
+                    //     path: ["category"],
+                    //     string_contains: category,
+                    // },
                 },
                 {
-                    metadata: {
-                        path: ["gender"],
-                        equals: category,
-                    },
+                    gender: category,
+                    // metadata: {
+                    //     path: ["gender"],
+                    //     equals: category,
+                    // },
                 },
             ],
         },
@@ -167,10 +170,11 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
     const products = await prisma.product.findMany({
         where: {
             active: true,
-            metadata: {
-                path: ["type"],
-                equals: "bundle",
-            },
+            type: "bundle",
+            // metadata: {
+            //     path: ["type"],
+            //     equals: "bundle",
+            // },
         },
         include: {
             prices: {

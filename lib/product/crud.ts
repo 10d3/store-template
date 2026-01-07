@@ -491,26 +491,30 @@ export async function listProducts(): Promise<StripeProduct[]> {
       expand: ["data.default_price"],
       limit: 100,
     });
-    // add the nutrition to the products while conserving the same structure
-    const productsWithNutrition = await Promise.all(
-      products.data.map(async (product) => {
-        const productNutrition = await prisma.productNutrition.findUnique({
-          where: {
-            productId: product.id,
-          },
-        });
-        // Ensure nutrition is always a string or excluded
-        const metadata = { ...product.metadata };
-        if (productNutrition?.nutrition) {
-          metadata.nutrition = productNutrition.nutrition;
-        }
 
-        return {
-          ...product,
-          metadata,
-        };
-      })
+    // Step 1: fetch all nutrition in a single query
+    const productIds = products.data.map((p) => p.id);
+    const nutritionData = await prisma.productNutrition.findMany({
+      where: { productId: { in: productIds } },
+    });
+
+    const nutritionMap = new Map(
+      nutritionData.map((n) => [n.productId, n.nutrition])
     );
+
+    // Step 2: merge nutrition into metadata
+    const productsWithNutrition = products.data.map((product) => {
+      const metadata = { ...product.metadata };
+      const nutrition = nutritionMap.get(product.id);
+      if (nutrition) metadata.nutrition = nutrition;
+
+      return {
+        ...product,
+        metadata,
+      };
+    });
+
+    // Step 3: transform to StripeProduct
     return productsWithNutrition.map(transformProduct);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -525,6 +529,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
     });
   }
 }
+
 
 export async function getProduct(slug: string) {
   try {
