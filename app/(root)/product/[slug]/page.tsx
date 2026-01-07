@@ -6,7 +6,7 @@ import SelectVariant from "@/components/shared/select-variant";
 import {
   Card,
   CardContent,
-  CardDescription,
+  // CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -18,14 +18,14 @@ import {
   getPack,
   getRelatedProducts,
 } from "@/lib/product/crud";
-import { getCachedProduct } from "@/lib/product/cache";
+import { getCachedProduct, transformPacksToProductData } from "@/lib/product/cache";
 import { Share2 } from "lucide-react";
 import { getBaseURL } from "@/lib/utils";
 import RelatedProducts from "@/components/shared/related-products";
 import { Button } from "@/components/ui/button";
 // import MediaGallery from "@/components/shared/media-gallery";
 import { PackCardNew } from "@/components/shared/product/product-card";
-import { transformPacksToProductData } from "@/lib/product/pack-transformer";
+// import { transformPacksToProductData } from "@/lib/product/pack-transformer";
 import WishlistButton from "@/components/shared/wishlist-button";
 import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { Markdown } from "@/components/shared/markdown";
@@ -151,16 +151,16 @@ export default async function page(props: {
   const packs = await getPack(variants[0]?.id as string);
 
   // Fetch related products, reviews, ratings, and all products for pack transformation in parallel
-  const [relatedProducts, reviews, ratingData, allProducts] = await Promise.all([
+  const [relatedProducts, reviews, ratingData,] = await Promise.all([
     getRelatedProducts(variants[0]?.id as string, 4),
     getReviewsByProductId(variants[0]?.id as string),
     getAverageRating(variants[0]?.id as string),
-    import("@/lib/product/crud").then(m => m.listProducts()),
+    // import("@/lib/product/stripe-product-test").then(m => m.listProductsFromDBCached()),
   ]);
   const { average: averageRating, count: reviewCount } = ratingData;
 
   // Transform packs using the new transformer
-  const packProductData = await transformPacksToProductData(packs, allProducts);
+  const packProductData = await transformPacksToProductData(packs);
 
   // console.log("packs from slug", packs);
   const mediaItems: MediaItem[] = [

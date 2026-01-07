@@ -1,6 +1,7 @@
 import "server-only";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import Link from "next/link";
+import Image from "next/image";
 
 // Define custom MDX components
 const mdxComponents = {
@@ -34,6 +35,9 @@ const mdxComponents = {
   ),
   li: (props: React.HTMLAttributes<HTMLLIElement>) => (
     <li className="ml-4" {...props} />
+  ),
+  img: (props: React.HTMLAttributes<HTMLImageElement>) => (
+    <img {...props} />
   ),
   // Line breaks for better text formatting
   br: () => <br className="my-2" />,

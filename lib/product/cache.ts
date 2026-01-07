@@ -2,7 +2,9 @@
 
 import { unstable_cache, revalidateTag } from "next/cache";
 import { listProducts as originalListProducts } from "./crud";
-import { listProductsFromDB } from "./db-queries";
+import { getProductsByIdsCached, listProductsFromDB } from "./db-queries";
+import { transformPackToProductData } from "./pack-transformer";
+import { ProductData, StripeProduct } from "@/types/product";
 
 // Flag to enable database reads (set to true after initial sync)
 const USE_DATABASE = true;
@@ -67,4 +69,30 @@ export async function getProductByCategory(slug: string) {
 
     return false;
   });
+}
+
+export async function transformPacksToProductData(
+  packs: StripeProduct[]
+): Promise<ProductData[]> {
+  const results: ProductData[] = [];
+
+  // Gather all content IDs from all packs
+  const contentIds = packs.flatMap((pack) =>
+    pack.metadata?.contents?.split(",").filter(Boolean) || []
+  );
+
+  // Fetch only the products actually referenced in packs
+  const relevantProducts = await getProductsByIdsCached(contentIds);
+
+  for (const pack of packs) {
+    const packContentIds = pack.metadata?.contents?.split(",").filter(Boolean) || [];
+    const baseProduct = packContentIds.length > 0
+      ? relevantProducts.find((p) => p.id === packContentIds[0])
+      : null;
+
+    const productData = transformPackToProductData(pack, baseProduct);
+    if (productData) results.push(productData);
+  }
+
+  return results;
 }

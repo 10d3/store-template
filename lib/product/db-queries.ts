@@ -189,3 +189,38 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
 
     return products.map(transformDbProduct);
 }
+
+
+const productCache = new Map<string, StripeProduct>();
+
+export async function getProductsByIdsCached(ids: string[]): Promise<StripeProduct[]> {
+    const result: StripeProduct[] = [];
+
+    const idsToFetch = ids.filter((id) => !productCache.has(id));
+
+    if (idsToFetch.length > 0) {
+        const productsFromDB = await prisma.product.findMany({
+            where: { id: { in: idsToFetch }, active: true },
+            include: {
+                prices: {
+                    where: { active: true },
+                    orderBy: { isDefault: "desc" },
+                    take: 1,
+                },
+            },
+        });
+
+        for (const prod of productsFromDB) {
+            const transformed = transformDbProduct(prod);
+            productCache.set(prod.id, transformed);
+        }
+    }
+
+    // Return products in the same order as ids
+    for (const id of ids) {
+        const cached = productCache.get(id);
+        if (cached) result.push(cached);
+    }
+
+    return result;
+}
