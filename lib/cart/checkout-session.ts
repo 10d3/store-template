@@ -82,9 +82,13 @@ export async function createCheckoutSessionNow(product: CartItem) {
     price_data: {
       currency: "usd",
       product_data: {
-        id: product.id,
         name: product.name,
         images: [product?.image as string],
+        // Remove the 'id' field - it's not allowed here
+        // Optionally add metadata to track your internal product ID
+        metadata: {
+          product_id: product.id
+        }
       },
       unit_amount: product.price
     },
@@ -100,7 +104,6 @@ export async function createCheckoutSessionNow(product: CartItem) {
     cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
     metadata: {
       userId: session.user.id,
-      // Optional: add more metadata if needed
       line_items: JSON.stringify(line_items),
       referralCode
     },
