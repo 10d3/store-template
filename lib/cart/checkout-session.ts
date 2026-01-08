@@ -57,7 +57,7 @@ export async function createCheckoutSession(cart: CartItem[]) {
     ],
     mode: "payment",
     success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
     metadata: {
       userId: session.user.id,
       // Optional: add more metadata if needed
@@ -101,7 +101,7 @@ export async function createCheckoutSessionNow(product: CartItem) {
     line_items: [line_items],
     mode: "payment",
     success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
     metadata: {
       userId: session.user.id,
       line_items: JSON.stringify(line_items),
