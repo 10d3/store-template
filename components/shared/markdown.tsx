@@ -36,8 +36,17 @@ const mdxComponents = {
   li: (props: React.HTMLAttributes<HTMLLIElement>) => (
     <li className="ml-4" {...props} />
   ),
-  img: (props: React.HTMLAttributes<HTMLImageElement>) => (
-    <img {...props} />
+  img: (props: any) => (
+    <div className="my-8 flex justify-center">
+      <Image
+        src={props.src || ""}
+        alt={props.alt || "Product image"}
+        width={800} // Set a default width
+        height={450} // Set a default height
+        className="rounded-lg shadow-md"
+        style={{ maxWidth: "100%", height: "auto" }}
+      />
+    </div>
   ),
   // Line breaks for better text formatting
   br: () => <br className="my-2" />,

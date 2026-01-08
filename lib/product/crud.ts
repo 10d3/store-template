@@ -217,6 +217,24 @@ export async function updateProduct(
   }
 }
 
+export async function unarchiveProduct(id: string) {
+  try {
+    const product = await stripe.products.update(id, { active: true });
+    return transformProduct(product);
+  } catch (error) {
+    if (error instanceof Stripe.errors.StripeError) {
+      throw new ProductCrudError(
+        `Stripe error: ${error.message}`,
+        "STRIPE_ERROR",
+        { stripeError: error }
+      );
+    }
+    throw new ProductCrudError("Failed to archive product", "UNKNOWN_ERROR", {
+      originalError: error,
+    });
+  }
+}
+
 export async function archiveProduct(id: string) {
   try {
     const product = await stripe.products.update(id, { active: false });

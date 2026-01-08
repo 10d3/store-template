@@ -11,6 +11,7 @@ import {
     archiveProduct,
     listProducts,
     listCoupons,
+    unarchiveProduct,
 } from "@/lib/product/crud"
 import { toast } from "sonner"
 import ProductForm from "../../_components/form/product-form"
@@ -78,6 +79,18 @@ export default function ProductManagementPage() {
         },
     })
 
+    const { mutate: handleUnarchiveProduct } = useMutation({
+        mutationFn: unarchiveProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] })
+            toast.success("Product unarchived successfully")
+        },
+        onError: (error) => {
+            toast.error("Failed to unarchive product")
+            console.error(error)
+        },
+    })
+
     const onProductSubmit = (data: ProductFormData) => {
         if (editingProduct) {
             handleUpdateProduct({ id: editingProduct.id, data })
@@ -126,6 +139,7 @@ export default function ProductManagementPage() {
                     products={products || []}
                     onEdit={onEditProduct}
                     onArchive={handleArchiveProduct}
+                    onUnarchive={handleUnarchiveProduct}
                     isLoading={creatingProduct || updatingProduct}
                     title="Product List"
                     description="Manage your individual products here"

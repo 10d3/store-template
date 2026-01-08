@@ -7,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Archive } from "lucide-react";
 import { StripeProduct } from "@/types/product";
+import { PiRoadHorizon } from "react-icons/pi";
 
 interface ProductOnlyListProps {
   products: StripeProduct[];
   onEdit: (product: StripeProduct) => void;
   onArchive: (id: string) => void;
+  onUnarchive: (id: string) => void;
   isLoading?: boolean;
   title?: string;
   description?: string;
@@ -21,6 +23,7 @@ export function ProductOnlyList({
   products,
   onEdit,
   onArchive,
+  onUnarchive,
   isLoading,
   title = "Products",
   description,
@@ -31,6 +34,15 @@ export function ProductOnlyList({
     setArchivingId(id);
     try {
       await onArchive(id);
+    } finally {
+      setArchivingId(null);
+    }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    setArchivingId(id);
+    try {
+      await onUnarchive(id);
     } finally {
       setArchivingId(null);
     }
@@ -100,6 +112,14 @@ export function ProductOnlyList({
                   >
                     <Archive className="h-4 w-4" />
                   </Button>
+                  {/* <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleUnarchive(product.id)}
+                    disabled={archivingId === product.id || isLoading}
+                  >
+                    <PiRoadHorizon className="h-4 w-4" />
+                  </Button> */}
                 </div>
               </div>
             ))

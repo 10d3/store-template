@@ -3,7 +3,7 @@ import { createCheckoutSessionNow } from "@/lib/cart/checkout-session";
 import { Button } from "../ui/button";
 import { useCartStore } from "@/lib/store";
 import { StripeProduct } from "@/types/product";
-import { ShoppingCart } from "lucide-react";
+import { CreditCard, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 
 export default function BuyNowButton({
@@ -56,7 +56,7 @@ export default function BuyNowButton({
                     </div>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <ShoppingCart className="w-5 h-5" />
+                        <CreditCard className="w-5 h-5" />
                         <h3>Buy now</h3>
                     </div>
                 )}

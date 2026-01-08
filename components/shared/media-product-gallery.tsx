@@ -18,7 +18,7 @@ export default function MediaProductGallery({
   return (
     <div
       className={cn(
-        "w-full flex flex-col-reverse md:flex-row gap-4 md:max-h-[48rem]",
+        "w-full flex flex-col-reverse md:flex-row gap-4 md:max-h-[38rem]",
         className
       )}
     >
@@ -34,7 +34,7 @@ export default function MediaProductGallery({
       </Card>
 
       {/* Thumbnail Navigation */}
-      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-32 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[48rem] pb-2 md:pb-0 items-center justify-center">
+      <div className="flex flex-row md:flex-col gap-2 md:gap-4 md:w-24 lg:w-24 order-1 md:order-2 overflow-x-auto md:overflow-y-auto md:max-h-[38rem] pb-2 md:pb-0 items-center justify-center">
         {images.map((image, index) => (
           <Card
             key={index}
