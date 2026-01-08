@@ -1,8 +1,9 @@
 import { cn, formatPrice } from "@/lib/utils";
 import { StripeProduct } from "@/types/product";
 // import { MainProductImage } from "@/ui/products/main-product-image";
-import AddToCartButton from "./add-to-cart-button";
+// import AddToCartButton from "./add-to-cart-button";
 import Image from "next/image";
+import BuyNowButton from "./buy-now-button";
 
 export const ProductBottomStickyCard = ({
   product,
@@ -56,9 +57,9 @@ export const ProductBottomStickyCard = ({
           </div>
         </div>
 
-        <AddToCartButton
+        <BuyNowButton
           product={product}
-          //   className="px-3 text-sm sm:text-lg sm:px-8 shrink-0 h-9 sm:h-10"
+        //   className="px-3 text-sm sm:text-lg sm:px-8 shrink-0 h-9 sm:h-10"
         />
       </div>
     </div>

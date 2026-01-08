@@ -37,6 +37,7 @@ import StarRating from "@/components/shared/star-rating";
 import ReviewList from "@/components/shared/review-list";
 import ReviewSection from "@/components/shared/review-section-wrapper";
 import type { Metadata } from "next";
+import BuyNowButton from "@/components/shared/buy-now-button";
 
 // Generate metadata for SEO and OG
 // Helper to strip markdown formatting
@@ -285,7 +286,8 @@ export default async function page(props: {
                 )}
               </Card>
             </div>
-            <div className="mt-6 md:hidden">
+            <div className="mt-6 md:hidden grid gap-2">
+              <BuyNowButton product={variants[0]} />
               <AddToCartButton product={variants[0]} />
             </div>
 
@@ -427,7 +429,8 @@ export default async function page(props: {
               </div>
 
               {/* Add to Cart */}
-              <div className="mt-6 hidden md:block">
+              <div className="mt-6 hidden md:grid grid-cols-2 gap-4">
+                <BuyNowButton product={variants[0]} />
                 <AddToCartButton product={variants[0]} />
               </div>
 

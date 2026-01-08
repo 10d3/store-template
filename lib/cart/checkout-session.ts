@@ -68,3 +68,43 @@ export async function createCheckoutSession(cart: CartItem[]) {
 
   return sessionStripe.url;
 }
+
+export async function createCheckoutSessionNow(product: CartItem) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    throw new Error("No session found");
+  }
+  const cookiesStore = await cookies();
+  const referralCode = cookiesStore.get("referral_code")?.value || null;
+  console.log(referralCode)
+
+  const line_items = {
+    price_data: {
+      currency: "usd",
+      product_data: {
+        id: product.id,
+        name: product.name,
+        images: [product?.image as string],
+      },
+      unit_amount: product.price
+    },
+    quantity: product.quantity,
+  }
+
+  const sessionStripe = await stripeClient.checkout.sessions.create({
+    payment_method_types: ["card", "link", "sepa_debit"],
+    customer: session.user.stripeCustomerId as string,
+    line_items: [line_items],
+    mode: "payment",
+    success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
+    metadata: {
+      userId: session.user.id,
+      // Optional: add more metadata if needed
+      line_items: JSON.stringify(line_items),
+      referralCode
+    },
+  });
+
+  return sessionStripe.url;
+}

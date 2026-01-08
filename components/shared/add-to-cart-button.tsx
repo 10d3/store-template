@@ -42,17 +42,17 @@ export default function AddToCartButton({
       <Button
         onClick={handleAddToCart}
         disabled={isAddingToCart}
-        className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-full py-3 shadow-lg hover:shadow-xl transition-all duration-300"
       >
         {isAddingToCart ? (
           <div className="flex items-center gap-2">
+            <h3>Adding to Cart</h3>
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Adding to Cart...
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
-            Add to Cart
+            <h3>Add to Cart</h3>
           </div>
         )}
       </Button>
