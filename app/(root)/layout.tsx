@@ -11,10 +11,26 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "Vitanou Store",
-  description: "",
-  keywords: [],
-  creator: ""
+  title: "Vitanou | Supplements for a Grounded Life",
+  description: "Holistic health for body and mind. Clean formulas to restore your inner connection. Honesty, purity, and vitality in every dose.",
+  keywords: [
+    "holistic wellness supplements",
+    "clean label vitamins",
+    "grounded living health",
+    "mind-body balance formulas",
+    "transparent ingredient supplements",
+    "restorative health vitamins",
+    "additive-free supplements",
+    "natural vitality boosters",
+    "ethical supplement brands",
+    "inner connection wellness",
+    "high-potency clean formulas",
+    "natural stress relief grounding",
+    "bioavailable plant-based vitamins",
+    "mental clarity supplements",
+    "sustainable health products"
+  ],
+  creator: "Dr Ricardo Roselyn"
 };
 
 export default async function Rootlayout({

@@ -12,17 +12,50 @@ import { StoryText } from "@/components/shared/story-text";
 import { Newsletter } from "@/components/shared/newsletter";
 
 export const metadata: Metadata = {
-  title: "Shop Premium Products | Our Store",
-  description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles with fast shipping.",
+  title: "Vitanou | Supplements for a Grounded Life",
+  description: "Holistic health for body and mind. Clean formulas to restore your inner connection. Honesty, purity, and vitality in every dose.",
+  keywords: [
+    "holistic wellness supplements",
+    "clean label vitamins",
+    "grounded living health",
+    "mind-body balance formulas",
+    "transparent ingredient supplements",
+    "restorative health vitamins",
+    "additive-free supplements",
+    "natural vitality boosters",
+    "ethical supplement brands",
+    "inner connection wellness",
+    "high-potency clean formulas",
+    "natural stress relief grounding",
+    "bioavailable plant-based vitamins",
+    "mental clarity supplements",
+    "sustainable health products"
+  ],
   openGraph: {
-    title: "Shop Premium Products | Our Store",
-    description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles.",
+    title: "Vitanou | Supplements for a Grounded Life",
+    description: "Holistic health for body and mind. Clean formulas to restore your inner connection. Honesty, purity, and vitality in every dose.",
+    images: [
+      {
+        url: "https://l2yvnapk4q.ufs.sh/f/RXG69DWav8dt0e0vAXM1pQSnwjcmdFTY5oKgAlu943z7hRfe",
+        width: 1200,
+        height: 630,
+        alt: "Vitanou | Supplements for a Grounded Life",
+      },
+    ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shop Premium Products | Our Store",
-    description: "Discover our curated collection of premium products. Shop the latest arrivals, best sellers, and exclusive bundles.",
+    title: "Vitanou | Supplements for a Grounded Life",
+    description: "Holistic health for body and mind. Clean formulas to restore your inner connection. Honesty, purity, and vitality in every dose.",
+    images: [
+      {
+        url: "https://l2yvnapk4q.ufs.sh/f/RXG69DWav8dt0e0vAXM1pQSnwjcmdFTY5oKgAlu943z7hRfe",
+        width: 1200,
+        height: 630,
+        alt: "Vitanou | Supplements for a Grounded Life",
+      },
+    ],
   },
 };
 
