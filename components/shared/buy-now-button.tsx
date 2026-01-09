@@ -1,10 +1,10 @@
 "use client";
 import { createCheckoutSessionNow } from "@/lib/cart/checkout-session";
 import { Button } from "../ui/button";
-import { useCartStore } from "@/lib/store";
 import { StripeProduct } from "@/types/product";
-import { CreditCard, ShoppingCart } from "lucide-react";
+import { CreditCard } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function BuyNowButton({
     product,
@@ -36,10 +36,16 @@ export default function BuyNowButton({
     }
 
     const generateStripeLink = async () => {
-        setLoading(true);
-        const session = await createCheckoutSessionNow(transformProductDatatoCartItem(product));
-        setLoading(false);
-        window.location.href = session as string;
+        try {
+            setLoading(true);
+            const session = await createCheckoutSessionNow(transformProductDatatoCartItem(product));
+            setLoading(false);
+            window.location.href = session as string;
+        } catch (error) {
+            toast.error("You need to login to buy this product");
+            console.error("Error creating checkout session:", error);
+            setLoading(false);
+        }
     }
 
     return (
@@ -47,7 +53,7 @@ export default function BuyNowButton({
             <Button
                 onClick={generateStripeLink}
                 disabled={loading}
-                className="w-full py-4 bg-green-500 hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full py-5 bg-green-500 hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300"
             >
                 {loading ? (
                     <div className="flex items-center gap-2">

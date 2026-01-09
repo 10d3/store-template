@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { createCheckoutSession } from "@/lib/cart/checkout-session";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function CartModal() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,10 +17,16 @@ export default function CartModal() {
   const router = useRouter();
 
   const createCheckoutUrl = async () => {
-    setIsLoading(true);
-    const session = await createCheckoutSession(cart);
-    router.push(session as string);
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const session = await createCheckoutSession(cart);
+      router.push(session as string);
+      setIsLoading(false);
+    } catch (error) {
+      toast.error("You need to login to buy this product");
+      console.error("Error creating checkout session:", error);
+      setIsLoading(false);
+    }
   };
   // const stripeCheckoutSession = useQuery({
   //   queryKey: ["stripe-checkout-session"],

@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { prisma } from "../prisma";
 import type { StripeProduct } from "@/types/product";
 
@@ -55,7 +56,7 @@ function transformDbProduct(dbProduct: {
 /**
  * List all active products
  */
-export async function listProductsFromDB(): Promise<StripeProduct[]> {
+export const listProductsFromDB = cache(async (): Promise<StripeProduct[]> => {
     const products = await prisma.product.findMany({
         where: { active: true },
         include: {
@@ -70,14 +71,14 @@ export async function listProductsFromDB(): Promise<StripeProduct[]> {
     });
 
     return products.map(transformDbProduct);
-}
+});
 
 /**
  * Get products by slug
  */
-export async function getProductBySlugFromDB(
+export const getProductBySlugFromDB = cache(async (
     slug: string
-): Promise<StripeProduct[]> {
+): Promise<StripeProduct[]> => {
     const products = await prisma.product.findMany({
         where: {
             active: true,
@@ -98,7 +99,7 @@ export async function getProductBySlugFromDB(
     });
 
     return products.map(transformDbProduct);
-}
+});
 
 /**
  * Get products by IDs

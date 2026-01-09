@@ -14,14 +14,14 @@ import {
 // import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import {
-  getPack,
-  getRelatedProducts,
-} from "@/lib/product/crud";
-import { getCachedProduct, transformPacksToProductData } from "@/lib/product/cache";
+// import {
+//   getPack,
+//   getRelatedProducts,
+// } from "@/lib/product/crud";
+import { transformPacksToProductData } from "@/lib/product/cache";
 import { Share2 } from "lucide-react";
 import { getBaseURL } from "@/lib/utils";
-import RelatedProducts from "@/components/shared/related-products";
+// import RelatedProducts from "@/components/shared/related-products";
 import { Button } from "@/components/ui/button";
 // import MediaGallery from "@/components/shared/media-gallery";
 import { PackCardNew } from "@/components/shared/product/product-card";
@@ -34,10 +34,16 @@ import { MarkdownNutrition } from "@/components/shared/nutrition-label";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
 import { getReviewsByProductId, getAverageRating } from "@/lib/review/crud";
 import StarRating from "@/components/shared/star-rating";
-import ReviewList from "@/components/shared/review-list";
-import ReviewSection from "@/components/shared/review-section-wrapper";
+// import ReviewList from "@/components/shared/review-list";
+// import ReviewSection from "@/components/shared/review-section-wrapper";
 import type { Metadata } from "next";
 import BuyNowButton from "@/components/shared/buy-now-button";
+import BadgeTrust from "@/components/shared/badge";
+import ReviewsClient from "@/components/shared/review-client";
+import RelatedProductsClient from "@/components/shared/related-product-client";
+import { getPack } from "@/lib/product/bundle-index";
+import { getRelatedProducts } from "@/lib/product/related-index";
+import { getCachedProduct } from "@/lib/product/test-index-product";
 
 // Generate metadata for SEO and OG
 // Helper to strip markdown formatting
@@ -149,59 +155,62 @@ export default async function page(props: {
   );
   // const selectedVariant = selectedVariants[0];
 
-  const packs = await getPack(variants[0]?.id as string);
+  const packsPromise = getPack(variants[0].id);
 
-  // Fetch related products, reviews, ratings, and all products for pack transformation in parallel
-  const [relatedProducts, reviews, ratingData,] = await Promise.all([
-    getRelatedProducts(variants[0]?.id as string, 4),
-    getReviewsByProductId(variants[0]?.id as string),
-    getAverageRating(variants[0]?.id as string),
-    // import("@/lib/product/stripe-product-test").then(m => m.listProductsFromDBCached()),
+  const [relatedProducts, reviews, ratingData, packs] = await Promise.all([
+    getRelatedProducts(variants[0].id, 4),
+    getReviewsByProductId(variants[0].id),
+    getAverageRating(variants[0].id),
+    packsPromise,
   ]);
+
+  const packProductData =
+    packs.length > 0 ? await transformPacksToProductData(packs) : [];
+
+
   const { average: averageRating, count: reviewCount } = ratingData;
 
-  // Transform packs using the new transformer
-  const packProductData = await transformPacksToProductData(packs);
-
   // console.log("packs from slug", packs);
-  const mediaItems: MediaItem[] = [
-    {
-      id: "1",
-      type: "image",
-      src: (variants[0]?.images?.[0] as string) || "",
-      alt: "Product image 1",
-      title: "Main product view",
-    },
-    {
-      id: "2",
-      type: "image",
-      src: (variants[0].images?.[1] as string) || "",
-      thumbnail: (variants[0].images?.[1] as string) || "",
-      alt: "Product demo video",
-      title: "Product demonstration",
-    },
-    {
-      id: "3",
-      type: "image",
-      src: (variants[0]?.images?.[2] as string) || "",
-      alt: "Product image 2",
-      title: "Detail view",
-    },
-    {
-      id: "4",
-      type: "image",
-      src: (variants[0]?.images?.[3] as string) || "",
-      alt: "Product image 4",
-      title: "Usage example",
-    },
-    {
-      id: "5",
-      type: "image",
-      src: (variants[0]?.images?.[4] as string) || "",
-      alt: "product image 5",
-      title: " benefit"
-    }
-  ];
+  // const mediaItems: MediaItem[] = [
+  //   {
+  //     id: "1",
+  //     type: "image",
+  //     src: (variants[0]?.images?.[0] as string) || "",
+  //     alt: "Product image 1",
+  //     title: "Main product view",
+  //   },
+  //   {
+  //     id: "2",
+  //     type: "image",
+  //     src: (variants[0].images?.[1] as string) || "",
+  //     thumbnail: (variants[0].images?.[1] as string) || "",
+  //     alt: "Product demo video",
+  //     title: "Product demonstration",
+  //   },
+  //   {
+  //     id: "3",
+  //     type: "image",
+  //     src: (variants[0]?.images?.[2] as string) || "",
+  //     alt: "Product image 2",
+  //     title: "Detail view",
+  //   },
+  //   {
+  //     id: "4",
+  //     type: "image",
+  //     src: (variants[0]?.images?.[3] as string) || "",
+  //     alt: "Product image 4",
+  //     title: "Usage example",
+  //   },
+  //   {
+  //     id: "5",
+  //     type: "image",
+  //     src: (variants[0]?.images?.[4] as string) || "",
+  //     alt: "product image 5",
+  //     title: " benefit"
+  //   }
+  // ];
+
+  const images = variants[0].images?.slice(0, 5) ?? [];
 
   // const getGridPosition = (index: number) => {
   //   const positions = [
@@ -222,7 +231,8 @@ export default async function page(props: {
             <div className="relative">
               <MediaProductGallery
                 // variant="default"
-                images={mediaItems.map((item) => item.src)}
+                // images={mediaItems.map((item) => item.src)}
+                images={images}
               // mediaItems={mediaItems}
               // getGridPosition={getGridPosition}
               />
@@ -290,6 +300,7 @@ export default async function page(props: {
               <BuyNowButton product={variants[0]} />
               <AddToCartButton product={variants[0]} />
             </div>
+            <BadgeTrust className="md:hidden" />
 
             {/* Product Description */}
             <div className="space-y-6">
@@ -317,11 +328,12 @@ export default async function page(props: {
               {relatedProducts.length > 0 && (
                 <div className="space-y-4">
                   <h2 className="text-2xl font-semibold">You May Also Like</h2>
-                  <RelatedProducts
+                  {/* <RelatedProducts
                     products={relatedProducts}
                     title=""
                     className="py-0"
-                  />
+                  /> */}
+                  <RelatedProductsClient products={relatedProducts} />
                 </div>
               )}
 
@@ -358,9 +370,11 @@ export default async function page(props: {
                   </div>
                 </div>
 
-                <ReviewSection productId={variants[0]?.id as string} />
+                <ReviewsClient productId={variants[0]?.id as string} reviews={reviews} />
 
-                <ReviewList reviews={reviews} />
+                {/* <ReviewSection productId={variants[0]?.id as string} />
+
+                <ReviewList reviews={reviews} /> */}
               </div>
             </div>
           </div>
@@ -433,8 +447,7 @@ export default async function page(props: {
                 <BuyNowButton product={variants[0]} />
                 <AddToCartButton product={variants[0]} />
               </div>
-
-
+              <BadgeTrust className="hidden md:block" />
             </div>
           </div>
         </div>

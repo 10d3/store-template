@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 
 export interface ReviewData {
     userId: string;
@@ -73,9 +73,9 @@ export async function createReview(data: ReviewData) {
 /**
  * Get all reviews for a product
  */
-export async function getReviewsByProductId(
+export const getReviewsByProductId = unstable_cache(async (
     productId: string
-): Promise<ReviewWithUser[]> {
+): Promise<ReviewWithUser[]> => {
     const reviews = await prisma.review.findMany({
         where: { productId },
         include: {
@@ -93,14 +93,17 @@ export async function getReviewsByProductId(
     });
 
     return reviews;
-}
+},
+    ["reviews"],
+    { revalidate: 60 * 60 }, // 1 hour
+);
 
 /**
  * Get average rating for a product
  */
-export async function getAverageRating(
+export const getAverageRating = unstable_cache(async (
     productId: string
-): Promise<{ average: number; count: number }> {
+): Promise<{ average: number; count: number }> => {
     const result = await prisma.review.aggregate({
         where: { productId },
         _avg: { rating: true },
@@ -111,7 +114,10 @@ export async function getAverageRating(
         average: result._avg.rating ?? 0,
         count: result._count.rating,
     };
-}
+},
+    ["reviews"],
+    { revalidate: 60 * 60 }, // 1 hour
+);
 
 /**
  * Delete a review (only by owner)
