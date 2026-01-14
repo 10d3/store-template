@@ -20,7 +20,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                     <p className="text-gray-600 mb-4">
                         Sign in to leave a review
                     </p>
-                    <Link href="/sign-in">
+                    <Link href="/login">
                         <Button variant="outline">Sign In</Button>
                     </Link>
                 </CardContent>
