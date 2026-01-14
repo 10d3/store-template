@@ -50,7 +50,7 @@ export default async function AffiliateProgramPage() {
     return (
         <div className="container py-12 md:py-24 max-w-4xl mx-auto space-y-12">
             <div className="text-center space-y-6">
-                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+                <h1 className="text-3xl md:text-7xl font-light mb-4 font-serif tracking-tight text-balance">
                     Partner with <span className="text-primary">Vitanou</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -61,22 +61,22 @@ export default async function AffiliateProgramPage() {
                 <div className="flex justify-center gap-4">
                     {isAffiliate ? (
                         affiliateStatus === "ACTIVE" ? (
-                            <Button size="lg" asChild>
+                            <Button size="lg" asChild className="bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80">
                                 <Link href="/affiliation">Go to Dashboard</Link>
                             </Button>
                         ) : (
-                            <Button size="lg" variant="secondary" disabled>
+                            <Button size="lg" variant="secondary" disabled className="bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80" >
                                 Application {affiliateStatus}
                             </Button>
                         )
                     ) : user ? (
                         <JoinAffiliateModal userEmail={user.email}>
-                            <Button size="lg" className="px-8">
+                            <Button size="lg" className="px-8 bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80">
                                 Apply Now
                             </Button>
                         </JoinAffiliateModal>
                     ) : (
-                        <Button size="lg" asChild>
+                        <Button size="lg" asChild className="bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80">
                             <Link href="/login?callbackUrl=/affiliate-program">
                                 Sign in to Apply
                             </Link>

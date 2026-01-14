@@ -36,7 +36,7 @@ const links = [
 
 export default function FooterSection() {
     return (
-        <footer className="mt-20">
+        <footer className="mt-10 md:mt-20">
             <div className="mx-auto max-w-5xl px-6">
                 <Link
                     href="/"
