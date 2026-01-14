@@ -69,7 +69,7 @@ export function Newsletter({
                         <Button
                             type="submit"
                             disabled={status === "loading"}
-                            className="h-12 px-8 rounded-full"
+                            className="h-12 px-8 rounded-full bg-[#063354] dark:bg-white hover:bg-[#063354]/90 dark:hover:bg-white/90"
                         >
                             {status === "loading" ? "Subscribing..." : "Subscribe"}
                         </Button>

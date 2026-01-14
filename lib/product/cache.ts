@@ -5,6 +5,8 @@ import { listProducts as originalListProducts } from "./crud";
 import { getProductsByIdsCached, listProductsFromDB } from "./db-queries";
 import { transformPackToProductData } from "./pack-transformer";
 import { ProductData, StripeProduct } from "@/types/product";
+import { prisma } from "../prisma";
+import { transformDbProduct } from "../utils";
 
 // Flag to enable database reads (set to true after initial sync)
 const USE_DATABASE = true;
@@ -70,6 +72,28 @@ export async function getProductByCategory(slug: string) {
     return false;
   });
 }
+
+export const getPackBySlug = unstable_cache(async (slug: string) => {
+  const pack = await prisma.product.findUnique({
+    where: {
+      slug
+    },
+    // 1. Fetch the related prices so the types match
+    include: {
+      prices: true,
+      // nutrition: true, // Include this too if your transformer needs it
+    }
+  });
+
+  // 2. Handle the case where the product wasn't found
+  if (!pack) {
+    return null;
+    // or: throw new Error("Product not found");
+  }
+
+  // Now 'pack' is guaranteed to be non-null and have 'prices'
+  return transformDbProduct(pack);
+})
 
 export async function transformPacksToProductData(
   packs: StripeProduct[]

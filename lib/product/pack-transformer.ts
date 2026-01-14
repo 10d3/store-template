@@ -156,6 +156,7 @@ export function transformPackToProductData(
         description: pack.description || "",
         // Default image (first enabled size's image or fallback)
         image: defaultImage,
+        slug: pack.slug || "",
         images: imagesPerSize,
         imageAlt: pack.name,
         packOptions,

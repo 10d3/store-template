@@ -3,55 +3,56 @@
 import { cache } from "react";
 import { prisma } from "../prisma";
 import type { StripeProduct } from "@/types/product";
+import { transformDbProduct } from "../utils";
 
 /**
  * Transform database product to StripeProduct interface
  * Keeps compatibility with existing StripeProduct consumers
  */
-function transformDbProduct(dbProduct: {
-    id: string;
-    name: string;
-    description: string | null;
-    images: string[];
-    active: boolean;
-    metadata: unknown;
-    prices: {
-        id: string;
-        unitAmount: number;
-        currency: string;
-        isDefault: boolean;
-    }[];
-    nutrition?: { nutrition: string } | null;
-}): StripeProduct {
-    const baseMetadata =
-        (dbProduct.metadata as Record<string, string>) ?? {};
+// function transformDbProduct(dbProduct: {
+//     id: string;
+//     name: string;
+//     description: string | null;
+//     images: string[];
+//     active: boolean;
+//     metadata: unknown;
+//     prices: {
+//         id: string;
+//         unitAmount: number;
+//         currency: string;
+//         isDefault: boolean;
+//     }[];
+//     nutrition?: { nutrition: string } | null;
+// }): StripeProduct {
+//     const baseMetadata =
+//         (dbProduct.metadata as Record<string, string>) ?? {};
 
-    const metadata = {
-        ...baseMetadata,
-        ...(dbProduct.nutrition?.nutrition && {
-            nutrition: dbProduct.nutrition.nutrition,
-        }),
-    };
+//     const metadata = {
+//         ...baseMetadata,
+//         ...(dbProduct.nutrition?.nutrition && {
+//             nutrition: dbProduct.nutrition.nutrition,
+//         }),
+//     };
 
-    const defaultPrice =
-        dbProduct.prices.find((p) => p.isDefault) ?? dbProduct.prices[0];
+//     const defaultPrice =
+//         dbProduct.prices.find((p) => p.isDefault) ?? dbProduct.prices[0];
 
-    return {
-        id: dbProduct.id,
-        name: dbProduct.name,
-        description: dbProduct.description,
-        images: dbProduct.images,
-        active: dbProduct.active,
-        metadata,
-        default_price: defaultPrice
-            ? {
-                id: defaultPrice.id,
-                unit_amount: defaultPrice.unitAmount,
-                currency: defaultPrice.currency,
-            }
-            : null,
-    };
-}
+//     return {
+//         id: dbProduct.id,
+//         name: dbProduct.name,
+//         description: dbProduct.description,
+//         images: dbProduct.images,
+//         active: dbProduct.active,
+//         metadata,
+//         default_price: defaultPrice
+//             ? {
+//                 id: defaultPrice.id,
+//                 unit_amount: defaultPrice.unitAmount,
+//                 currency: defaultPrice.currency,
+//             }
+//             : null,
+//     };
+// }
 
 /**
  * List all active products

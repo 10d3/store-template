@@ -3,6 +3,7 @@ export interface StripeProduct {
   name: string;
   description?: string | null;
   images?: string[];
+  slug?: string
   metadata: Record<string, string>;
   default_price?:
   | {
@@ -71,6 +72,7 @@ export interface ProductData {
   id: string
   name: string
   description: string
+  slug: string
   image: string // Default/fallback image
   images: Record<string, string> // Images per pack size, keyed by size (e.g., "2", "3")
   imageAlt: string

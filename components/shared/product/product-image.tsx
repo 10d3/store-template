@@ -22,8 +22,8 @@ export function ProductImage({ src, alt, savings, className = "" }: ProductImage
         className="w-full h-auto object-contain rounded-xl"
       />
       <Badge
-        variant="secondary"
-        className="absolute -top-2 right-8 bg-foreground text-background hover:bg-foreground/90 font-medium rounded-xl"
+        // variant="secondary"
+        className="absolute -top-2 right-8 bg-[#73BF44] text-primary-foreground [a&]:hover:bg-[#73BF44]/90 font-medium rounded-xl"
       >
         {savings}% OFF
       </Badge>

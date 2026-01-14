@@ -44,7 +44,7 @@ model Product {
   description String?  @db.Text
   images      String[] // Array of image URLs
   active      Boolean  @default(true)
-  slug        String?
+  slug        String?  @unique
   category    String?
   type        String?
   gender      String?
@@ -97,15 +97,17 @@ model ProductNutrition {
 }
 
 model Review {
-  id          String   @id
+  id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId   String
   rating      Float
   comment     String?
   otherRating Json?
-  createdAt   DateTime
-  updatedAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, userId])
 }
 
 model Order {
@@ -134,7 +136,7 @@ model Wishlist {
 }
 
 model User {
-  id            String     @id
+  id            String     @id @default(cuid())
   name          String
   email         String
   emailVerified Boolean

@@ -25614,6 +25614,7 @@ export namespace Prisma {
 
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    slug?: string
     AND?: ProductWhereInput | ProductWhereInput[]
     OR?: ProductWhereInput[]
     NOT?: ProductWhereInput | ProductWhereInput[]
@@ -25621,7 +25622,6 @@ export namespace Prisma {
     description?: StringNullableFilter<"Product"> | string | null
     images?: StringNullableListFilter<"Product">
     active?: BoolFilter<"Product"> | boolean
-    slug?: StringNullableFilter<"Product"> | string | null
     category?: StringNullableFilter<"Product"> | string | null
     type?: StringNullableFilter<"Product"> | string | null
     gender?: StringNullableFilter<"Product"> | string | null
@@ -25630,7 +25630,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     prices?: PriceListRelationFilter
     nutrition?: XOR<ProductNutritionNullableScalarRelationFilter, ProductNutritionWhereInput> | null
-  }, "id">
+  }, "id" | "slug">
 
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder
@@ -25814,6 +25814,7 @@ export namespace Prisma {
 
   export type ReviewWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    productId_userId?: ReviewProductIdUserIdCompoundUniqueInput
     AND?: ReviewWhereInput | ReviewWhereInput[]
     OR?: ReviewWhereInput[]
     NOT?: ReviewWhereInput | ReviewWhereInput[]
@@ -25825,7 +25826,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Review"> | Date | string
     updatedAt?: DateTimeFilter<"Review"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "productId_userId">
 
   export type ReviewOrderByWithAggregationInput = {
     id?: SortOrder
@@ -27394,25 +27395,25 @@ export namespace Prisma {
   }
 
   export type ReviewCreateInput = {
-    id: string
+    id?: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutReviewsInput
   }
 
   export type ReviewUncheckedCreateInput = {
-    id: string
+    id?: string
     userId: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ReviewUpdateInput = {
@@ -27438,14 +27439,14 @@ export namespace Prisma {
   }
 
   export type ReviewCreateManyInput = {
-    id: string
+    id?: string
     userId: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ReviewUpdateManyMutationInput = {
@@ -27613,7 +27614,7 @@ export namespace Prisma {
   }
 
   export type UserCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -27637,7 +27638,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -27709,7 +27710,7 @@ export namespace Prisma {
   }
 
   export type UserCreateManyInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -29195,6 +29196,11 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type ReviewProductIdUserIdCompoundUniqueInput = {
+    productId: string
+    userId: string
   }
 
   export type ReviewCountOrderByAggregateInput = {
@@ -31703,7 +31709,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutBlogInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -31726,7 +31732,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutBlogInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32191,7 +32197,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutReviewsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32214,7 +32220,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutReviewsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32299,7 +32305,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutOrdersInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32322,7 +32328,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutOrdersInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32407,7 +32413,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutWishlistInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32430,7 +32436,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutWishlistInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -32621,23 +32627,23 @@ export namespace Prisma {
   }
 
   export type ReviewCreateWithoutUserInput = {
-    id: string
+    id?: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ReviewUncheckedCreateWithoutUserInput = {
-    id: string
+    id?: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ReviewCreateOrConnectWithoutUserInput = {
@@ -33195,7 +33201,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutSessionsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -33218,7 +33224,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -33303,7 +33309,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutAccountsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -33326,7 +33332,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -33411,7 +33417,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutAffiliateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -33434,7 +33440,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutAffiliateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -34005,7 +34011,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutReferredByInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -34028,7 +34034,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutReferredByInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -34096,7 +34102,7 @@ export namespace Prisma {
   }
 
   export type UserCreateWithoutReferralInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -34119,7 +34125,7 @@ export namespace Prisma {
   }
 
   export type UserUncheckedCreateWithoutReferralInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -34909,13 +34915,13 @@ export namespace Prisma {
   }
 
   export type ReviewCreateManyUserInput = {
-    id: string
+    id?: string
     productId: string
     rating: number
     comment?: string | null
     otherRating?: NullableJsonNullValueInput | InputJsonValue
-    createdAt: Date | string
-    updatedAt: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type WishlistCreateManyUserInput = {
@@ -35397,7 +35403,7 @@ export namespace Prisma {
   }
 
   export type UserCreateManyReferralInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean

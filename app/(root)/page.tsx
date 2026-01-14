@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import NewHero from "@/components/shared/new-hero";
 import { StoryText } from "@/components/shared/story-text";
 import { Newsletter } from "@/components/shared/newsletter";
+import { getCachedProducts } from "@/lib/product/test-index-product";
 
 export const metadata: Metadata = {
   title: "Vitanou | Supplements for a Grounded Life",
@@ -67,7 +68,7 @@ export default async function Home() {
   let packProductData: ProductData[] = [];
 
   try {
-    const allProducts = await listProducts();
+    const allProducts = await getCachedProducts();
     console.log("All products:", allProducts);
 
     // Separate regular products from packs

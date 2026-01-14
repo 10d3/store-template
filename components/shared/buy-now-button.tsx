@@ -53,7 +53,7 @@ export default function BuyNowButton({
             <Button
                 onClick={generateStripeLink}
                 disabled={loading}
-                className="w-full py-5 bg-green-500 hover:bg-green-600 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full py-5 bg-[#73BF44] hover:bg-[#73BF44]/90 shadow-lg hover:shadow-xl transition-all duration-300"
             >
                 {loading ? (
                     <div className="flex items-center gap-2">

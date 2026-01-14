@@ -795,3 +795,25 @@ export async function getCollections(): Promise<
     return [];
   }
 }
+
+export async function getArchivedProducts(): Promise<StripeProduct[]> {
+  try {
+    const products = await stripe.products.list({
+      active: false,
+    })
+    return products.data;
+  } catch (error) {
+    console.error("Error fetching archived products:", error);
+    return [];
+  }
+}
+
+// export async function unarchiveProduct(productId: string) {
+//     try {
+//         await stripe.products.update(productId, {
+//             active: true,
+//         })
+//     } catch (error) {
+//         console.error("Error unarchiving product:", error);
+//     }
+// }

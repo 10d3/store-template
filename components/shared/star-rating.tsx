@@ -34,7 +34,7 @@ export default function StarRating({
             {Array.from({ length: fullStars }).map((_, i) => (
                 <Star
                     key={`full-${i}`}
-                    className={cn(sizeClasses[size], "text-yellow-400 fill-yellow-400")}
+                    className={cn(sizeClasses[size], "text-[#73BF44] fill-[#73BF44]")}
                 />
             ))}
 
@@ -46,7 +46,7 @@ export default function StarRating({
                     />
                     <div className="absolute inset-0 overflow-hidden w-1/2">
                         <Star
-                            className={cn(sizeClasses[size], "text-yellow-400 fill-yellow-400")}
+                            className={cn(sizeClasses[size], "text-[#73BF44] fill-[#73BF44]")}
                         />
                     </div>
                 </div>

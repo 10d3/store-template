@@ -44,6 +44,7 @@ import RelatedProductsClient from "@/components/shared/related-product-client";
 import { getPack } from "@/lib/product/bundle-index";
 import { getRelatedProducts } from "@/lib/product/related-index";
 import { getCachedProduct } from "@/lib/product/test-index-product";
+import { StripeProduct } from "@/types/product";
 
 // Generate metadata for SEO and OG
 // Helper to strip markdown formatting
@@ -132,14 +133,14 @@ export async function generateMetadata(props: {
   };
 }
 
-interface MediaItem {
-  id: string;
-  type: "image" | "video";
-  src: string;
-  thumbnail?: string;
-  alt: string;
-  title?: string;
-}
+// interface MediaItem {
+//   id: string;
+//   type: "image" | "video";
+//   src: string;
+//   thumbnail?: string;
+//   alt: string;
+//   title?: string;
+// }
 
 export default async function page(props: {
   params: Promise<{ slug: string }>;
@@ -155,15 +156,20 @@ export default async function page(props: {
   );
   // const selectedVariant = selectedVariants[0];
 
-  const packsPromise = getPack(variants[0].id);
+  let packsPromise: Promise<StripeProduct[]> = Promise.resolve([]);
+
+  if (variants[0].metadata?.packs) {
+    packsPromise = getPack(variants[0].id);
+  }
 
   const [relatedProducts, reviews, ratingData, packs] = await Promise.all([
     getRelatedProducts(variants[0].id, 4),
     getReviewsByProductId(variants[0].id),
     getAverageRating(variants[0].id),
-    packsPromise,
+    packsPromise, // This is now guaranteed to be a Promise<StripeProduct[]>
   ]);
 
+  // 2. Now 'packs' is always an array, so .length is safe
   const packProductData =
     packs.length > 0 ? await transformPacksToProductData(packs) : [];
 

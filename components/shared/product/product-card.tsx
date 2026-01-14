@@ -10,6 +10,7 @@ import { PackSelector } from "./pack-selector"
 // import { PriceSummary } from "./price-summary"
 // import { TrustIndicators } from "./trust-indicators"
 import { useCartStore } from "@/lib/store"
+import Link from "next/link"
 
 interface PackCardProps {
   product: ProductData
@@ -40,6 +41,8 @@ export function PackCardNew({
 
   const currentPrice = product.pricing[purchaseType][selectedPack]
   const savings = Math.round(((currentPrice.original - currentPrice.total) / currentPrice.original) * 100)
+
+  console.log(product)
 
   const handleAddToCart = () => {
     // Add to cart store
@@ -109,7 +112,9 @@ export function PackCardNew({
         </div>
       ) : (
         <div className="w-full mb-4">
-          <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} className="w-full mb-0" />
+          <Link href={`/pack/${product.slug}`}>
+            <ProductImage src={currentImage} alt={product.imageAlt} savings={savings} className="w-full mb-0" />
+          </Link>
         </div>
       )}
 
@@ -119,7 +124,7 @@ export function PackCardNew({
 
       {/* <PriceSummary total={currentPrice.total} original={currentPrice.original} /> */}
 
-      <Button className="w-full h-12 text-base font-medium" size="lg" onClick={handleAddToCart}>
+      <Button className="w-full h-12 text-base font-medium bg-[#063354] hover:bg-[#063354]/90 dark:bg-white dark:hover:bg-white/90" size="lg" onClick={handleAddToCart}>
         Add to Cart - ${currentPrice.total.toFixed(2)}
       </Button>
 

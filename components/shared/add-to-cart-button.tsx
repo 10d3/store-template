@@ -42,7 +42,7 @@ export default function AddToCartButton({
       <Button
         onClick={handleAddToCart}
         disabled={isAddingToCart}
-        className="w-full py-5 shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-full py-5 bg-[#063354] hover:bg-[#063354]/90 dark:bg-white dark:hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300"
       >
         {isAddingToCart ? (
           <div className="flex items-center gap-2">

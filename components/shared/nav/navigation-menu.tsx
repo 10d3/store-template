@@ -78,7 +78,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                 </NavigationMenuLink>
               </NavigationMenuItem>
 
-              <NavigationMenuItem>
+              {/* <NavigationMenuItem>
                 <NavigationMenuTrigger>Shop</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[600px] gap-3 p-4 md:grid-cols-2">
@@ -93,7 +93,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                     ))}
                   </ul>
                 </NavigationMenuContent>
-              </NavigationMenuItem>
+              </NavigationMenuItem> */}
 
               {/* <NavigationMenuItem>
                 <NavigationMenuLink
@@ -134,7 +134,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
           </NavigationMenu>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:flex items-center flex-1 max-w-sm mx-8">
+          {/* <div className="hidden md:flex items-center flex-1 max-w-sm mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -143,7 +143,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                 className="pl-10 pr-4 w-full"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
@@ -202,7 +202,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                       </Link>
 
                       {/* Shop with Collapsible Submenu */}
-                      <Collapsible>
+                      {/* <Collapsible>
                         <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200 group">
                           <span>Shop</span>
                           <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
@@ -220,7 +220,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                             ))}
                           </div>
                         </CollapsibleContent>
-                      </Collapsible>
+                      </Collapsible> */}
 
                       {/* Collections */}
                       <Link
@@ -261,7 +261,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
         </div>
 
         {/* Mobile Search Bar */}
-        {isSearchOpen && (
+        {/* {isSearchOpen && (
           <div className="md:hidden py-4 border-t">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -272,7 +272,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
               />
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </header>
   );

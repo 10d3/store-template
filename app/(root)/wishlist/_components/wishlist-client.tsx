@@ -27,6 +27,8 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
     }
   };
 
+  console.log(wishlistItems)
+
   return (
     <div className="min-h-fit">
       <div className="container mx-auto py-4 md:py-12">
@@ -76,7 +78,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                   <CardHeader className="">
                     <div className="flex items-start justify-between gap-4">
                       <Link
-                        href={`/product/${item.metadata.slug}`}
+                        href={`/product/${item.slug}`}
                         className="flex-1 min-w-0"
                       >
                         <CardTitle className="text-xl font-semibold truncate group-hover:text-primary transition-colors">
@@ -117,7 +119,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                             ${typeof item.default_price === 'object' && item.default_price?.unit_amount ? (item.default_price.unit_amount / 100).toFixed(2) : '0.00'}
                           </p>
                           <Button asChild size="sm">
-                            <Link href={`/product/${item.name}`}>
+                            <Link href={`/${item.metadata.slug ? "product" : "pack"}/${item.slug}`}>
                               View Details
                             </Link>
                           </Button>

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { StripeProduct } from "@/types/product";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -79,3 +80,68 @@ export function generateReferralCode(length = 8): string {
 export const getStripeLink = (url: string, data: string) => {
   return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${url}&state=${data}`;
 };
+
+type price = {
+  id: string;
+  unitAmount: number;
+  currency: string;
+  isDefault: boolean;
+}
+export function transformDbProduct(dbProduct: {
+  id: string;
+  name: string;
+  description: string | null;
+  images: string[];
+  active: boolean;
+  metadata: unknown;
+  slug: string | null;
+  prices: price[];
+  nutrition?: { nutrition: string } | null;
+}): StripeProduct {
+  const baseMetadata =
+    (dbProduct.metadata as Record<string, string>) ?? {};
+
+  const metadata = {
+    ...baseMetadata,
+    ...(dbProduct.nutrition?.nutrition && {
+      nutrition: dbProduct.nutrition.nutrition,
+    }),
+  };
+
+  const defaultPrice =
+    dbProduct.prices.find((p) => p.isDefault) ?? dbProduct.prices[0];
+
+  return {
+    id: dbProduct.id,
+    name: dbProduct.name,
+    description: dbProduct.description,
+    images: dbProduct.images,
+    active: dbProduct.active,
+    metadata,
+    slug: dbProduct.slug ?? undefined,
+    default_price: defaultPrice
+      ? {
+        id: defaultPrice.id,
+        unit_amount: defaultPrice.unitAmount,
+        currency: defaultPrice.currency,
+      }
+      : null,
+  };
+}
+
+export function stripMarkdown(text: string): string {
+  return text
+    .replace(/#{1,6}\s?/g, '') // Remove headers
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Bold
+    .replace(/\*([^*]+)\*/g, '$1') // Italic
+    .replace(/__([^_]+)__/g, '$1') // Bold alt
+    .replace(/_([^_]+)_/g, '$1') // Italic alt
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+    .replace(/`([^`]+)`/g, '$1') // Inline code
+    .replace(/```[\s\S]*?```/g, '') // Code blocks
+    .replace(/>\s?/g, '') // Blockquotes
+    .replace(/[-*+]\s/g, '') // List items
+    .replace(/\n{2,}/g, ' ') // Multiple newlines
+    .replace(/\n/g, ' ') // Single newlines
+    .trim();
+}
