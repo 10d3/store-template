@@ -32,6 +32,7 @@ import RelatedProductsClient from "@/components/shared/related-product-client";
 import ReviewsClient from "@/components/shared/review-client";
 import { getBaseURL, stripMarkdown } from "@/lib/utils";
 import { Metadata } from "next";
+import relatedProducts from "@/components/shared/related-products";
 
 export async function generateMetadata(props: {
     params: Promise<{ slug: string }>;
@@ -226,7 +227,7 @@ export default async function page(props: {
                                 )}
                             </div>
 
-                            <Separator className="my-8" />
+                            {relatedProducts.length > 0 && <Separator className="my-8" />}
 
                             {/* Related Products Section */}
                             {relatedProducts.length > 0 && (

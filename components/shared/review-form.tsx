@@ -83,7 +83,7 @@ export default function ReviewForm({
             <Button
                 type="submit"
                 disabled={isSubmitting || rating === 0}
-                className="w-full"
+                className="w-full bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80"
             >
                 {isSubmitting ? "Submitting..." : "Submit Review"}
             </Button>

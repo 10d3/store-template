@@ -328,7 +328,7 @@ export default async function page(props: {
                 )}
               </div>
 
-              <Separator className="my-8" />
+              {relatedProducts.length > 0 && <Separator className="my-8" />}
 
               {/* Related Products Section */}
               {relatedProducts.length > 0 && (

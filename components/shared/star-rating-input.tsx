@@ -71,9 +71,9 @@ export default function StarRatingInput({
                             className={cn(
                                 sizeClasses[size],
                                 isFilled
-                                    ? "text-yellow-400 fill-yellow-400"
+                                    ? "text-[#73BF44] fill-[#73BF44]"
                                     : isHalfFilled
-                                        ? "text-yellow-400"
+                                        ? "text-[#73BF44]"
                                         : "text-gray-300"
                             )}
                         />
@@ -82,7 +82,7 @@ export default function StarRatingInput({
                                 <Star
                                     className={cn(
                                         sizeClasses[size],
-                                        "text-yellow-400 fill-yellow-400"
+                                        "text-[#73BF44] fill-[#73BF44]"
                                     )}
                                 />
                             </div>

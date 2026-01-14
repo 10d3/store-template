@@ -36,10 +36,10 @@ export default function ReviewList({ reviews }: ReviewListProps) {
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-medium text-gray-900">{review.user.name}</p>
+                                    <p className="font-medium">{review.user.name}</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <StarRating rating={review.rating} size="sm" />
-                                        <span className="text-sm text-gray-500">
+                                        <span className="text-sm text-primary/60">
                                             {formatDistanceToNow(new Date(review.createdAt), {
                                                 addSuffix: true,
                                             })}
@@ -49,7 +49,7 @@ export default function ReviewList({ reviews }: ReviewListProps) {
                             </div>
 
                             {review.comment && (
-                                <p className="mt-3 text-gray-700 leading-relaxed">
+                                <p className="mt-3 leading-relaxed">
                                     {review.comment}
                                 </p>
                             )}
