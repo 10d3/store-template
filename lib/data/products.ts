@@ -4,6 +4,7 @@ export const sleepGummiesProduct: ProductData = {
   id: "dreamy-sleep-gummies",
   name: "Dreamy Sleep Gummies",
   description: "Natural sleep support for better rest",
+  slug: "dreamy-sleep-gummies",
   image: "/images/image.png",
   images: {
     "1": "/images/image.png",
