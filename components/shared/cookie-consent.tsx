@@ -96,7 +96,7 @@ export function CookieConsent({
                         </p>
                     </div>
                     <div className="grid grid-cols-2 items-center gap-2 p-3 sm:p-4 sm:py-5 border-t border-border dark:bg-background/20">
-                        <Button onClick={accept} variant="default" className="w-full">
+                        <Button onClick={accept} variant="default" className="w-full bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80">
                             Accept
                         </Button>
                         <Button onClick={decline} variant="outline" className="w-full">
@@ -129,7 +129,7 @@ export function CookieConsent({
                     </p>
                 </div>
                 <div className="grid grid-cols-2 items-center gap-2 p-3 mt-2 border-t">
-                    <Button onClick={accept} className="w-full">
+                    <Button onClick={accept} className="w-full bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80">
                         Accept
                     </Button>
                     <Button
@@ -168,7 +168,7 @@ export function CookieConsent({
                             <Button
                                 onClick={accept}
                                 variant="default"
-                                className="w-full"
+                                className="w-full bg-[#063354] hover:bg-[#063354]/80 dark:bg-white dark:hover:bg-white/80"
                             >
                                 Accept
                             </Button>
