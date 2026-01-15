@@ -53,7 +53,7 @@ export default async function AffiliateProgramPage() {
                 <h1 className="text-3xl md:text-7xl font-light mb-4 font-serif tracking-tight text-balance">
                     Partner with <span className="text-primary">Vitanou</span>
                 </h1>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto ">
                     Join our affiliate program and earn commissions by sharing the products you love.
                     Start earning today with our competitive rewards.
                 </p>
@@ -87,7 +87,7 @@ export default async function AffiliateProgramPage() {
 
             <div className="grid md:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
-                    <h2 className="text-3xl font-bold">Why Join?</h2>
+                    <h2 className="text-3xl font-light font-serif tracking-tight text-balance">Why Join?</h2>
                     <ul className="space-y-4">
                         {benefits.map((benefit, i) => (
                             <li key={i} className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export default async function AffiliateProgramPage() {
                     </ul>
                 </div>
                 <div className="bg-muted rounded-2xl p-8 space-y-4">
-                    <h3 className="text-xl font-bold">How it works</h3>
+                    <h3 className="text-xl font-light font-serif tracking-tight text-balance">How it works</h3>
                     <div className="space-y-4">
                         <div className="flex gap-4">
                             <div className="font-bold text-4xl text-primary/40">1</div>
