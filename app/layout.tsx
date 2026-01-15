@@ -6,6 +6,7 @@ import { getLocale } from "@/i18n/server";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "./api/uploadthing/core";
+import { CookieConsent } from "@/components/shared/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default async function RootLayout({
       >
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <Provider>{children}</Provider>
+        <CookieConsent variant="small" />
       </body>
     </html>
   );
