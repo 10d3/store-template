@@ -4,6 +4,8 @@ export interface StripeProduct {
   description?: string | null;
   images?: string[];
   slug?: string
+  subtitle?: string | null;
+  tagline?: string | null;
   metadata: Record<string, string>;
   default_price?:
   | {

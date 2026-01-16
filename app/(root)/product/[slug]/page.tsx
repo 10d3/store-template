@@ -6,6 +6,7 @@ import SelectVariant from "@/components/shared/select-variant";
 import {
   Card,
   CardContent,
+  CardDescription,
   // CardDescription,
   CardFooter,
   CardHeader,
@@ -278,6 +279,12 @@ export default async function page(props: {
                       {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
                     </span>
                   </a>
+                  <CardDescription className="text-base font-semibold">
+                    {variants[0].subtitle}
+                  </CardDescription>
+                  <Badge variant="secondary" className="w-fit">
+                    {variants[0].tagline}
+                  </Badge>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -423,6 +430,12 @@ export default async function page(props: {
                         {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
                       </span>
                     </a>
+                    <CardDescription className="text-base font-semibold">
+                      {variants[0].subtitle}
+                    </CardDescription>
+                    <Badge variant="secondary" className="w-fit">
+                      {variants[0].tagline}
+                    </Badge>
                   </CardHeader>
 
                   <CardContent className="space-y-6">

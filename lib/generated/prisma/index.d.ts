@@ -5174,6 +5174,8 @@ export namespace Prisma {
     id: string | null
     name: string | null
     description: string | null
+    subtitle: string | null
+    tagline: string | null
     active: boolean | null
     slug: string | null
     category: string | null
@@ -5187,6 +5189,8 @@ export namespace Prisma {
     id: string | null
     name: string | null
     description: string | null
+    subtitle: string | null
+    tagline: string | null
     active: boolean | null
     slug: string | null
     category: string | null
@@ -5200,6 +5204,8 @@ export namespace Prisma {
     id: number
     name: number
     description: number
+    subtitle: number
+    tagline: number
     images: number
     active: number
     slug: number
@@ -5217,6 +5223,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    subtitle?: true
+    tagline?: true
     active?: true
     slug?: true
     category?: true
@@ -5230,6 +5238,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    subtitle?: true
+    tagline?: true
     active?: true
     slug?: true
     category?: true
@@ -5243,6 +5253,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    subtitle?: true
+    tagline?: true
     images?: true
     active?: true
     slug?: true
@@ -5331,6 +5343,8 @@ export namespace Prisma {
     id: string
     name: string
     description: string | null
+    subtitle: string | null
+    tagline: string | null
     images: string[]
     active: boolean
     slug: string | null
@@ -5363,6 +5377,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    subtitle?: boolean
+    tagline?: boolean
     images?: boolean
     active?: boolean
     slug?: boolean
@@ -5381,6 +5397,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    subtitle?: boolean
+    tagline?: boolean
     images?: boolean
     active?: boolean
     slug?: boolean
@@ -5396,6 +5414,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    subtitle?: boolean
+    tagline?: boolean
     images?: boolean
     active?: boolean
     slug?: boolean
@@ -5411,6 +5431,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    subtitle?: boolean
+    tagline?: boolean
     images?: boolean
     active?: boolean
     slug?: boolean
@@ -5422,7 +5444,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "images" | "active" | "slug" | "category" | "type" | "gender" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "subtitle" | "tagline" | "images" | "active" | "slug" | "category" | "type" | "gender" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prices?: boolean | Product$pricesArgs<ExtArgs>
     nutrition?: boolean | Product$nutritionArgs<ExtArgs>
@@ -5441,6 +5463,8 @@ export namespace Prisma {
       id: string
       name: string
       description: string | null
+      subtitle: string | null
+      tagline: string | null
       images: string[]
       active: boolean
       slug: string | null
@@ -5878,6 +5902,8 @@ export namespace Prisma {
     readonly id: FieldRef<"Product", 'String'>
     readonly name: FieldRef<"Product", 'String'>
     readonly description: FieldRef<"Product", 'String'>
+    readonly subtitle: FieldRef<"Product", 'String'>
+    readonly tagline: FieldRef<"Product", 'String'>
     readonly images: FieldRef<"Product", 'String[]'>
     readonly active: FieldRef<"Product", 'Boolean'>
     readonly slug: FieldRef<"Product", 'String'>
@@ -24914,6 +24940,8 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     description: 'description',
+    subtitle: 'subtitle',
+    tagline: 'tagline',
     images: 'images',
     active: 'active',
     slug: 'slug',
@@ -25582,6 +25610,8 @@ export namespace Prisma {
     id?: StringFilter<"Product"> | string
     name?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
+    subtitle?: StringNullableFilter<"Product"> | string | null
+    tagline?: StringNullableFilter<"Product"> | string | null
     images?: StringNullableListFilter<"Product">
     active?: BoolFilter<"Product"> | boolean
     slug?: StringNullableFilter<"Product"> | string | null
@@ -25599,6 +25629,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    subtitle?: SortOrderInput | SortOrder
+    tagline?: SortOrderInput | SortOrder
     images?: SortOrder
     active?: SortOrder
     slug?: SortOrderInput | SortOrder
@@ -25620,6 +25652,8 @@ export namespace Prisma {
     NOT?: ProductWhereInput | ProductWhereInput[]
     name?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
+    subtitle?: StringNullableFilter<"Product"> | string | null
+    tagline?: StringNullableFilter<"Product"> | string | null
     images?: StringNullableListFilter<"Product">
     active?: BoolFilter<"Product"> | boolean
     category?: StringNullableFilter<"Product"> | string | null
@@ -25636,6 +25670,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    subtitle?: SortOrderInput | SortOrder
+    tagline?: SortOrderInput | SortOrder
     images?: SortOrder
     active?: SortOrder
     slug?: SortOrderInput | SortOrder
@@ -25657,6 +25693,8 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Product"> | string
     name?: StringWithAggregatesFilter<"Product"> | string
     description?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    subtitle?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    tagline?: StringNullableWithAggregatesFilter<"Product"> | string | null
     images?: StringNullableListFilter<"Product">
     active?: BoolWithAggregatesFilter<"Product"> | boolean
     slug?: StringNullableWithAggregatesFilter<"Product"> | string | null
@@ -27168,6 +27206,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -27185,6 +27225,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -27202,6 +27244,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27219,6 +27263,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27236,6 +27282,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -27251,6 +27299,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27266,6 +27316,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29060,6 +29112,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    subtitle?: SortOrder
+    tagline?: SortOrder
     images?: SortOrder
     active?: SortOrder
     slug?: SortOrder
@@ -29075,6 +29129,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    subtitle?: SortOrder
+    tagline?: SortOrder
     active?: SortOrder
     slug?: SortOrder
     category?: SortOrder
@@ -29088,6 +29144,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    subtitle?: SortOrder
+    tagline?: SortOrder
     active?: SortOrder
     slug?: SortOrder
     category?: SortOrder
@@ -32040,6 +32098,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -32056,6 +32116,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -32088,6 +32150,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32104,6 +32168,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32120,6 +32186,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -32136,6 +32204,8 @@ export namespace Prisma {
     id: string
     name: string
     description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
     images?: ProductCreateimagesInput | string[]
     active?: boolean
     slug?: string | null
@@ -32168,6 +32238,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32184,6 +32256,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
     images?: ProductUpdateimagesInput | string[]
     active?: BoolFieldUpdateOperationsInput | boolean
     slug?: NullableStringFieldUpdateOperationsInput | string | null

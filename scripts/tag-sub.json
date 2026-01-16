@@ -1,0 +1,39 @@
+{
+    "products": [
+        {
+            "id": "prod_SIj7xyS1l39Bjg",
+            "name": "Prime Flow Prostate Support",
+            "slug": "prime-flow-prostate-support",
+            "subtitle": "Prostate & Urinary Health",
+            "tagline": "Confidence in continuity. Uninterrupted daily life."
+        },
+        {
+            "id": "prod_SIjOIdRNk25uVP",
+            "name": "Pidjanm",
+            "slug": "pidjanm",
+            "subtitle": "Male Vitality & Stamina",
+            "tagline": "Stand firm. Rooted power from within."
+        },
+        {
+            "id": "prod_SIjQzeKhufRYTn",
+            "name": "Metabolic Balance, Blood Sugar Support",
+            "slug": "metabolic-balance-blood-sugar-support",
+            "subtitle": "Glucose Metabolism Support",
+            "tagline": "Your daily rhythm, balanced. Energy without the noise."
+        },
+        {
+            "id": "prod_SIjUqbzVQPPjC4",
+            "name": "Ashwagandha, The Calm",
+            "slug": "ashwagandha-the-calm",
+            "subtitle": "Stress Relief & Mental Clarity",
+            "tagline": "Silence the chaos. Ancient wisdom for modern resilience."
+        },
+        {
+            "id": "prod_SIk4m9DpSju5Fb",
+            "name": "Femme Flow",
+            "slug": "femme-flow",
+            "subtitle": "Hormonal Harmony & Vitality",
+            "tagline": "Grace through every phase. Tune into your body’s wisdom."
+        }
+    ]
+}

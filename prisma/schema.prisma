@@ -42,6 +42,8 @@ model Product {
   id          String   @id // Stripe product ID (prod_xxx)
   name        String
   description String?  @db.Text
+  subtitle    String?
+  tagline     String?
   images      String[] // Array of image URLs
   active      Boolean  @default(true)
   slug        String?  @unique

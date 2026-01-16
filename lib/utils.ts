@@ -95,6 +95,8 @@ export function transformDbProduct(dbProduct: {
   active: boolean;
   metadata: unknown;
   slug: string | null;
+  subtitle: string | null;
+  tagline: string | null;
   prices: price[];
   nutrition?: { nutrition: string } | null;
 }): StripeProduct {
@@ -119,6 +121,8 @@ export function transformDbProduct(dbProduct: {
     active: dbProduct.active,
     metadata,
     slug: dbProduct.slug ?? undefined,
+    subtitle: dbProduct.subtitle ?? undefined,
+    tagline: dbProduct.tagline ?? undefined,
     default_price: defaultPrice
       ? {
         id: defaultPrice.id,
