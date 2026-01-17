@@ -92,7 +92,7 @@ export function LoginForm({
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {/* {isLoading ? "test" : null} */}
-              {isLoading ? "Chargement" : "Se connecter"}
+              {isLoading ? "Loading..." : "Login"}
             </Button>
           </form>
           <p className="text-center text-xs text-muted-foreground py-4">or</p>
