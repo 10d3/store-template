@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.redirect(
         new URL(
-          `/settings?success=true&message=Stripe+account+connect+success`,
+          `/affiliation/payment?success=true&message=Stripe+account+connect+success`,
           request.url
         )
       );
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.redirect(
         new URL(
-          `/settings?success=false&message=${encodeURIComponent((stripeError as Error).message)}`,
+          `/affiliation/payment?success=false&message=${encodeURIComponent((stripeError as Error).message)}`,
           request.url
         )
       );
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return NextResponse.redirect(
       new URL(
-        `/settings?success=false&message=An+unexpected+error+occurred`,
+        `/affiliation/payment?success=false&message=An+unexpected+error+occurred`,
         request.url
       )
     );

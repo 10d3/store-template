@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Metadata } from "next";
+import { StripeNotificationHandler } from "../_components/stripe-notification-handler";
 
 export const metadata: Metadata = {
   title: "Affiliate Payments",
@@ -47,6 +48,7 @@ export default async function PaymentsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <StripeNotificationHandler />
       <div className="mx-auto px-4 py-10">
         {/* Header */}
         <div className="mb-8">
