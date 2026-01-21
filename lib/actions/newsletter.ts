@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { sendNewsletterSubscriptionEmail } from "@/lib/email/newsletter-emails"
 
 export type NewsletterResult = {
     success: boolean
@@ -32,6 +33,9 @@ export async function subscribeToNewsletter(
                 data: { status: "ACTIVE", updatedAt: new Date() }
             })
 
+            // Send welcome email again on reactivation? Optional, but good for "resubscribing to get the coupon" behavior
+            await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim() });
+
             return {
                 success: true,
                 message: "Welcome back! Your subscription has been reactivated."
@@ -45,6 +49,9 @@ export async function subscribeToNewsletter(
                 source: source || "website"
             }
         })
+
+        // Send welcome email
+        await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim() });
 
         revalidatePath("/")
 

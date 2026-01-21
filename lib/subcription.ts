@@ -8,6 +8,7 @@ import {
   syncPriceToDatabase,
   deletePriceFromDatabase,
 } from "./product/product-sync";
+import { sendOrderStatusEmail } from "./email/order-emails";
 
 export default async function handleSubscription(payload: Stripe.Event) {
   const { type, data } = payload;
@@ -232,6 +233,17 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         updatedAt: new Date(),
       },
     });
+
+    // Send confirmation email
+    await sendOrderStatusEmail({
+      customerEmail: data.customer_details?.email || "",
+      customerName: data.customer_details?.name || "Customer",
+      orderId: data.id,
+      orderTotal: data.amount_total ? data.amount_total / 100 : 0,
+      orderStatus: "completed",
+      orderItems: data.metadata?.line_items ? JSON.parse(data.metadata.line_items) : [],
+    });
+
   } catch (error) {
     console.error("Error handling checkout completed session:", error);
   }
