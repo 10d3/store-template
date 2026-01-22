@@ -91,7 +91,7 @@ export const AffiliateApprovalEmail: React.FC<Readonly<AffiliateApprovalEmailPro
                         color: "#6b7280",
                     }}
                 >
-                    <p>Vitanou | noreply@vitanou.com</p>
+                    <p>Vitanou | no-reply@vitanou.com</p>
                 </div>
             </div>
         </body>

@@ -82,7 +82,7 @@ export const AffiliateRejectionEmail: React.FC<Readonly<AffiliateRejectionEmailP
                         color: "#6b7280",
                     }}
                 >
-                    <p>Vitanou | noreply@vitanou.com</p>
+                    <p>Vitanou | no-reply@vitanou.com</p>
                 </div>
             </div>
         </body>

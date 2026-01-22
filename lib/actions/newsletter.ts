@@ -34,8 +34,9 @@ export async function subscribeToNewsletter(
             })
 
             // Send welcome email again on reactivation? Optional, but good for "resubscribing to get the coupon" behavior
-            await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim(), couponCode: "VITANOUFAMILY", discountValue: "10%" });
+            const result = await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim(), couponCode: "VITANOUFAMILY", discountValue: "10%" });
 
+            console.log(result)
             return {
                 success: true,
                 message: "Welcome back! Your subscription has been reactivated."
@@ -51,8 +52,9 @@ export async function subscribeToNewsletter(
         })
 
         // Send welcome email
-        await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim() });
+        const result = await sendNewsletterSubscriptionEmail({ email: email.toLowerCase().trim(), couponCode: "VITANOUFAMILY", discountValue: "10%" });
 
+        console.log(result)
         revalidatePath("/")
 
         return {
