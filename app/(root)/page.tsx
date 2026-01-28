@@ -69,7 +69,6 @@ export default async function Home() {
 
   try {
     const allProducts = await getCachedProducts();
-    console.log("All products:", allProducts);
 
     // Separate regular products from packs
     products = allProducts.filter(
@@ -80,7 +79,6 @@ export default async function Home() {
     const allPacks = allProducts.filter(
       (product) => product.metadata?.type === "bundle"
     );
-    console.log("All packs:", allPacks);
 
     // Transform ALL packs to ProductData format for PackCardNew
     // (bundles without pack_sizes will get a single pack option)

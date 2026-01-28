@@ -1,8 +1,8 @@
 import { inngest } from "@/lib/inngest/client";
 import { serve } from "inngest/next";
-import { sendTransfer, sendWeeklyDigest } from "@/lib/inngest/functions";
+import { payoutBatchJob, processPayout } from "@/lib/inngest/functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [sendTransfer, sendWeeklyDigest],
+  functions: [payoutBatchJob, processPayout],
 });

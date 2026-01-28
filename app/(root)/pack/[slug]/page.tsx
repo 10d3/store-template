@@ -75,7 +75,6 @@ export async function generateMetadata(props: {
     // Add tag
     if (tags.length > 0) ogImageUrl += `&tags=${encodeURIComponent(tags.slice(0, 3).join(","))}`;
 
-    console.log("ogImageUrl", ogImageUrl);
     return {
         title: seoTitle,
         description: seoDescription,
@@ -117,10 +116,6 @@ export default async function page(props: {
         getAverageRating(pack?.id as string),
         // packsPromise,
     ]);
-
-    console.log("relatedProducts", relatedProducts);
-    console.log("reviews", reviews);
-    console.log("ratingData", ratingData);
 
     const { average: averageRating, count: reviewCount } = ratingData;
 

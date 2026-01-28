@@ -27,7 +27,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
     }
   };
 
-  console.log(wishlistItems)
+  // console.log(wishlistItems)
 
   return (
     <div className="min-h-fit">

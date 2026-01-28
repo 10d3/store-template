@@ -108,7 +108,6 @@ export async function generateMetadata(props: {
   // Add tag
   if (tags.length > 0) ogImageUrl += `&tags=${encodeURIComponent(tags.slice(0, 3).join(","))}`;
 
-  console.log("ogImageUrl", ogImageUrl);
   return {
     title: seoTitle,
     description: seoDescription,

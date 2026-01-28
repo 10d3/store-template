@@ -256,6 +256,7 @@ model Affiliate {
   commissions Commission[]
   payouts     Payout[]
   clicks      AffiliateClick[]
+  ledger      LedgerEntry[]
 
   @@index([referralCode])
   @@index([status])
@@ -371,6 +372,7 @@ model Payout {
   transactionId  String?
   paymentEmail   String?
   paymentAccount String?
+  batchId        String?
 
   // Metadata
   notes         String?
@@ -383,11 +385,43 @@ model Payout {
 
   // Relations
   commissions Commission[]
+  batch       PayoutBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
 
   @@index([affiliateId])
   @@index([status])
   @@index([createdAt])
   @@map("payouts")
+}
+
+model LedgerEntry {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  type   LedgerType // CREDIT, DEBIT, PAYOUT_HOLD, PAYOUT_SENT
+  amount Float
+
+  referenceType String // "COMMISSION", "PAYOUT"
+  referenceId   String
+
+  createdAt DateTime @default(now())
+
+  @@index([affiliateId])
+  @@index([referenceType, referenceId])
+}
+
+model PayoutBatch {
+  id     String      @id @default(cuid())
+  status BatchStatus @default(PENDING)
+
+  totalAmount Float @default(0)
+  totalCount  Int   @default(0)
+
+  createdAt  DateTime  @default(now())
+  startedAt  DateTime?
+  finishedAt DateTime?
+
+  payouts Payout[]
 }
 
 // Support Requests
@@ -420,6 +454,20 @@ model NewsletterSubscription {
   @@index([status])
   @@index([createdAt])
   @@map("newsletter_subscriptions")
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+  PAYOUT_HOLD
+  PAYOUT_SENT
+}
+
+enum BatchStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
 }
 
 enum NewsletterSubscriptionStatus {

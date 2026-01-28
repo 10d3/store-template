@@ -1,55 +1,50 @@
 import { prisma } from "../prisma";
+// import { inngest } from "../inngest/client";
 
-//orderId, commissionId, reason
 export async function refund({
   orderId,
   commissionId,
   reason,
+  processedBy,
 }: {
   orderId: string;
   commissionId: string;
   reason: string;
+  processedBy?: string;
 }) {
-  try {
-    console.log(orderId);
 
-    if (!commissionId) {
-      throw new Error("Missing commissionId");
-    }
+  console.warn("Refunding commission:", { orderId, commissionId, reason, processedBy });
+  
+  if (!commissionId) throw new Error("Missing commissionId");
 
-    // Find commission
-    const commission = await prisma.commission.findUnique({
+  return await prisma.$transaction(async (tx) => {
+    // 1️⃣ Fetch commission with related affiliate and referral
+    const commission = await tx.commission.findUnique({
       where: { id: commissionId },
-      include: {
-        affiliate: true,
-        referral: true,
-      },
+      include: { affiliate: true, referral: true },
     });
 
-    if (!commission) {
-      throw new Error("Commission not found");
-    }
+    if (!commission) throw new Error("Commission not found");
 
-    // Update commission status to CANCELLED
-    await prisma.commission.update({
+    // 2️⃣ Update commission status
+    const updatedCommission = await tx.commission.update({
       where: { id: commissionId },
       data: {
         status: "CANCELLED",
         notes: `Refunded: ${reason || "No reason provided"}`,
+        updatedAt: new Date(),
       },
     });
 
-    // Update referral status
-    const result = await prisma.referral.update({
+    // 3️⃣ Update referral status
+    const updatedReferral = await tx.referral.update({
       where: { id: commission.referralId },
-      data: {
-        status: "REFUNDED",
-      },
+      data: { status: "REFUNDED" },
     });
 
-    // Deduct from affiliate earnings (only if not already paid)
+    // 4️⃣ Deduct from affiliate earnings if commission not paid
     if (commission.status !== "PAID") {
-      await prisma.affiliate.update({
+      await tx.affiliate.update({
         where: { id: commission.affiliateId },
         data: {
           totalEarnings: { decrement: commission.amount },
@@ -58,9 +53,19 @@ export async function refund({
       });
     }
 
-    return result;
-  } catch (error) {
-    console.error(error);
-    throw new Error(error instanceof Error ? error.message : String(error));
-  }
+    // 5️⃣ Emit refund event (optional)
+    // await inngest.send({
+    //   name: "affiliate/commission.refunded",
+    //   data: {
+    //     commissionId,
+    //     affiliateId: commission.affiliateId,
+    //     amount: commission.amount,
+    //     orderId,
+    //     reason,
+    //     processedBy,
+    //   },
+    // });
+
+    return { updatedCommission, updatedReferral };
+  });
 }

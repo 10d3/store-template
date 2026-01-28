@@ -1,9 +1,8 @@
-"use server"
+"use server";
 import { headers } from "next/headers";
 import { prisma } from "../prisma";
-// import { auth } from "../auth";
+import { inngest } from "../inngest/client";
 
-// userId, email, orderValue, orderId, orderDetails
 export async function trackPurchase({
   userId,
   email,
@@ -11,7 +10,7 @@ export async function trackPurchase({
   orderId,
   productId,
   productName,
-  referralCode
+  referralCode,
 }: {
   userId: string;
   email: string;
@@ -21,59 +20,51 @@ export async function trackPurchase({
   productName: string;
   referralCode: string | null;
 }) {
-  try {
-    if (!orderValue || orderValue <= 0) {
-      throw new Error("Order value must be greater than 0");
-    }
-    console.log(userId, email, orderValue, orderId, productId, productName);
-    const headersList = await headers();
+  if (!orderValue || orderValue <= 0) {
+    throw new Error("Order value must be greater than 0");
+  }
 
-    if (!referralCode) {
-      // No referral, purchase is successful but not tracked
-      throw new Error("No referral code found in cookies");
-    }
+  if (!referralCode) {
+    throw new Error("No referral code found");
+  }
 
-    // Find affiliate
-    const affiliate = await prisma.affiliate.findUnique({
-      where: { referralCode },
-    });
+  const headersList = await headers();
+  const ipAddress =
+    headersList.get("x-forwarded-for") ||
+    headersList.get("x-real-ip") ||
+    "unknown";
 
-    if (!affiliate || affiliate.status !== "ACTIVE") {
-      throw new Error("Affiliate not active");
-    }
+  // 1️⃣ Find affiliate
+  const affiliate = await prisma.affiliate.findUnique({
+    where: { referralCode },
+  });
 
-    // Prevent self-referral
-    if (userId && affiliate.userId === userId) {
-      throw new Error("Self-referral not allowed");
-    }
+  if (!affiliate || affiliate.status !== "ACTIVE") {
+    throw new Error("Affiliate not active");
+  }
 
-    const ipAddress =
-      headersList.get("x-forwarded-for") ||
-      headersList.get("x-real-ip") ||
-      "unknown";
+  // 2️⃣ Prevent self-referral
+  if (userId && affiliate.userId === userId) {
+    throw new Error("Self-referral not allowed");
+  }
 
-    // Check if referral already exists for this user/email
-    let referral;
-
+  // 3️⃣ Begin transaction
+  const result = await prisma.$transaction(async (tx) => {
+    // Check existing referral
+    let referral = null;
     if (userId) {
-      referral = await prisma.referral.findFirst({
-        where: {
-          affiliateId: affiliate.id,
-          userId,
-        },
+      referral = await tx.referral.findFirst({
+        where: { affiliateId: affiliate.id, userId },
       });
     } else if (email) {
-      referral = await prisma.referral.findFirst({
-        where: {
-          affiliateId: affiliate.id,
-          email,
-        },
+      referral = await tx.referral.findFirst({
+        where: { affiliateId: affiliate.id, email },
       });
     }
 
-    // Create or update referral record
+    // Create or update referral
     if (!referral) {
-      referral = await prisma.referral.create({
+      referral = await tx.referral.create({
         data: {
           affiliateId: affiliate.id,
           userId,
@@ -87,8 +78,7 @@ export async function trackPurchase({
         },
       });
     } else {
-      // Update existing referral with new order
-      referral = await prisma.referral.update({
+      referral = await tx.referral.update({
         where: { id: referral.id },
         data: {
           orderValue: { increment: orderValue },
@@ -105,25 +95,25 @@ export async function trackPurchase({
     } else {
       commissionAmount = affiliate.commissionRate;
     }
-
-    // Round to 2 decimal places
     commissionAmount = Math.round(commissionAmount * 100) / 100;
 
-    // Create commission record
-    const commission = await prisma.commission.create({
+    // Create commission record (APPROVED)
+    const commission = await tx.commission.create({
       data: {
         affiliateId: affiliate.id,
         referralId: referral.id,
         amount: commissionAmount,
         type: affiliate.commissionType,
         rate: affiliate.commissionRate,
-        status: "APPROVED", // Auto-approve or set to PENDING for manual review
-        description: `Purchase commission for order ${orderId || "N/A"} - $${orderValue.toFixed(2)}`,
+        status: "APPROVED",
+        description: `Purchase commission for order ${orderId} - $${orderValue.toFixed(
+          2
+        )}`,
       },
     });
 
-    // Update affiliate stats and earnings
-    await prisma.affiliate.update({
+    // Update affiliate stats
+    await tx.affiliate.update({
       where: { id: affiliate.id },
       data: {
         totalConversions: { increment: 1 },
@@ -133,27 +123,33 @@ export async function trackPurchase({
       },
     });
 
-    // Mark click as converted (if exists)
-    await prisma.affiliateClick.updateMany({
+    // Mark clicks as converted
+    await tx.affiliateClick.updateMany({
       where: {
         affiliateId: affiliate.id,
         ipAddress,
         converted: false,
       },
-      data: {
-        converted: true,
-        convertedAt: new Date(),
-      },
+      data: { converted: true, convertedAt: new Date() },
     });
 
     return {
-      id: referral.id,
+      referralId: referral.id,
       affiliateId: affiliate.id,
-      commission: commissionAmount,
+      commissionAmount,
       commissionId: commission.id,
     };
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  });
+
+  // 4️⃣ Optional: emit event outside transaction
+  // await inngest.send({
+  //   name: "affiliate/commission.earned",
+  //   data: {
+  //     commissionId: result.commissionId,
+  //     affiliateId: result.affiliateId,
+  //     amount: result.commissionAmount,
+  //   },
+  // });
+
+  return result;
 }

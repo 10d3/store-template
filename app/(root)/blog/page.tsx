@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default async function page() {
   const blogs = await findBlogs();
-  console.log(blogs)
+
   return (
     <main className="min-h-screen bg-background">
       <BlogHeader />

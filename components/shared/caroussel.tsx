@@ -46,7 +46,6 @@ export default function CarouselComponent({
 
     // Only preload if it's a video and hasn't been preloaded yet
     if (nextItem.type === "video" && !preloadedVideos.has(nextIndex)) {
-      console.log(`Preloading video at index ${nextIndex}:`, nextItem.src);
 
       // Create a hidden video element for preloading
       const preloadVideo = document.createElement("video");
@@ -63,7 +62,6 @@ export default function CarouselComponent({
 
       // Handle preload events
       preloadVideo.addEventListener("canplaythrough", () => {
-        console.log(`Video ${nextIndex} preloaded successfully`);
         setPreloadedVideos((prev) => new Set([...prev, nextIndex]));
       });
 
@@ -90,7 +88,6 @@ export default function CarouselComponent({
   }, []);
   // Function to restart a video
   const restartVideo = (index: number) => {
-    console.log(`Restarting video at index ${index}`);
     setRestartTrigger((prev) => ({
       ...prev,
       [index]: !prev[index], // Toggle to trigger useEffect
@@ -110,7 +107,6 @@ export default function CarouselComponent({
     }
   };
   const onVideoEnd = (videoIndex: number) => {
-    console.log(`Video at index ${videoIndex} has ended`);
 
     // You can add custom logic here when a video ends
     // For example, automatically advance to next slide:
@@ -127,13 +123,6 @@ export default function CarouselComponent({
   // Custom handler for when video completes
   const handleVideoCompletion = (index: number) => {
     const item = items[index];
-    console.log(`Video completed:`, {
-      index,
-      src: item.src,
-      type: item.type,
-      timestamp: new Date().toISOString(),
-      wasPreloaded: preloadedVideos.has(index),
-    });
 
     // Preload the next video after current one ends
     preloadNextVideo(index);

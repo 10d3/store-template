@@ -2,83 +2,77 @@ import { CommissionStatus, PayoutStatus } from "../generated/prisma";
 import { prisma } from "../prisma";
 import { getStripeClient } from "../stripe";
 
-export const sendMoney = async (
-  stripeAccountId: string, // ID du compte Stripe Connect
-  amount: number,
-  affiliateId: string,
-  // paymentMethod: PaymentMethod
-) => {
+export async function sendMoney(stripeAccountId: string, affiliateId: string) {
   const stripe = getStripeClient();
 
-  // Étape 1 : Créer un enregistrement "Payout" avec le statut PENDING.
-  // Cet objet sert de "source de vérité" pour cette tentative de paiement.
-  const payout = await prisma.payout.create({
-    data: {
-      affiliateId,
-      amount,
-      method: "STRIPE",
-      status: PayoutStatus.PENDING,
-    },
-  });
+  return prisma.$transaction(async (tx) => {
+    // 1️⃣ Lock eligible commissions (PREVENT DOUBLE PAYOUT)
+    const commissions = await tx.$queryRaw<
+      { id: string; amount: number }[]
+    >`
+      SELECT id, amount 
+      FROM "commissions"
+      WHERE "affiliateId" = ${affiliateId}
+        AND status = 'APPROVED'
+        AND "payoutId" IS NULL
+        AND "status" != 'CANCELLED'
+      FOR UPDATE SKIP LOCKED
+    `;
 
-  try {
-    // Étape 2 : Valider le compte Stripe et les montants des commissions.
-    const account = await stripe.accounts.retrieve(stripeAccountId);
-    if (!account.charges_enabled || !account.payouts_enabled) {
-      throw new Error("Ce compte Stripe ne peut pas recevoir de paiements.");
-    }
+    if (!commissions.length) return null;
 
-    const eligibleCommissions = await prisma.commission.findMany({
-      where: {
+    const amount = commissions.reduce((s, c) => s + c.amount, 0);
+
+    // 2️⃣ Create payout record (source of truth)
+    const payout = await tx.payout.create({
+      data: {
         affiliateId,
-        status: CommissionStatus.APPROVED,
-        payoutId: null,
+        amount,
+        method: "STRIPE",
+        status: PayoutStatus.PROCESSING,
       },
     });
 
-    const totalCommissionAmount = eligibleCommissions.reduce(
-      (sum, commission) => sum + commission.amount,
-      0
-    );
+    // 3️⃣ Ledger HOLD entry
+    await tx.ledgerEntry.create({
+      data: {
+        affiliateId,
+        type: "PAYOUT_HOLD",
+        amount,
+        referenceType: "PAYOUT",
+        referenceId: payout.id,
+      },
+    });
 
-    // Vérification cruciale de la cohérence des montants
-    if (totalCommissionAmount !== amount) {
-      throw new Error(
-        `Le montant du paiement (${amount}) ne correspond pas au total des commissions (${totalCommissionAmount}).`
-      );
+    return { payout, commissions };
+  })
+  .then(async (data) => {
+    if (!data) return null;
+    const { payout, commissions } = data;
+    if (!payout) return null;
+
+    // 4️⃣ Validate Stripe account
+    const account = await stripe.accounts.retrieve(stripeAccountId);
+    if (!account.charges_enabled || !account.payouts_enabled) {
+      throw new Error("Stripe account not payout-enabled");
     }
 
-    // Étape 3 : Exécuter le transfert d'argent via Stripe.
-    // L'appel inclut une clé d'idempotence pour éviter les doubles paiements.
-    // Note : "Transfer" déplace l'argent du solde de votre plateforme vers le solde Stripe du compte connecté.
+    // 5️⃣ Stripe Transfer (idempotent)
     const transfer = await stripe.transfers.create(
       {
-        amount: Math.round(amount * 100), // Montant en centimes
-        currency: "usd", // À rendre dynamique si votre application est multi-devises
+        amount: Math.round(payout.amount * 100),
+        currency: "usd",
         destination: stripeAccountId,
-        description: `Paiement des commissions de $${amount} pour l'affilié ${affiliateId}`,
-        metadata: {
-          affiliateId: affiliateId,
-          payoutId: payout.id, // Lien vers notre enregistrement interne
-        },
+        description: `Affiliate payout ${payout.id}`,
+        metadata: { payoutId: payout.id, affiliateId: payout.affiliateId },
       },
-      {
-        // Clé d'idempotence : garantit que même si la fonction est appelée
-        // plusieurs fois avec le même payout.id, le transfert ne sera effectué qu'une seule fois.
-        idempotencyKey: payout.id,
-      }
+      { idempotencyKey: payout.id }
     );
 
-    // Étape 4 : Si le transfert Stripe réussit, mettre à jour la base de données de manière atomique.
-    // Une transaction garantit que soit toutes les mises à jour réussissent, soit aucune n'est appliquée.
+    // 6️⃣ Finalize payout + commissions atomically
     await prisma.$transaction(async (tx) => {
-      // Marquer les commissions comme payées et les lier au Payout
       await tx.commission.updateMany({
-        where: {
-          id: {
-            in: eligibleCommissions.map((c) => c.id),
-          },
-        },
+        where: { id: { in: commissions.map(c => c.id) } },
         data: {
           payoutId: payout.id,
           status: CommissionStatus.PAID,
@@ -86,36 +80,43 @@ export const sendMoney = async (
         },
       });
 
-      // Mettre à jour le Payout comme étant complété
       await tx.payout.update({
         where: { id: payout.id },
         data: {
           status: PayoutStatus.COMPLETED,
-          processedAt: new Date(),
-          // Stocker l'ID du transfert pour référence future
           transactionId: transfer.id,
+          processedAt: new Date(),
+          completedAt: new Date(),
+        },
+      });
+
+      await tx.ledgerEntry.create({
+        data: {
+          affiliateId: payout.affiliateId,
+          type: "PAYOUT_SENT",
+          amount: payout.amount,
+          referenceType: "PAYOUT",
+          referenceId: payout.id,
         },
       });
     });
 
     return transfer;
-  } catch (error) {
-    // Étape 5 : En cas d'échec à n'importe quelle étape, marquer le Payout comme "FAILED".
-    // Cela permet de savoir exactement ce qui a échoué et de pouvoir investiguer.
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred.";
+  })
+  .catch(async (error) => {
+    console.error("Payout failed:", error);
 
-    await prisma.payout.update({
-      where: { id: payout.id },
-      data: {
-        status: PayoutStatus.FAILED,
-        failureReason: errorMessage,
-      },
-    });
+    // Mark payout failed if created
+    if ((error as any).payout?.id) {
+      await prisma.payout.update({
+        where: { id: (error as any).payout.id },
+        data: {
+          status: PayoutStatus.FAILED,
+          failureReason: String(error),
+        },
+      });
+    }
 
-    console.error(`Échec du traitement du paiement ${payout.id}:`, error);
-
-    // Renvoyer l'erreur pour que la fonction appelante puisse la gérer
     throw error;
-  }
-};
+  });
+}

@@ -60,7 +60,7 @@ export function UnifiedProductList({
 
   const regularProducts = products.filter((p) => p.metadata && p.metadata.type !== "bundle");
   const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
-  console.log("packProducts", packProducts)
+  // console.log("packProducts", packProducts)
 
   return (
     <Card>
