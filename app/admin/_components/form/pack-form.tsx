@@ -148,10 +148,11 @@ export function EnhancedPackForm({
     }).format(amount / 100);
   };
 
-  const calculateSuggestedPrice = () => {
-    const selected = products.filter((p) => selectedProducts.includes(p.id));
-    const total = selected.reduce((sum, product) => {
+  const calculateTotalFromIds = (ids: string[]) => {
+    return ids.reduce((sum, id) => {
+      const product = products.find((p) => p.id === id);
       if (
+        product &&
         product.default_price &&
         typeof product.default_price === "object" &&
         product.default_price.unit_amount !== null
@@ -160,7 +161,10 @@ export function EnhancedPackForm({
       }
       return sum;
     }, 0);
-    return total;
+  };
+
+  const calculateSuggestedPrice = () => {
+    return calculateTotalFromIds(selectedProducts);
   };
 
   const suggestedPrice = calculateSuggestedPrice();
@@ -328,7 +332,19 @@ export function EnhancedPackForm({
                   <ProductMultiSelect
                     products={products}
                     selectedIds={field.value || []}
-                    onSelectionChange={field.onChange}
+                    onSelectionChange={(newIds) => {
+                      field.onChange(newIds);
+                      // Auto-calculate pack price based on selection
+                      const total = calculateTotalFromIds(newIds);
+                      const currentDiscount = form.getValues("discount") || 0;
+
+                      let newPrice = total;
+                      if (currentDiscount > 0) {
+                        newPrice = Math.round(total * (1 - currentDiscount / 100));
+                      }
+
+                      form.setValue("packPrice", newPrice);
+                    }}
                   />
                 </FormControl>
                 <FormDescription className="text-xs">
