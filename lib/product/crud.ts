@@ -409,13 +409,20 @@ export async function createPack(data: PackFormData) {
       metadata: validatedMetadata,
     });
 
-    await stripe.prices.create({
+    const price = await stripe.prices.create({
       product: product.id,
       unit_amount: data.packPrice,
       currency: "usd",
     });
 
-    return transformProduct(product);
+    await stripe.products.update(product.id, {
+      default_price: price.id,
+    });
+
+    return transformProduct({
+      ...product,
+      default_price: price.id,
+    });
   } catch (error) {
     if (error instanceof ProductCrudError) {
       throw error;
