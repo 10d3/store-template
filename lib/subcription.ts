@@ -202,7 +202,7 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         }
       }
     }
-    await prisma.order.upsert({
+    const order = await prisma.order.upsert({
       where: { id: data.id },
       update: {
         status: "completed",
@@ -234,14 +234,32 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       },
     });
 
+    // Prepare items with images for email
+    let orderItems: any[] = [];
+    if (data.metadata?.line_items) {
+      try {
+        const rawItems = JSON.parse(data.metadata.line_items);
+        if (Array.isArray(rawItems)) {
+          orderItems = rawItems.map((item: any) => ({
+            name: item.description || item.name || "Product",
+            quantity: item.quantity || 1,
+            price: item.price_data?.unit_amount ? (item.price_data.unit_amount / 100) : (item.amount_total ? (item.amount_total / 100) / (item.quantity || 1) : 0),
+            image: item.image || item.price_data?.product_data?.images?.[0] || item.images?.[0]
+          }));
+        }
+      } catch (e) {
+        console.error("Error parsing items for email:", e);
+      }
+    }
+
     // Send confirmation email
     await sendOrderStatusEmail({
       customerEmail: data.customer_details?.email || "",
       customerName: data.customer_details?.name || "Customer",
-      orderId: data.id,
+      orderId: order.orderNumber.toString(), // Use friendly ID from DB
       orderTotal: data.amount_total ? data.amount_total / 100 : 0,
       orderStatus: "completed",
-      orderItems: data.metadata?.line_items ? JSON.parse(data.metadata.line_items) : [],
+      orderItems: orderItems,
     });
 
   } catch (error) {
