@@ -191,7 +191,7 @@ export async function createCheckoutSessionNow(product: CartItem) {
     cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
     metadata: {
       userId: session.user.id,
-      line_items: JSON.stringify(line_items),
+      line_items: JSON.stringify([line_items]),
       referralCode
     },
   });

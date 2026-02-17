@@ -238,10 +238,14 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
     let orderItems: any[] = [];
     if (data.metadata?.line_items) {
       try {
-        const rawItems = JSON.parse(data.metadata.line_items);
+        let rawItems = JSON.parse(data.metadata.line_items);
+        if (!Array.isArray(rawItems)) {
+          rawItems = [rawItems];
+        }
+
         if (Array.isArray(rawItems)) {
           orderItems = rawItems.map((item: any) => ({
-            name: item.description || item.name || "Product",
+            name: item.name || item.price_data?.product_data?.name || item.description || item.title || "Product",
             quantity: item.quantity || 1,
             price: item.price_data?.unit_amount ? (item.price_data.unit_amount / 100) : (item.amount_total ? (item.amount_total / 100) / (item.quantity || 1) : 0),
             image: item.image || item.price_data?.product_data?.images?.[0] || item.images?.[0]
