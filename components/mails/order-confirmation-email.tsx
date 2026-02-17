@@ -1,213 +1,324 @@
 import * as React from "react";
 
+interface OrderItem {
+    name: string;
+    quantity?: number;
+    price: number;
+}
+
 interface OrderConfirmationEmailProps {
     customerName?: string;
     orderId: string;
     orderTotal: number;
-    orderItems?: any[];
+    orderItems?: OrderItem[];
 }
 
-export const OrderConfirmationEmail: React.FC<Readonly<OrderConfirmationEmailProps>> = ({
-    customerName,
-    orderId,
-    orderTotal,
-    orderItems,
-}) => (
-    <html>
-        <body>
+export const OrderConfirmationEmail: React.FC<
+    Readonly<OrderConfirmationEmailProps>
+> = ({ customerName, orderId, orderTotal, orderItems }) => (
+    <html
+        lang="en"
+        {...({
+            "xmlns": "http://www.w3.org/1999/xhtml",
+            "xmlns:o": "urn:schemas-microsoft-com:office:office",
+        } as any)}
+    >
+        <head>
+            <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta name="x-apple-disable-message-reformatting" />
+            <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+            <title>Order Confirmation - Vitanou</title>
+            {/*[if mso]>
+      <noscript>
+        <xml>
+          <o:OfficeDocumentSettings>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+          </o:OfficeDocumentSettings>
+        </xml>
+      </noscript>
+      <![endif]*/}
+        </head>
+        <body
+            style={{
+                margin: "0",
+                padding: "0",
+                backgroundColor: "#faf9f7",
+                fontFamily:
+                    "'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+                WebkitTextSizeAdjust: "100%",
+                msTextSizeAdjust: "100%",
+            } as any}
+        >
+            {/* Preheader text for email clients */}
             <div
                 style={{
-                    fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
-                    backgroundColor: "#f9fafb",
-                    padding: "40px 20px",
+                    display: "none",
+                    maxHeight: "0",
+                    overflow: "hidden",
+                    fontSize: "1px",
+                    lineHeight: "1px",
+                    color: "#faf9f7",
+                }}
+            >
+                Your order #{orderId} has been confirmed. Thank you for your purchase!
+            </div>
+
+            <div
+                style={{
+                    backgroundColor: "#faf9f7",
+                    padding: "48px 24px",
                 }}
             >
                 <div
                     style={{
-                        maxWidth: "600px",
+                        maxWidth: "520px",
                         margin: "0 auto",
-                        backgroundColor: "#ffffff",
-                        borderRadius: "12px",
-                        overflow: "hidden",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                     }}
                 >
+                    {/* Logo / Brand */}
                     <div
                         style={{
-                            backgroundColor: "#111827",
-                            padding: "40px",
                             textAlign: "center",
+                            marginBottom: "48px",
                         }}
                     >
-                        <h1
+                        <span
                             style={{
-                                color: "#ffffff",
-                                margin: "0",
-                                fontSize: "24px",
-                                fontWeight: "600",
-                                letterSpacing: "-0.025em",
+                                fontSize: "13px",
+                                fontWeight: 500,
+                                letterSpacing: "0.2em",
+                                textTransform: "uppercase",
+                                color: "#1a1a1a",
                             }}
                         >
-                            Order Confirmed!
-                        </h1>
-                        <p
-                            style={{
-                                margin: "8px 0 0",
-                                fontSize: "16px",
-                                color: "#e5e7eb",
-                            }}
-                        >
-                            Thank you for your purchase
-                        </p>
+                            Vitanou
+                        </span>
                     </div>
 
-                    <div style={{ padding: "40px" }}>
-                        <p
-                            style={{
-                                margin: "0 0 24px",
-                                fontSize: "16px",
-                                lineHeight: "26px",
-                                color: "#374151",
-                            }}
-                        >
-                            Hi {customerName || "Customer"},
-                        </p>
-
-                        <p
-                            style={{
-                                margin: "0 0 24px",
-                                fontSize: "16px",
-                                lineHeight: "26px",
-                                color: "#374151",
-                            }}
-                        >
-                            We&apos;re getting your order ready to be shipped. We will notify you when it has been sent.
-                        </p>
-
+                    {/* Main Card */}
+                    <div
+                        style={{
+                            backgroundColor: "#ffffff",
+                            borderRadius: "2px",
+                            padding: "48px 40px",
+                        }}
+                    >
+                        {/* Confirmation Icon */}
                         <div
                             style={{
-                                backgroundColor: "#f9fafb",
-                                borderRadius: "8px",
-                                border: "1px solid #e5e7eb",
-                                padding: "24px",
-                                margin: "32px 0",
+                                textAlign: "center",
+                                marginBottom: "32px",
                             }}
                         >
-                            <h3
-                                style={{
-                                    margin: "0 0 16px",
-                                    fontSize: "18px",
-                                    fontWeight: "600",
-                                    color: "#111827",
-                                }}
-                            >
-                                Order Details
-                            </h3>
-                            <p
-                                style={{
-                                    margin: "0 0 8px",
-                                    fontSize: "14px",
-                                    color: "#6b7280",
-                                }}
-                            >
-                                <strong>Order Number:</strong> #{orderId}
-                            </p>
                             <div
                                 style={{
-                                    margin: "16px 0",
-                                    borderTop: "1px solid #e5e7eb",
-                                }}
-                            />
-
-                            {orderItems && orderItems.length > 0 && (
-                                <div style={{ marginBottom: "16px" }}>
-                                    {orderItems.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            style={{
-                                                padding: "8px 0",
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                borderBottom:
-                                                    index === orderItems.length - 1
-                                                        ? "none"
-                                                        : "1px solid #f3f4f6",
-                                            }}
-                                        >
-                                            <span style={{ color: "#374151", fontSize: "14px" }}>
-                                                {item.quantity || 1} × {item.name || "Product"}
-                                            </span>
-                                            <span
-                                                style={{
-                                                    color: "#111827",
-                                                    fontWeight: "500",
-                                                    fontSize: "14px",
-                                                }}
-                                            >
-                                                ${(item.price || 0).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                    <div
-                                        style={{
-                                            margin: "16px 0",
-                                            borderTop: "1px solid #e5e7eb",
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
+                                    display: "inline-block",
+                                    width: "48px",
+                                    height: "48px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#1a1a1a",
+                                    lineHeight: "48px",
+                                    textAlign: "center",
+                                    fontSize: "20px",
+                                    color: "#ffffff",
                                 }}
                             >
-                                <span
-                                    style={{
-                                        fontSize: "16px",
-                                        fontWeight: "600",
-                                        color: "#374151",
-                                    }}
-                                >
-                                    Total
-                                </span>
-                                <span
-                                    style={{
-                                        fontSize: "20px",
-                                        fontWeight: "700",
-                                        color: "#111827",
-                                    }}
-                                >
-                                    ${orderTotal.toFixed(2)}
-                                </span>
+                                &#10003;
                             </div>
                         </div>
 
-                        <p
+                        <h1
                             style={{
-                                margin: "0 0 24px",
-                                fontSize: "16px",
-                                lineHeight: "26px",
-                                color: "#374151",
+                                margin: "0 0 8px",
+                                fontSize: "22px",
+                                fontWeight: 500,
+                                letterSpacing: "-0.02em",
+                                color: "#1a1a1a",
+                                textAlign: "center",
                             }}
                         >
-                            You will receive another email with tracking information once your order ships.
+                            Order Confirmed
+                        </h1>
+
+                        <p
+                            style={{
+                                margin: "0 0 40px",
+                                fontSize: "14px",
+                                lineHeight: "22px",
+                                color: "#888888",
+                                textAlign: "center",
+                            }}
+                        >
+                            Thank you for your purchase, {customerName || "Customer"}.
                         </p>
 
-                        <div style={{ textAlign: "center", marginTop: "40px" }}>
+                        {/* Divider */}
+                        <div
+                            style={{
+                                height: "1px",
+                                backgroundColor: "#f0eeeb",
+                                margin: "0 0 32px",
+                            }}
+                        />
+
+                        {/* Order Number */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                marginBottom: "32px",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    letterSpacing: "0.1em",
+                                    textTransform: "uppercase",
+                                    color: "#888888",
+                                }}
+                            >
+                                Order
+                            </span>
+                            <span
+                                style={{
+                                    fontSize: "13px",
+                                    fontWeight: 500,
+                                    color: "#1a1a1a",
+                                    fontFamily:
+                                        "'SF Mono', 'Fira Code', 'Fira Mono', monospace",
+                                }}
+                            >
+                                #{orderId}
+                            </span>
+                        </div>
+
+                        {/* Items */}
+                        {orderItems && orderItems.length > 0 && (
+                            <div style={{ marginBottom: "32px" }}>
+                                {orderItems.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "baseline",
+                                            padding: "14px 0",
+                                            borderBottom:
+                                                index < orderItems.length - 1
+                                                    ? "1px solid #f0eeeb"
+                                                    : "none",
+                                        }}
+                                    >
+                                        <div>
+                                            <span
+                                                style={{
+                                                    fontSize: "14px",
+                                                    color: "#1a1a1a",
+                                                    fontWeight: 400,
+                                                }}
+                                            >
+                                                {item.name || "Product"}
+                                            </span>
+                                            {(item.quantity || 1) > 1 && (
+                                                <span
+                                                    style={{
+                                                        fontSize: "12px",
+                                                        color: "#aaaaaa",
+                                                        marginLeft: "8px",
+                                                    }}
+                                                >
+                                                    x{item.quantity}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span
+                                            style={{
+                                                fontSize: "14px",
+                                                color: "#1a1a1a",
+                                                fontWeight: 500,
+                                                fontFamily:
+                                                    "'SF Mono', 'Fira Code', 'Fira Mono', monospace",
+                                            }}
+                                        >
+                                            ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Divider */}
+                        <div
+                            style={{
+                                height: "1px",
+                                backgroundColor: "#f0eeeb",
+                                margin: "0 0 20px",
+                            }}
+                        />
+
+                        {/* Total */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "baseline",
+                                marginBottom: "40px",
+                            }}
+                        >
+                            <span
+                                style={{
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    letterSpacing: "0.1em",
+                                    textTransform: "uppercase",
+                                    color: "#888888",
+                                }}
+                            >
+                                Total
+                            </span>
+                            <span
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: 500,
+                                    color: "#1a1a1a",
+                                    letterSpacing: "-0.02em",
+                                }}
+                            >
+                                ${orderTotal.toFixed(2)}
+                            </span>
+                        </div>
+
+                        {/* Shipping notice */}
+                        <p
+                            style={{
+                                margin: "0 0 40px",
+                                fontSize: "13px",
+                                lineHeight: "20px",
+                                color: "#888888",
+                                textAlign: "center",
+                            }}
+                        >
+                            We&apos;ll send you tracking details once your order ships.
+                        </p>
+
+                        {/* CTA */}
+                        <div style={{ textAlign: "center" }}>
                             <a
                                 href={`https://vitanou.com/orders/${orderId}`}
                                 style={{
                                     display: "inline-block",
-                                    backgroundColor: "#111827",
+                                    backgroundColor: "#1a1a1a",
                                     color: "#ffffff",
-                                    padding: "16px 32px",
-                                    borderRadius: "6px",
+                                    padding: "14px 40px",
+                                    borderRadius: "2px",
                                     textDecoration: "none",
-                                    fontSize: "16px",
-                                    fontWeight: "600",
+                                    fontSize: "12px",
+                                    fontWeight: 500,
+                                    letterSpacing: "0.08em",
+                                    textTransform: "uppercase",
                                 }}
                             >
                                 View Order
@@ -215,31 +326,39 @@ export const OrderConfirmationEmail: React.FC<Readonly<OrderConfirmationEmailPro
                         </div>
                     </div>
 
+                    {/* Footer */}
                     <div
                         style={{
-                            backgroundColor: "#f9fafb",
-                            padding: "24px 40px",
-                            borderTop: "1px solid #e5e7eb",
                             textAlign: "center",
+                            padding: "40px 0 0",
                         }}
                     >
                         <p
                             style={{
-                                margin: "0",
-                                fontSize: "14px",
-                                color: "#6b7280",
+                                margin: "0 0 8px",
+                                fontSize: "12px",
+                                color: "#aaaaaa",
                             }}
                         >
-                            Need help? <a href="mailto:support@vitanou.com" style={{ color: "#111827", textDecoration: "underline" }}>Contact us</a>
+                            <a
+                                href="mailto:support@vitanou.com"
+                                style={{
+                                    color: "#888888",
+                                    textDecoration: "none",
+                                    borderBottom: "1px solid #dddddd",
+                                }}
+                            >
+                                support@vitanou.com
+                            </a>
                         </p>
                         <p
                             style={{
-                                margin: "12px 0 0",
-                                fontSize: "12px",
-                                color: "#9ca3af",
+                                margin: "0",
+                                fontSize: "11px",
+                                color: "#cccccc",
                             }}
                         >
-                            © {new Date().getFullYear()} Vitanou. All rights reserved.
+                            {new Date().getFullYear()} Vitanou
                         </p>
                     </div>
                 </div>
