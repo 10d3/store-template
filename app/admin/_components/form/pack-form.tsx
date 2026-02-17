@@ -76,14 +76,36 @@ export function EnhancedPackForm({
   useEffect(() => {
     if (initialData) {
       const productIds = initialData.metadata?.contents
-        ? initialData.metadata.contents.split(",").filter(Boolean)
+        ? initialData.metadata.contents.split(",").map(id => id.trim()).filter(Boolean)
         : [];
 
       // Parse pack sizes from metadata JSON
       let packSizes = DEFAULT_PACK_SIZES;
       if (initialData.metadata?.pack_sizes) {
         try {
-          packSizes = JSON.parse(initialData.metadata.pack_sizes);
+          const parsedSizes = JSON.parse(initialData.metadata.pack_sizes);
+          // Recalculate fixedPrice if missing but discount exists
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          packSizes = parsedSizes.map((sizeConfig: any) => {
+            if (sizeConfig.enabled && sizeConfig.discountPercent !== undefined && sizeConfig.fixedPrice === undefined) {
+              // We need the base price to calculate. 
+              // Since we can't easily access suggestedPrice here without calculation, 
+              // and products might not be loaded, we'll try to find the price from products prop
+              // However, products prop is available in scope.
+              const basePrice = products?.find(p => productIds.includes(p.id))?.default_price;
+              let unitAmount = 0;
+              if (basePrice && typeof basePrice === 'object' && basePrice.unit_amount) {
+                unitAmount = basePrice.unit_amount;
+              }
+
+              if (unitAmount > 0) {
+                const totalBase = unitAmount * sizeConfig.size;
+                const calculatedFixed = Math.round(totalBase * (1 - sizeConfig.discountPercent / 100));
+                return { ...sizeConfig, fixedPrice: calculatedFixed };
+              }
+            }
+            return sizeConfig;
+          });
         } catch {
           console.warn("Failed to parse pack_sizes metadata");
         }
@@ -149,8 +171,15 @@ export function EnhancedPackForm({
   };
 
   const calculateTotalFromIds = (ids: string[]) => {
+    console.log("Debug: calculateTotalFromIds", { ids, productsCount: products.length });
     return ids.reduce((sum, id) => {
       const product = products.find((p) => p.id === id);
+      console.log(`Debug: Checking product ${id}`, {
+        found: !!product,
+        price: product?.default_price,
+        unit_amount: (product?.default_price as any)?.unit_amount
+      });
+
       if (
         product &&
         product.default_price &&
@@ -680,9 +709,18 @@ export function EnhancedPackForm({
                                   max="100"
                                   value={sizeConfig.discountPercent || 0}
                                   onChange={(e) => {
+                                    const newVal = Number(e.target.value);
                                     const currentSizes = form.getValues("packSizes") || DEFAULT_PACK_SIZES;
+
+                                    // Calculate fixed price based on discount
+                                    let fixedPrice: number | undefined;
+                                    if (suggestedPrice > 0) {
+                                      const totalBase = suggestedPrice * size;
+                                      fixedPrice = Math.round(totalBase * (1 - newVal / 100));
+                                    }
+
                                     const newSizes = currentSizes.map(s =>
-                                      s.size === size ? { ...s, discountPercent: Number(e.target.value) } : s
+                                      s.size === size ? { ...s, discountPercent: newVal, fixedPrice } : s
                                     );
                                     form.setValue("packSizes", newSizes);
                                   }}
@@ -698,10 +736,18 @@ export function EnhancedPackForm({
                                   placeholder="Optional"
                                   value={sizeConfig.fixedPrice ? sizeConfig.fixedPrice / 100 : ""}
                                   onChange={(e) => {
-                                    const currentSizes = form.getValues("packSizes") || DEFAULT_PACK_SIZES;
                                     const cents = e.target.value ? Number(e.target.value) * 100 : undefined;
+                                    const currentSizes = form.getValues("packSizes") || DEFAULT_PACK_SIZES;
+
+                                    // Calculate discount percent based on fixed price
+                                    let discountPercent = 0;
+                                    if (suggestedPrice > 0 && cents) {
+                                      const totalBase = suggestedPrice * size;
+                                      discountPercent = Math.max(0, Math.round(((totalBase - cents) / totalBase) * 100));
+                                    }
+
                                     const newSizes = currentSizes.map(s =>
-                                      s.size === size ? { ...s, fixedPrice: cents } : s
+                                      s.size === size ? { ...s, fixedPrice: cents, discountPercent } : s
                                     );
                                     form.setValue("packSizes", newSizes);
                                   }}

@@ -72,6 +72,7 @@ export const packSizeConfigSchema = z.object({
   discountPercent: z.number().min(0).max(100).optional(),
   fixedPrice: z.number().min(0).optional(), // Fixed price in cents (overrides discount)
   image: z.string().optional(), // Image URL for this specific pack size
+  stripePriceId: z.string().optional(), // ID of the Stripe Price object
 });
 
 export const packSchema = z.object({

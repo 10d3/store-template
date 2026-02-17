@@ -14,6 +14,7 @@ import {
 } from "@/lib/product/crud";
 import { toast } from "sonner";
 import { EnhancedPackForm } from "../../_components/form/pack-form";
+import { MultiPackForm } from "../../_components/form/multi-pack-form";
 import { StripeProduct } from "@/types/product";
 import { PackFormData } from "@/lib/product/product.schema";
 import { BundleOnlyList } from "../../_components/bundle-only-list";
@@ -28,6 +29,7 @@ export default function BundleManagementPage() {
     const queryClient = useQueryClient();
     const [editingPack, setEditingPack] = useState<StripeProduct | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [formType, setFormType] = useState<"generic" | "multi">("generic");
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -90,11 +92,24 @@ export default function BundleManagementPage() {
 
     const handleEditPack = (pack: StripeProduct) => {
         setEditingPack(pack);
+        // Determine form type based on pack metadata
+        if (pack.metadata?.pack_type === "same_product") {
+            setFormType("multi");
+        } else {
+            setFormType("generic");
+        }
         setIsDialogOpen(true);
     };
 
     const startCreatePack = () => {
         setEditingPack(null);
+        setFormType("generic");
+        setIsDialogOpen(true);
+    };
+
+    const startCreateMultiPack = () => {
+        setEditingPack(null);
+        setFormType("multi");
         setIsDialogOpen(true);
     };
 
@@ -120,9 +135,14 @@ export default function BundleManagementPage() {
                         Create and manage product bundles with discounts
                     </p>
                 </div>
-                <Button onClick={startCreatePack}>
-                    Create New Bundle
-                </Button>
+                <div className="flex gap-2">
+                    <Button onClick={startCreateMultiPack} variant="secondary">
+                        Create Multi-Pack
+                    </Button>
+                    <Button onClick={startCreatePack}>
+                        Create Custom Bundle
+                    </Button>
+                </div>
             </div>
 
             <div className="grid gap-6 w-full">
@@ -139,15 +159,30 @@ export default function BundleManagementPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="max-w-6xl min-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{editingPack ? "Edit Bundle" : "Create New Bundle"}</DialogTitle>
+                        <DialogTitle>
+                            {editingPack
+                                ? (formType === "multi" ? "Edit Multi-Pack" : "Edit Bundle")
+                                : (formType === "multi" ? "Create Multi-Pack" : "Create New Bundle")
+                            }
+                        </DialogTitle>
                     </DialogHeader>
-                    <EnhancedPackForm
-                        products={products}
-                        onSubmit={onPackSubmit}
-                        initialData={editingPack || undefined}
-                        isLoading={creatingPack || updatingPack}
-                        embed
-                    />
+                    {formType === "multi" ? (
+                        <MultiPackForm
+                            products={products}
+                            onSubmit={onPackSubmit}
+                            initialData={editingPack || undefined}
+                            isLoading={creatingPack || updatingPack}
+                            embed
+                        />
+                    ) : (
+                        <EnhancedPackForm
+                            products={products}
+                            onSubmit={onPackSubmit}
+                            initialData={editingPack || undefined}
+                            isLoading={creatingPack || updatingPack}
+                            embed
+                        />
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

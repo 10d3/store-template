@@ -13,6 +13,7 @@ import { ProductCrudError } from "./errors";
 import { prisma } from "../prisma";
 import { getCachedProducts } from "./cache";
 import { getProductsByIdsFromDB } from "./db-queries";
+import { syncProductToDatabase, syncPriceToDatabase } from "./product-sync";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
@@ -419,6 +420,49 @@ export async function createPack(data: PackFormData) {
       default_price: price.id,
     });
 
+    // Create prices for pack sizes if they exist
+    if (data.packSizes && data.packSizes.length > 0) {
+      const updatedPackSizes = await Promise.all(
+        data.packSizes.map(async (sizeConfig) => {
+          if (sizeConfig.enabled && sizeConfig.fixedPrice) {
+            // Create a price for this pack size
+            const sizePrice = await stripe.prices.create({
+              product: product.id,
+              unit_amount: sizeConfig.fixedPrice,
+              currency: "usd",
+              metadata: {
+                pack_size: sizeConfig.size.toString(),
+                generated_for: "pack_size",
+              },
+            });
+
+            // Sync price to database
+            await syncPriceToDatabase(sizePrice, false);
+
+            return {
+              ...sizeConfig,
+              stripePriceId: sizePrice.id,
+            };
+          }
+          return sizeConfig;
+        })
+      );
+
+      // Update metadata with the new price IDs
+      const finalProduct = await stripe.products.update(product.id, {
+        metadata: {
+          ...validatedMetadata,
+          pack_sizes: JSON.stringify(updatedPackSizes),
+        },
+      });
+
+      // Sync the final product state to the database
+      await syncProductToDatabase(finalProduct as Stripe.Product);
+    } else {
+      // If no pack sizes, still sync the initial product creation
+      await syncProductToDatabase(product as Stripe.Product);
+    }
+
     return transformProduct({
       ...product,
       default_price: price.id,
@@ -491,6 +535,69 @@ export async function updatePack(id: string, data: PackFormData) {
       });
     }
 
+    // Handle pack sizes prices
+    if (data.packSizes && data.packSizes.length > 0) {
+      const updatedPackSizes = await Promise.all(
+        data.packSizes.map(async (sizeConfig) => {
+          if (sizeConfig.enabled && sizeConfig.fixedPrice) {
+            // Check if we need to create a new price
+            // If we have a price ID, we assume it's valid, but ideally we should verify amount.
+            // For now, let's create a new price if the ID is missing OR if we want to enforce update.
+            // Simplest approach: If ID is missing, create it.
+            // If ID is present, we *could* retrieve it and check amount, but that is slow.
+            // A better optimization: If the form sends back the ID, we assume it matches the *previous* state.
+            // But if the user *changed* the fixedPrice in the UI, does the UI blank out the ID?
+            // The UI logic in pack-form doesn't seem to clear ID on change currently.
+            // So we should probably just ALWAYS create a new price for enabled sizes on update to be safe,
+            // or at least if we don't implement price update logic (which is complicated). 
+            // Creating new prices is safe. Archiving old ones is better hygiene but optional for now.
+
+            // Let's create a new price to be sure it matches the current configuration
+            const sizePrice = await stripe.prices.create({
+              product: id,
+              unit_amount: sizeConfig.fixedPrice,
+              currency: "usd",
+              metadata: {
+                pack_size: sizeConfig.size.toString(),
+                generated_for: "pack_size",
+              },
+            });
+
+            // Sync price to database
+            await syncPriceToDatabase(sizePrice, false);
+
+            return {
+              ...sizeConfig,
+              stripePriceId: sizePrice.id,
+            };
+          }
+          return sizeConfig;
+        })
+      );
+
+      // Update metadata with new price IDs
+      // Note: We already updated product above, but we need to update it again with the new pack_sizes
+      // This is a second update call, which is not ideal but necessary to get the IDs.
+      await stripe.products.update(id, {
+        metadata: {
+          ...validatedMetadata,
+          pack_sizes: JSON.stringify(updatedPackSizes),
+        }
+      });
+
+      // We should return the product with the updated metadata
+      const updatedProduct = await stripe.products.retrieve(id, { expand: ["default_price"] });
+
+      // Sync to database to ensure storefront has latest data
+      await syncProductToDatabase(updatedProduct as Stripe.Product);
+
+      return transformProduct(updatedProduct as Stripe.Product);
+    }
+
+    // Sync normal updates as well
+    const updatedSimpleProduct = await stripe.products.retrieve(id, { expand: ["default_price"] });
+    await syncProductToDatabase(updatedSimpleProduct as Stripe.Product);
+
     return transformProduct(product);
   } catch (error) {
     if (error instanceof ProductCrudError) {
@@ -542,6 +649,7 @@ export async function listProducts(): Promise<StripeProduct[]> {
     // Step 3: transform to StripeProduct
     return productsWithNutrition.map(transformProduct);
   } catch (error) {
+    console.error("Error in listProducts:", error);
     if (error instanceof Stripe.errors.StripeError) {
       throw new ProductCrudError(
         `Stripe error: ${error.message}`,
