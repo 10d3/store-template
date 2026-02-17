@@ -372,7 +372,7 @@ model Payout {
   transactionId  String?
   paymentEmail   String?
   paymentAccount String?
-  batchId     String?
+  batchId        String?
 
   // Metadata
   notes         String?
@@ -394,11 +394,11 @@ model Payout {
 }
 
 model LedgerEntry {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   affiliateId String
   affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
 
-  type LedgerType // CREDIT, DEBIT, PAYOUT_HOLD, PAYOUT_SENT
+  type   LedgerType // CREDIT, DEBIT, PAYOUT_HOLD, PAYOUT_SENT
   amount Float
 
   referenceType String // "COMMISSION", "PAYOUT"
@@ -411,19 +411,18 @@ model LedgerEntry {
 }
 
 model PayoutBatch {
-  id String @id @default(cuid())
+  id     String      @id @default(cuid())
   status BatchStatus @default(PENDING)
 
   totalAmount Float @default(0)
   totalCount  Int   @default(0)
 
-  createdAt DateTime @default(now())
-  startedAt DateTime?
+  createdAt  DateTime  @default(now())
+  startedAt  DateTime?
   finishedAt DateTime?
 
   payouts Payout[]
 }
-
 
 // Support Requests
 model SupportRequest {
@@ -463,6 +462,7 @@ enum LedgerType {
   PAYOUT_HOLD
   PAYOUT_SENT
 }
+
 enum BatchStatus {
   PENDING
   IN_PROGRESS

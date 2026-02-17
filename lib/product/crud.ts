@@ -46,12 +46,36 @@ function validateAndTransformMetadata(
 
 // Transform Stripe Product to plain object
 function transformProduct(product: Stripe.Product): StripeProduct {
+  let metadata = product.metadata;
+
+  // Reconstruct pack_sizes images from separate metadata keys
+  if (metadata && metadata.pack_sizes) {
+    try {
+      const packSizes = JSON.parse(metadata.pack_sizes);
+      if (Array.isArray(packSizes)) {
+        const enhancedPackSizes = packSizes.map((size: any) => {
+          const imageKey = `pack_img_${size.size}`;
+          if (metadata[imageKey]) {
+            return { ...size, image: metadata[imageKey] };
+          }
+          return size;
+        });
+        metadata = {
+          ...metadata,
+          pack_sizes: JSON.stringify(enhancedPackSizes),
+        };
+      }
+    } catch (e) {
+      console.warn("Error parsing pack_sizes metadata:", e);
+    }
+  }
+
   return {
     id: product.id,
     name: product.name,
     description: product.description,
     images: product.images,
-    metadata: product.metadata,
+    metadata: metadata,
     default_price: product.default_price,
     active: product.active,
   };
@@ -387,9 +411,20 @@ export async function createPack(data: PackFormData) {
       packMetadata.pack_type = data.packType;
     }
 
-    // Add pack sizes configuration as JSON string
+    // Add pack sizes configuration as JSON string and separate image keys
+    // This avoids hitting the 500 char limit for a single metadata value
     if (data.packSizes && data.packSizes.length > 0) {
-      packMetadata.pack_sizes = JSON.stringify(data.packSizes);
+      const packSizesForStripe = data.packSizes.map((sizeConfig: any) => {
+        // Store image in a separate metadata key if present
+        if (sizeConfig.image) {
+          packMetadata[`pack_img_${sizeConfig.size}`] = sizeConfig.image;
+        }
+        // Return a copy without the image property for the JSON string
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { image, ...rest } = sizeConfig;
+        return rest;
+      });
+      packMetadata.pack_sizes = JSON.stringify(packSizesForStripe);
     }
 
     // Merge with any additional metadata
@@ -449,10 +484,12 @@ export async function createPack(data: PackFormData) {
       );
 
       // Update metadata with the new price IDs
+      const packSizesForStripe = updatedPackSizes.map(({ image, ...rest }: any) => rest);
+      // Note: Image keys are already in validatedMetadata from the initial create/update
       const finalProduct = await stripe.products.update(product.id, {
         metadata: {
           ...validatedMetadata,
-          pack_sizes: JSON.stringify(updatedPackSizes),
+          pack_sizes: JSON.stringify(packSizesForStripe),
         },
       });
 
@@ -501,13 +538,22 @@ export async function updatePack(id: string, data: PackFormData) {
       packMetadata.pack_type = data.packType;
     }
 
-    // Add pack sizes configuration as JSON string
+    // Add pack sizes configuration as JSON string and extract images
+    let packSizesForMetadata: any[] = [];
     if (data.packSizes && data.packSizes.length > 0) {
-      packMetadata.pack_sizes = JSON.stringify(data.packSizes);
+      packSizesForMetadata = data.packSizes.map((sizeConfig) => {
+        if (sizeConfig.image) {
+          packMetadata[`pack_img_${sizeConfig.size}`] = sizeConfig.image;
+        }
+        // Return a copy of sizeConfig without the image property for pack_sizes JSON
+        const { image, ...rest } = sizeConfig;
+        return rest;
+      });
+      packMetadata.pack_sizes = JSON.stringify(packSizesForMetadata);
     }
 
     const validatedMetadata = validateAndTransformMetadata(
-      packMetadata,
+      { ...packMetadata, ...data.metadata }, // Merge with any additional metadata from data
       "product"
     );
 
@@ -575,13 +621,13 @@ export async function updatePack(id: string, data: PackFormData) {
         })
       );
 
-      // Update metadata with new price IDs
-      // Note: We already updated product above, but we need to update it again with the new pack_sizes
-      // This is a second update call, which is not ideal but necessary to get the IDs.
+      // Update metadata with new price IDs with images stripped
+      const packSizesForStripe = updatedPackSizes.map(({ image, ...rest }: any) => rest);
+      // Note: Image keys are already in validatedMetadata from the initial create/update
       await stripe.products.update(id, {
         metadata: {
           ...validatedMetadata,
-          pack_sizes: JSON.stringify(updatedPackSizes),
+          pack_sizes: JSON.stringify(packSizesForStripe),
         }
       });
 
