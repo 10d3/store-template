@@ -4,6 +4,7 @@ interface OrderItem {
     name: string;
     quantity?: number;
     price: number;
+    image?: string;
 }
 
 interface OrderConfirmationEmailProps {
@@ -204,7 +205,7 @@ export const OrderConfirmationEmail: React.FC<
                                         style={{
                                             display: "flex",
                                             justifyContent: "space-between",
-                                            alignItems: "baseline",
+                                            alignItems: "center",
                                             padding: "14px 0",
                                             borderBottom:
                                                 index < orderItems.length - 1
@@ -212,27 +213,43 @@ export const OrderConfirmationEmail: React.FC<
                                                     : "none",
                                         }}
                                     >
-                                        <div>
-                                            <span
-                                                style={{
-                                                    fontSize: "14px",
-                                                    color: "#1a1a1a",
-                                                    fontWeight: 400,
-                                                }}
-                                            >
-                                                {item.name || "Product"}
-                                            </span>
-                                            {(item.quantity || 1) > 1 && (
+                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                            {item.image && (
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    style={{
+                                                        width: "48px",
+                                                        height: "48px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "4px",
+                                                        marginRight: "16px",
+                                                        backgroundColor: "#f5f5f5"
+                                                    }}
+                                                />
+                                            )}
+                                            <div>
                                                 <span
                                                     style={{
-                                                        fontSize: "12px",
-                                                        color: "#aaaaaa",
-                                                        marginLeft: "8px",
+                                                        fontSize: "14px",
+                                                        color: "#1a1a1a",
+                                                        fontWeight: 400,
+                                                        display: "block",
                                                     }}
                                                 >
-                                                    x{item.quantity}
+                                                    {item.name || "Product"}
                                                 </span>
-                                            )}
+                                                {(item.quantity || 1) > 1 && (
+                                                    <span
+                                                        style={{
+                                                            fontSize: "12px",
+                                                            color: "#aaaaaa",
+                                                        }}
+                                                    >
+                                                        Qty: {item.quantity}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                         <span
                                             style={{
@@ -241,6 +258,8 @@ export const OrderConfirmationEmail: React.FC<
                                                 fontWeight: 500,
                                                 fontFamily:
                                                     "'SF Mono', 'Fira Code', 'Fira Mono', monospace",
+                                                whiteSpace: "nowrap",
+                                                marginLeft: "16px"
                                             }}
                                         >
                                             ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}

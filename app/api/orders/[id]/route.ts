@@ -5,6 +5,40 @@ import { sendOrderStatusEmail } from "@/lib/email/order-emails";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
+// Helper to find local order by Stripe ID (PaymentIntent or Session)
+async function getLocalOrder(stripeId: string) {
+  try {
+    const stripe = getStripeClient();
+
+    // 1. Try to find by PaymentIntent ID directly (if stored as ID)
+    let order = await prisma.order.findUnique({
+      where: { id: stripeId },
+      include: { user: true }
+    });
+
+    if (order) return order;
+
+    // 2. Try to find via Checkout Session (common if created via Checkout)
+    const sessions = await stripe.checkout.sessions.list({
+      payment_intent: stripeId,
+      limit: 1
+    });
+
+    if (sessions.data.length > 0) {
+      const sessionId = sessions.data[0].id;
+      order = await prisma.order.findUnique({
+        where: { id: sessionId },
+        include: { user: true }
+      });
+    }
+
+    return order;
+  } catch (error) {
+    console.warn("Error fetching local order:", error);
+    return null;
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -17,7 +51,36 @@ export async function PATCH(
     const stripe = getStripeClient();
 
     let result;
-    let emailData;
+    let emailData: any = {};
+
+    // Always try to get the local order to provide better email data (friendly ID, items)
+    const localOrder = await getLocalOrder(orderId);
+
+    // Prepare common email data from local order if available
+    if (localOrder) {
+      emailData.orderId = localOrder.orderNumber?.toString();
+
+      // Parse line items if they exist
+      if (localOrder.lineItems) {
+        try {
+          const parsedItems = typeof localOrder.lineItems === 'string'
+            ? JSON.parse(localOrder.lineItems)
+            : localOrder.lineItems;
+
+          // Map to the format expected by email templates
+          if (Array.isArray(parsedItems)) {
+            emailData.orderItems = parsedItems.map((item: any) => ({
+              name: item.description || item.name || "Product",
+              quantity: item.quantity || 1,
+              price: item.amount_total ? (item.amount_total / 100) / (item.quantity || 1) : 0,
+              image: item.image || item.images?.[0]
+            }));
+          }
+        } catch (e) {
+          console.warn("Failed to parse local order line items:", e);
+        }
+      }
+    }
 
     switch (action) {
       case "update_status":
@@ -28,66 +91,14 @@ export async function PATCH(
           }
         });
 
-        // Get customer email for notification with robust fallback
-        let customerEmail = result.receipt_email;
-        let localOrder;
-
-        // 1. If no receipt email, try fetching from Stripe Customer object
-        if (!customerEmail && result.customer) {
-          try {
-            const customerId = typeof result.customer === 'string'
-              ? result.customer
-              : result.customer.id;
-
-            const customer = await stripe.customers.retrieve(customerId);
-            if (!customer.deleted && customer.email) {
-              customerEmail = customer.email;
-            }
-          } catch (err) {
-            console.warn("Failed to fetch Stripe customer email:", err);
-          }
-        }
-
-        // 2. Fetch local database order - needed for orderNumber and as email fallback
-        try {
-          // Primary: Try to find session via Stripe API linkage
-          // PaymentIntent ID -> Checkout Session -> Local Order (ID=SessionID)
-          const sessions = await stripe.checkout.sessions.list({
-            payment_intent: orderId,
-            limit: 1
-          });
-
-          if (sessions.data.length > 0) {
-            const sessionId = sessions.data[0].id;
-            localOrder = await prisma.order.findUnique({
-              where: { id: sessionId },
-              include: { user: true }
-            });
-          }
-
-          // Fallback: Try to find order by Payment Intent ID directly (if schema differs)
-          if (!localOrder) {
-            localOrder = await prisma.order.findUnique({
-              where: { id: orderId },
-              include: { user: true }
-            });
-          }
-
-          if (!customerEmail && localOrder?.user?.email) {
-            customerEmail = localOrder.user.email;
-          }
-        } catch (err) {
-          console.warn("Failed to fetch local DB order:", err);
-        }
-
-        if (customerEmail) {
-          emailData = {
-            customerEmail,
-            orderId: localOrder?.orderNumber?.toString() || result.id,
-            orderTotal: result.amount / 100,
-            orderStatus: fulfillmentStatus
-          };
-        }
+        emailData = {
+          ...emailData,
+          orderStatus: fulfillmentStatus,
+          orderTotal: result.amount / 100,
+          customerEmail: result.receipt_email, // Will define fallback below
+          // Use Stripe ID as fallback if local ID missing
+          orderId: emailData.orderId || result.id
+        };
         break;
 
       case "cancel":
@@ -96,10 +107,11 @@ export async function PATCH(
         });
 
         emailData = {
-          customerEmail: result.receipt_email || "",
-          orderId: result.id,
+          ...emailData,
+          orderStatus: "cancelled",
           orderTotal: result.amount / 100,
-          orderStatus: "cancelled"
+          customerEmail: result.receipt_email,
+          orderId: emailData.orderId || result.id
         };
         break;
 
@@ -124,11 +136,12 @@ export async function PATCH(
         });
 
         emailData = {
-          customerEmail: paymentIntent.receipt_email || "",
-          orderId: paymentIntent.id,
-          orderTotal: paymentIntent.amount / 100,
+          ...emailData,
           orderStatus: "refunded",
-          refundAmount: result.amount / 100
+          orderTotal: paymentIntent.amount / 100,
+          refundAmount: result.amount / 100,
+          customerEmail: paymentIntent.receipt_email,
+          orderId: emailData.orderId || paymentIntent.id
         };
         break;
 
@@ -136,10 +149,11 @@ export async function PATCH(
         result = await stripe.paymentIntents.capture(orderId);
 
         emailData = {
-          customerEmail: result.receipt_email || "",
-          orderId: result.id,
+          ...emailData,
+          orderStatus: "completed",
           orderTotal: result.amount / 100,
-          orderStatus: "completed"
+          customerEmail: result.receipt_email,
+          orderId: emailData.orderId || result.id
         };
         break;
 
@@ -148,6 +162,31 @@ export async function PATCH(
           { error: "Invalid action" },
           { status: 400 }
         );
+    }
+
+    // --- Customer Email Fallback Logic ---
+    if (!emailData.customerEmail) {
+      // 1. Try Stripe Customer
+      // Cast to any because 'result' can be a Refund object which doesn't have 'customer'
+      if ((result as any).customer) {
+        try {
+          const customerId = typeof (result as any).customer === 'string'
+            ? (result as any).customer
+            : (result as any).customer.id;
+
+          const customer = await stripe.customers.retrieve(customerId);
+          if (!customer.deleted && customer.email) {
+            emailData.customerEmail = customer.email;
+          }
+        } catch (e) {
+          console.warn("Failed to fetch Stripe customer for email:", e);
+        }
+      }
+
+      // 2. Try Local User
+      if (!emailData.customerEmail && localOrder?.user?.email) {
+        emailData.customerEmail = localOrder.user.email;
+      }
     }
 
     // Send email notification if we have customer email
@@ -253,8 +292,16 @@ export async function GET(
       refunds = refundsList.data;
     }
 
+    // Also try to find a local order number to display
+    let localOrderNumber = null;
+    const localOrder = await getLocalOrder(orderId);
+    if (localOrder) {
+      localOrderNumber = localOrder.orderNumber;
+    }
+
     const order = {
       id: paymentIntent.id,
+      friendlyId: localOrderNumber, // Exposed for frontend use
       amount: paymentIntent.amount / 100,
       currency: paymentIntent.currency.toUpperCase(),
       status: paymentIntent.status,
