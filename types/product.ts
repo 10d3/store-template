@@ -58,6 +58,7 @@ export interface PricingTier {
   price: number
   total: number
   original: number
+  stripePriceId?: string
 }
 
 export interface PricingData {

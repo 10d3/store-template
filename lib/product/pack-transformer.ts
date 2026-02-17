@@ -6,6 +6,7 @@ interface PackSizeConfig {
     discountPercent?: number;
     fixedPrice?: number; // in cents
     image?: string; // Image URL for this pack size
+    stripePriceId?: string; // Stripe Price ID
 }
 
 /**
@@ -138,6 +139,7 @@ export function transformPackToProductData(
             price: pricePerUnit / 100, // Convert cents to dollars for display
             total: discountedTotal / 100,
             original: originalTotal / 100,
+            stripePriceId: sizeConfig.stripePriceId, // Pass the stripePriceId
         };
 
         // Use size-specific image if available, otherwise use default

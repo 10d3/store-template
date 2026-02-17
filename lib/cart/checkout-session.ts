@@ -29,15 +29,37 @@ export async function createCheckoutSession(cart: CartItem[]) {
     quantity: item.quantity,
   }));
 
-  const productIds = cart.map((item) => item.id);
-  const productsFromStripe = await getCachedProducts();
-  const products = productsFromStripe.filter((product) =>
-    productIds.includes(product.id)
-  );
-  const productsWithQuantity = products.map((product) => ({
-    ...product,
-    quantity: cart.find((item) => item.id === product.id)?.quantity || 1,
-  }));
+  // Construct line items directly from cart, prioritizing stripePriceId
+  const line_items_stripe = cart.map((item) => {
+    if (item.stripePriceId) {
+      return {
+        price: item.stripePriceId,
+        quantity: item.quantity
+      };
+    } else {
+      // Construct absolute image URL if needed
+      let imageUrl = item.image;
+      if (imageUrl && imageUrl.startsWith("/")) {
+        imageUrl = `${process.env.NEXT_PUBLIC_BASE_URL}${imageUrl}`;
+      }
+
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.name,
+            images: imageUrl ? [imageUrl] : [],
+            metadata: {
+              productId: item.id,
+              ...item.metadata
+            }
+          },
+          unit_amount: item.price
+        },
+        quantity: item.quantity
+      };
+    }
+  });
 
   console.log("createCheckoutSession: referralCode", referralCode);
   let stripeCustomerId = session.user.stripeCustomerId;
@@ -75,22 +97,7 @@ export async function createCheckoutSession(cart: CartItem[]) {
     const sessionStripe = await stripeClient.checkout.sessions.create({
       payment_method_types: ["card", "link", "sepa_debit"],
       customer: stripeCustomerId as string,
-      line_items: [
-        ...productsWithQuantity.map((product) => ({
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: product.name,
-              images: [product?.images?.[0] as string],
-            },
-            unit_amount:
-              typeof product.default_price === "object"
-                ? product?.default_price?.unit_amount || 0
-                : 0,
-          },
-          quantity: product.quantity,
-        })),
-      ],
+      line_items: line_items_stripe,
       mode: "payment",
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
@@ -118,21 +125,30 @@ export async function createCheckoutSessionNow(product: CartItem) {
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   console.log(referralCode)
 
-  const line_items = {
-    price_data: {
-      currency: "usd",
-      product_data: {
-        name: product.name,
-        images: [product?.image as string],
-        // Remove the 'id' field - it's not allowed here
-        // Optionally add metadata to track your internal product ID
-        metadata: {
-          product_id: product.id
-        }
+  let line_items: any;
+
+  if (product.stripePriceId) {
+    line_items = {
+      price: product.stripePriceId,
+      quantity: product.quantity,
+    };
+  } else {
+    line_items = {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: product.name,
+          images: [product?.image as string],
+          // Remove the 'id' field - it's not allowed here
+          // Optionally add metadata to track your internal product ID
+          metadata: {
+            product_id: product.id
+          }
+        },
+        unit_amount: product.price
       },
-      unit_amount: product.price
-    },
-    quantity: product.quantity,
+      quantity: product.quantity,
+    }
   }
 
   let stripeCustomerId = session.user.stripeCustomerId;

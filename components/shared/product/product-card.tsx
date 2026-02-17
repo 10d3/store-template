@@ -56,6 +56,8 @@ export function PackCardNew({
       price: Math.round(currentPrice.total * 100), // Convert to cents
       quantity: 1, // 1 pack
       maxQuantity: 99,
+      variantId: selectedPack, // Use pack size as variant ID to distinguish specific packs
+      stripePriceId: currentPrice.stripePriceId, // Pass the Stripe Price ID
       metadata: {
         packSize: parseInt(selectedPack),
         purchaseType,
