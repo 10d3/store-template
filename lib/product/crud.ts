@@ -459,7 +459,7 @@ export async function createPack(data: PackFormData) {
       const finalProduct = await stripe.products.update(product.id, {
         metadata: {
           ...validatedMetadata,
-          pack_sizes: JSON.stringify(updatedPackSizes),
+          pack_sizes: JSON.stringify(updatedPackSizes.map(({ image, ...rest }: any) => rest)),
         },
       });
 
