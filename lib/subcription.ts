@@ -9,6 +9,7 @@ import {
   deletePriceFromDatabase,
 } from "./product/product-sync";
 import { sendOrderStatusEmail, sendOwnerOrderNotification } from "./email/order-emails";
+import { generateOrderId } from "./order-id";
 
 export default async function handleSubscription(payload: Stripe.Event) {
   const { type, data } = payload;
@@ -150,6 +151,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
       },
       create: {
         id: paymentIntent.id,
+        orderNumber: generateOrderId(),
         userId: paymentIntent.metadata?.user_id || "unknown",
         total: paymentIntent.amount / 100,
         status: "failed",
@@ -164,7 +166,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
         },
         createdAt: new Date(paymentIntent.created * 1000),
         updatedAt: new Date(),
-      },
+      } as any,
     });
   } catch (error) {
     console.error("Error handling payment failure:", error);
@@ -215,6 +217,7 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       },
       create: {
         id: data.id,
+        orderNumber: generateOrderId(),
         userId: data?.metadata?.userId as string,
         total: data?.amount_total ? data.amount_total / 100 : 0,
         status: "completed",
@@ -231,7 +234,7 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         },
         createdAt: new Date(data.created * 1000),
         updatedAt: new Date(),
-      },
+      } as any,
     });
 
     // Prepare items with images for email

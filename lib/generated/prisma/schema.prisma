@@ -124,7 +124,7 @@ model Order {
   status          String
   createdAt       DateTime
   updatedAt       DateTime
-  orderNumber     Int      @unique @default(autoincrement())
+  orderNumber     String   @unique
 
   @@map("order")
 }
