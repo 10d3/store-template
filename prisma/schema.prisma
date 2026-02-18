@@ -78,6 +78,7 @@ model Price {
   currency   String  @default("usd")
   active     Boolean @default(true)
   isDefault  Boolean @default(false)
+  image      String? // Optional image URL for this specific price variant
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

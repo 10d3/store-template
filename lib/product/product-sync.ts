@@ -121,6 +121,7 @@ export async function syncPriceToDatabase(
                 currency: price.currency,
                 active: price.active,
                 isDefault,
+                image: price.metadata?.image || null,
                 updatedAt: new Date(),
             },
             create: {
@@ -130,6 +131,7 @@ export async function syncPriceToDatabase(
                 currency: price.currency,
                 active: price.active,
                 isDefault,
+                image: price.metadata?.image || null,
             },
         });
 
