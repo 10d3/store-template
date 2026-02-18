@@ -86,6 +86,7 @@ type price = {
   unitAmount: number;
   currency: string;
   isDefault: boolean;
+  image: string | null;
 }
 export function transformDbProduct(dbProduct: {
   id: string;
@@ -135,7 +136,7 @@ export function transformDbProduct(dbProduct: {
       unit_amount: p.unitAmount,
       currency: p.currency,
       is_default: p.isDefault,
-      image: (p as any).image ?? null, // Cast to any because db type might not be updated in this file's definition yet
+      image: p.image ?? null,
       metadata: {},
     })),
   };

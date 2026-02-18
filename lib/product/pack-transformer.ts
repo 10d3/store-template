@@ -147,7 +147,7 @@ export function transformPackToProductData(
 
         // If no image explicitly set on pack size, try to find it in the fetched prices
         if (!imageUrl && pack.prices && pack.prices.length > 0) {
-            // First try to match by Stripe Price ID if we have it
+            // Primary: match by Stripe Price ID
             const matchedPrice = sizeConfig.stripePriceId
                 ? pack.prices.find(p => p.id === sizeConfig.stripePriceId)
                 : null;
@@ -155,10 +155,14 @@ export function transformPackToProductData(
             if (matchedPrice && matchedPrice.image) {
                 imageUrl = matchedPrice.image;
             } else {
-                // Fallback: try to match by metadata (if we had access to price metadata, which we don't fully in StripeProduct yet,
-                // but we might rely on the DB 'image' field being sufficient).
-                // Actually, we do pass metadata in the type definition now, but db-queries might not populate it fully.
-                // But wait, we added 'image' to the price object directly in types/product.ts.
+                // Fallback: match by pack_size in price metadata
+                // Each pack size price has metadata.pack_size = size.toString()
+                const fallbackPrice = pack.prices.find(
+                    (p: any) => p.metadata?.pack_size === size.toString() && p.image
+                );
+                if (fallbackPrice) {
+                    imageUrl = (fallbackPrice as any).image;
+                }
             }
         }
 

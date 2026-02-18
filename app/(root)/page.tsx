@@ -121,6 +121,8 @@ export default async function Home() {
     };
   });
 
+  // console.log("test eyyaf", packProductData)
+
   return (
     <div className="min-h-screen">
       <div className="w-full">

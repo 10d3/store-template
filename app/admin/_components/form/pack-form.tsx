@@ -87,6 +87,9 @@ export function EnhancedPackForm({
           // Recalculate fixedPrice if missing but discount exists
           /* eslint-disable @typescript-eslint/no-explicit-any */
           packSizes = parsedSizes.map((sizeConfig: any) => {
+            // Recalculate fixedPrice if missing but discount exists
+            let enriched = { ...sizeConfig };
+
             if (sizeConfig.enabled && sizeConfig.discountPercent !== undefined && sizeConfig.fixedPrice === undefined) {
               // We need the base price to calculate. 
               // Since we can't easily access suggestedPrice here without calculation, 
@@ -101,10 +104,21 @@ export function EnhancedPackForm({
               if (unitAmount > 0) {
                 const totalBase = unitAmount * sizeConfig.size;
                 const calculatedFixed = Math.round(totalBase * (1 - sizeConfig.discountPercent / 100));
-                return { ...sizeConfig, fixedPrice: calculatedFixed };
+                enriched = { ...enriched, fixedPrice: calculatedFixed };
               }
             }
-            return sizeConfig;
+
+            // If no image in metadata (stripped to save space), look up from DB prices by stripePriceId
+            if (!enriched.image && enriched.stripePriceId && initialData.prices) {
+              const matchedPrice = (initialData.prices as any[]).find(
+                (p: any) => p.id === enriched.stripePriceId
+              );
+              if (matchedPrice?.image) {
+                enriched = { ...enriched, image: matchedPrice.image };
+              }
+            }
+
+            return enriched;
           });
         } catch {
           console.warn("Failed to parse pack_sizes metadata");
