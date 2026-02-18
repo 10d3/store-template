@@ -36,6 +36,7 @@ export function NavUserMenu({
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          // router.refresh();
           router.push("/login");
         },
       },
