@@ -6,6 +6,44 @@ import { CartItem } from "../store";
 import { prisma } from "../prisma";
 import { stripeClient } from "../stripe";
 
+/**
+ * Resolves a valid live Stripe customer ID for the user.
+ * If the stored ID is stale (e.g. from test mode), creates a fresh one.
+ */
+async function getOrCreateStripeCustomer(
+  userId: string,
+  email: string | null | undefined,
+  name: string | null | undefined,
+  storedCustomerId: string | null | undefined
+): Promise<string> {
+  // Try to use the stored ID — but verify it actually exists in Stripe
+  if (storedCustomerId) {
+    try {
+      const existing = await stripeClient.customers.retrieve(storedCustomerId);
+      if (!existing.deleted) return existing.id;
+    } catch {
+      // Customer not found in live Stripe (stale test ID) — fall through to create
+      console.warn(`Stale Stripe customer ID ${storedCustomerId} — creating new live customer`);
+    }
+  }
+
+  // Create a new customer in live Stripe
+  const customer = await stripeClient.customers.create({
+    email: email ?? undefined,
+    name: name ?? undefined,
+    metadata: { userId },
+  });
+
+  // Persist the new live ID to the DB
+  await prisma.user.update({
+    where: { id: userId },
+    data: { stripeCustomerId: customer.id },
+  });
+
+  console.log(`Created new live Stripe customer ${customer.id} for user ${userId}`);
+  return customer.id;
+}
+
 export async function createCheckoutSession(cart: CartItem[]) {
   const session = await auth.api.getSession({ headers: await headers() });
   console.log("createCheckoutSession: session found?", !!session);
@@ -62,36 +100,17 @@ export async function createCheckoutSession(cart: CartItem[]) {
   });
 
   console.log("createCheckoutSession: referralCode", referralCode);
-  let stripeCustomerId = session.user.stripeCustomerId;
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { stripeCustomerId: true, email: true, name: true },
+  });
 
-  // Verify stripeCustomerId exists, if not create it
-  if (!stripeCustomerId) {
-    console.log("createCheckoutSession: No stripeCustomerId found on session, fetching from DB...");
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true, email: true, name: true }
-    });
-
-    if (user?.stripeCustomerId) {
-      stripeCustomerId = user.stripeCustomerId;
-    } else {
-      console.log("createCheckoutSession: No stripeCustomerId in DB, creating new customer...");
-      const customer = await stripeClient.customers.create({
-        email: user?.email || session.user.email,
-        name: user?.name || session.user.name,
-        metadata: {
-          userId: session.user.id,
-        }
-      });
-      stripeCustomerId = customer.id;
-
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: { stripeCustomerId: customer.id }
-      });
-      console.log("createCheckoutSession: Created new customer", customer.id);
-    }
-  }
+  const stripeCustomerId = await getOrCreateStripeCustomer(
+    session.user.id,
+    user?.email ?? session.user.email,
+    user?.name ?? session.user.name,
+    user?.stripeCustomerId ?? session.user.stripeCustomerId
+  );
 
   try {
     const sessionStripe = await stripeClient.checkout.sessions.create({
@@ -151,36 +170,17 @@ export async function createCheckoutSessionNow(product: CartItem) {
     }
   }
 
-  let stripeCustomerId = session.user.stripeCustomerId;
+  const user2 = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { stripeCustomerId: true, email: true, name: true },
+  });
 
-  // Verify stripeCustomerId exists, if not create it
-  if (!stripeCustomerId) {
-    console.log("createCheckoutSession: No stripeCustomerId found on session, fetching from DB...");
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { stripeCustomerId: true, email: true, name: true }
-    });
-
-    if (user?.stripeCustomerId) {
-      stripeCustomerId = user.stripeCustomerId;
-    } else {
-      console.log("createCheckoutSession: No stripeCustomerId in DB, creating new customer...");
-      const customer = await stripeClient.customers.create({
-        email: user?.email || session.user.email,
-        name: user?.name || session.user.name,
-        metadata: {
-          userId: session.user.id,
-        }
-      });
-      stripeCustomerId = customer.id;
-
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: { stripeCustomerId: customer.id }
-      });
-      console.log("createCheckoutSession: Created new customer", customer.id);
-    }
-  }
+  const stripeCustomerId = await getOrCreateStripeCustomer(
+    session.user.id,
+    user2?.email ?? session.user.email,
+    user2?.name ?? session.user.name,
+    user2?.stripeCustomerId ?? session.user.stripeCustomerId
+  );
 
   const sessionStripe = await stripeClient.checkout.sessions.create({
     payment_method_types: ["card", "link", "sepa_debit"],
