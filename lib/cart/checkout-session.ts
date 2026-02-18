@@ -114,7 +114,7 @@ export async function createCheckoutSession(cart: CartItem[]) {
 
   try {
     const sessionStripe = await stripeClient.checkout.sessions.create({
-      payment_method_types: ["card", "link", "sepa_debit"],
+      payment_method_types: ["card", "link"],
       customer: stripeCustomerId as string,
       line_items: line_items_stripe,
       mode: "payment",
@@ -183,7 +183,7 @@ export async function createCheckoutSessionNow(product: CartItem) {
   );
 
   const sessionStripe = await stripeClient.checkout.sessions.create({
-    payment_method_types: ["card", "link", "sepa_debit"],
+    payment_method_types: ["card", "link"],
     customer: stripeCustomerId as string,
     line_items: [line_items],
     mode: "payment",
