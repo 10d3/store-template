@@ -12,6 +12,7 @@ import {
     listProducts,
     listCoupons,
     unarchiveProduct,
+    getArchivedProducts,
 } from "@/lib/product/crud"
 import { toast } from "sonner"
 import ProductForm from "../../_components/form/product-form"
@@ -38,6 +39,12 @@ export default function ProductManagementPage() {
 
     // Filter out packs to show only regular products
     const regularProducts = products.filter(p => p.metadata?.type !== 'pack')
+
+    // Archived products query
+    const { data: archivedProducts = [], isLoading: archivedLoading } = useQuery({
+        queryKey: ["archived-products"],
+        queryFn: getArchivedProducts,
+    })
 
     // Mutations
     const { mutate: handleCreateProduct, isPending: creatingProduct } = useMutation({
@@ -71,6 +78,7 @@ export default function ProductManagementPage() {
         mutationFn: archiveProduct,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
+            queryClient.invalidateQueries({ queryKey: ["archived-products"] })
             toast.success("Product archived successfully")
         },
         onError: (error) => {
@@ -83,6 +91,7 @@ export default function ProductManagementPage() {
         mutationFn: unarchiveProduct,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] })
+            queryClient.invalidateQueries({ queryKey: ["archived-products"] })
             toast.success("Product unarchived successfully")
         },
         onError: (error) => {
@@ -141,8 +150,19 @@ export default function ProductManagementPage() {
                     onArchive={handleArchiveProduct}
                     onUnarchive={handleUnarchiveProduct}
                     isLoading={creatingProduct || updatingProduct}
-                    title="Product List"
+                    title="Active Products"
                     description="Manage your individual products here"
+                />
+
+                <ProductOnlyList
+                    products={archivedProducts || []}
+                    onEdit={onEditProduct}
+                    onArchive={handleArchiveProduct}
+                    onUnarchive={handleUnarchiveProduct}
+                    isLoading={archivedLoading}
+                    title="Archived Products"
+                    description="These products are hidden from the storefront. Unarchive to restore them."
+                    isArchived
                 />
             </div>
 

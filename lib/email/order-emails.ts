@@ -7,6 +7,7 @@ import PaymentFailedEmail from "@/components/mails/payment-failed-email";
 import DisputeEmail from "@/components/mails/dispute-email";
 import TrackingEmail from "@/components/mails/tracking-email";
 import OrderUpdateEmail from "@/components/mails/order-update-email";
+import NewOrderNotificationEmail from "@/components/mails/new-order-notification-email";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -125,5 +126,39 @@ export async function sendTrackingEmail(data: {
   } catch (error) {
     console.error("Error in sendTrackingEmail:", error);
     throw error;
+  }
+}
+
+export async function sendOwnerOrderNotification(data: {
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  orderTotal: number;
+  orderItems?: any[];
+}) {
+  const ownerEmail = process.env.STORE_OWNER_EMAIL;
+  if (!ownerEmail) {
+    console.warn("STORE_OWNER_EMAIL not set — skipping owner notification");
+    return;
+  }
+
+  try {
+    const { data: result, error } = await resend.emails.send({
+      from: "Vitanou <noreply@vitanou.com>",
+      to: [ownerEmail],
+      subject: `🛍️ New Order #${data.orderId} — $${data.orderTotal.toFixed(2)}`,
+      // @ts-ignore
+      react: NewOrderNotificationEmail(data),
+    });
+
+    if (error) {
+      console.error("Error sending owner notification:", error);
+      return;
+    }
+
+    console.log("Owner notification sent:", result?.id);
+  } catch (error) {
+    // Non-fatal: log but don't throw so the main flow isn't interrupted
+    console.error("Error in sendOwnerOrderNotification:", error);
   }
 }

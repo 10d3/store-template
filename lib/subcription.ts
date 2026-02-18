@@ -8,7 +8,7 @@ import {
   syncPriceToDatabase,
   deletePriceFromDatabase,
 } from "./product/product-sync";
-import { sendOrderStatusEmail } from "./email/order-emails";
+import { sendOrderStatusEmail, sendOwnerOrderNotification } from "./email/order-emails";
 
 export default async function handleSubscription(payload: Stripe.Event) {
   const { type, data } = payload;
@@ -256,13 +256,22 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       }
     }
 
-    // Send confirmation email
+    // Send confirmation email to customer
     await sendOrderStatusEmail({
       customerEmail: data.customer_details?.email || "",
       customerName: data.customer_details?.name || "Customer",
-      orderId: order.orderNumber.toString(), // Use friendly ID from DB
+      orderId: order.orderNumber.toString(),
       orderTotal: data.amount_total ? data.amount_total / 100 : 0,
       orderStatus: "completed",
+      orderItems: orderItems,
+    });
+
+    // Notify store owner
+    await sendOwnerOrderNotification({
+      orderId: order.orderNumber.toString(),
+      customerName: data.customer_details?.name || "Customer",
+      customerEmail: data.customer_details?.email || "",
+      orderTotal: data.amount_total ? data.amount_total / 100 : 0,
       orderItems: orderItems,
     });
 

@@ -17,6 +17,7 @@ interface ProductOnlyListProps {
   isLoading?: boolean;
   title?: string;
   description?: string;
+  isArchived?: boolean;
 }
 
 export function ProductOnlyList({
@@ -27,6 +28,7 @@ export function ProductOnlyList({
   isLoading,
   title = "Products",
   description,
+  isArchived = false,
 }: ProductOnlyListProps) {
   const [archivingId, setArchivingId] = useState<string | null>(null);
 
@@ -82,7 +84,9 @@ export function ProductOnlyList({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-medium truncate">{product.name}</h3>
-                    <Badge variant="outline">Product</Badge>
+                    <Badge variant={isArchived ? "secondary" : "outline"}>
+                      {isArchived ? "Archived" : "Product"}
+                    </Badge>
                   </div>
                   {product.description && (
                     <p className="text-sm text-muted-foreground truncate max-w-[200px]">
@@ -96,30 +100,37 @@ export function ProductOnlyList({
                   )}
                 </div>
                 <div className="flex items-center gap-2 ml-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onEdit(product)}
-                    disabled={isLoading}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleArchive(product.id)}
-                    disabled={archivingId === product.id || isLoading}
-                  >
-                    <Archive className="h-4 w-4" />
-                  </Button>
-                  {/* <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleUnarchive(product.id)}
-                    disabled={archivingId === product.id || isLoading}
-                  >
-                    <PiRoadHorizon className="h-4 w-4" />
-                  </Button> */}
+                  {!isArchived && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onEdit(product)}
+                      disabled={isLoading}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {isArchived ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleUnarchive(product.id)}
+                      disabled={archivingId === product.id || isLoading}
+                      title="Unarchive"
+                    >
+                      <PiRoadHorizon className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleArchive(product.id)}
+                      disabled={archivingId === product.id || isLoading}
+                      title="Archive"
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             ))
