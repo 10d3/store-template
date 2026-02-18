@@ -64,7 +64,7 @@ export const listProductsFromDB = cache(async (): Promise<StripeProduct[]> => {
             prices: {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
-                take: 1,
+                take: 5,
             },
             nutrition: true,
         },
@@ -93,7 +93,7 @@ export const getProductBySlugFromDB = cache(async (
             prices: {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
-                take: 1,
+                take: 5,
             },
             nutrition: true,
         },
@@ -117,7 +117,7 @@ export async function getProductsByIdsFromDB(
             prices: {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
-                take: 1,
+                take: 10,
             },
             nutrition: true,
         },
@@ -156,7 +156,7 @@ export async function getProductsByCategoryFromDB(
             prices: {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
-                take: 1,
+                take: 10,
             },
             nutrition: true,
         },
@@ -182,7 +182,7 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
             prices: {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
-                take: 1,
+                take: 10,
             },
             nutrition: true,
         },

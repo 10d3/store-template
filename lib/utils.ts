@@ -130,6 +130,14 @@ export function transformDbProduct(dbProduct: {
         currency: defaultPrice.currency,
       }
       : null,
+    prices: dbProduct.prices.map((p) => ({
+      id: p.id,
+      unit_amount: p.unitAmount,
+      currency: p.currency,
+      is_default: p.isDefault,
+      image: (p as any).image ?? null, // Cast to any because db type might not be updated in this file's definition yet
+      metadata: {},
+    })),
   };
 }
 

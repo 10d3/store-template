@@ -17,6 +17,14 @@ export interface StripeProduct {
   | null;
   active: boolean;
   variants?: StripeProductVariant[];
+  prices?: {
+    id: string;
+    unit_amount: number | null;
+    currency: string;
+    is_default: boolean;
+    image?: string | null;
+    metadata?: Record<string, string>;
+  }[];
 }
 
 export interface StripeProductVariant {

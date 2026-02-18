@@ -143,7 +143,26 @@ export function transformPackToProductData(
         };
 
         // Use size-specific image if available, otherwise use default
-        imagesPerSize[size.toString()] = image || defaultImage;
+        let imageUrl = image;
+
+        // If no image explicitly set on pack size, try to find it in the fetched prices
+        if (!imageUrl && pack.prices && pack.prices.length > 0) {
+            // First try to match by Stripe Price ID if we have it
+            const matchedPrice = sizeConfig.stripePriceId
+                ? pack.prices.find(p => p.id === sizeConfig.stripePriceId)
+                : null;
+
+            if (matchedPrice && matchedPrice.image) {
+                imageUrl = matchedPrice.image;
+            } else {
+                // Fallback: try to match by metadata (if we had access to price metadata, which we don't fully in StripeProduct yet,
+                // but we might rely on the DB 'image' field being sufficient).
+                // Actually, we do pass metadata in the type definition now, but db-queries might not populate it fully.
+                // But wait, we added 'image' to the price object directly in types/product.ts.
+            }
+        }
+
+        imagesPerSize[size.toString()] = imageUrl || defaultImage;
     }
 
     // If no valid pricing was created, bail out
