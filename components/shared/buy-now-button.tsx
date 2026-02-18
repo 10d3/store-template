@@ -41,8 +41,8 @@ export default function BuyNowButton({
             const session = await createCheckoutSessionNow(transformProductDatatoCartItem(product));
             setLoading(false);
             window.location.href = session as string;
-        } catch (error) {
-            toast.error("You need to login to buy this product");
+        } catch (error: any) {
+            toast.error(error.message || "An error occurred during checkout");
             console.error("Error creating checkout session:", error);
             setLoading(false);
         }

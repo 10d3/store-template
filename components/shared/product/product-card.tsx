@@ -42,7 +42,6 @@ export function PackCardNew({
   const currentPrice = product.pricing[purchaseType][selectedPack]
   const savings = Math.round(((currentPrice.original - currentPrice.total) / currentPrice.original) * 100)
 
-  console.log(product)
 
   const handleAddToCart = () => {
     // Add to cart store
@@ -52,7 +51,7 @@ export function PackCardNew({
     addOrUpdateItem({
       id: product.id,
       name: hasMultiplePacks ? `${product.name} (${selectedPack} Pack)` : product.name,
-      image: product.image,
+      image: currentImage, // Use size-specific image
       price: Math.round(currentPrice.total * 100), // Convert to cents
       quantity: 1, // 1 pack
       maxQuantity: 99,

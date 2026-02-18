@@ -22,8 +22,8 @@ export default function CartModal() {
       const session = await createCheckoutSession(cart);
       router.push(session as string);
       setIsLoading(false);
-    } catch (error) {
-      toast.error("You need to login to buy this product");
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during checkout");
       console.error("Error creating checkout session:", error);
       setIsLoading(false);
     }
@@ -66,7 +66,7 @@ export default function CartModal() {
                 <li key={item.id} className="flex py-6">
                   <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
                     <Image
-                      src={item.image}
+                      src={item.image || "/placeholder.svg"}
                       alt={item.name}
                       width={64}
                       height={64}
