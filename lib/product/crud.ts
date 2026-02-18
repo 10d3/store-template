@@ -11,7 +11,7 @@ import { validateMetadata } from "@/lib/metadata/config";
 import { transformMetadataForSubmission } from "@/lib/metadata/form-utils";
 import { ProductCrudError } from "./errors";
 import { prisma } from "../prisma";
-import { getCachedProducts } from "./cache";
+import { getCachedProducts, revalidateProductCache } from "./cache";
 import { getProductsByIdsFromDB } from "./db-queries";
 import { syncProductToDatabase, syncPriceToDatabase } from "./product-sync";
 
@@ -120,6 +120,7 @@ export async function createProduct(data: ProductFormData) {
       },
     };
 
+    await revalidateProductCache();
     return transformProduct(productWithNutrition);
   } catch (error) {
     if (error instanceof ProductCrudError) {
@@ -198,6 +199,7 @@ export async function updateProduct(
       },
     };
 
+    await revalidateProductCache();
     return transformProduct(productWithNutrition);
   } catch (error) {
     console.error("updateProduct error:", error);
@@ -221,6 +223,7 @@ export async function updateProduct(
 export async function unarchiveProduct(id: string) {
   try {
     const product = await stripe.products.update(id, { active: true });
+    await revalidateProductCache();
     return transformProduct(product);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -239,6 +242,7 @@ export async function unarchiveProduct(id: string) {
 export async function archiveProduct(id: string) {
   try {
     const product = await stripe.products.update(id, { active: false });
+    await revalidateProductCache();
     return transformProduct(product);
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
@@ -466,6 +470,7 @@ export async function createPack(data: PackFormData) {
       await syncProductToDatabase(product as Stripe.Product);
     }
 
+    await revalidateProductCache();
     return transformProduct({
       ...product,
       default_price: price.id,
@@ -596,6 +601,7 @@ export async function updatePack(id: string, data: PackFormData) {
       // Sync to database to ensure storefront has latest data
       await syncProductToDatabase(updatedProduct as Stripe.Product);
 
+      await revalidateProductCache();
       return transformProduct(updatedProduct as Stripe.Product);
     }
 
@@ -603,6 +609,7 @@ export async function updatePack(id: string, data: PackFormData) {
     const updatedSimpleProduct = await stripe.products.retrieve(id, { expand: ["default_price"] });
     await syncProductToDatabase(updatedSimpleProduct as Stripe.Product);
 
+    await revalidateProductCache();
     return transformProduct(product);
   } catch (error) {
     if (error instanceof ProductCrudError) {
