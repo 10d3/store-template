@@ -248,31 +248,7 @@ export const useCartStore = create<CartStore>()(
 
       getTotalPrice: () => {
         const sub = get().getSubTotal();
-        const { coupon } = get();
-
-        console.log("🔍 Debug getTotalPrice:");
-        console.log("Subtotal (cents):", sub);
-        console.log("Coupon:", coupon);
-
-        // if (!coupon) {
-        const result = Number((sub / 100).toFixed(2));
-        console.log("No coupon - Total (dollars):", result);
-        return result;
-        // }
-
-        // const discount =
-        //   coupon.type === "percent" ? (coupon.value / 100) * sub : coupon.value;
-
-        // console.log("Discount calculation:", discount);
-        // console.log("Discount type:", coupon.type, "value:", coupon.value);
-
-        // const total = Math.max(sub - discount, 0);
-        // console.log("Total after discount (cents):", total);
-
-        // const finalResult = Number((total / 100).toFixed(2));
-        // console.log("Final result (dollars):", finalResult);
-
-        // return finalResult;
+        return Number((sub / 100).toFixed(2));
       },
 
       getTotalUniqueItems: () => get().cart.length,

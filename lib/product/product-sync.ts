@@ -13,7 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
  */
 export async function syncProductToDatabase(product: Stripe.Product) {
     try {
-        console.log(`📦 Syncing product ${product.id} to database...`);
+
 
         // Get the default price if it exists
         let defaultPrice: Stripe.Price | null = null;
@@ -51,7 +51,7 @@ export async function syncProductToDatabase(product: Stripe.Product) {
             await syncPriceToDatabase(defaultPrice, true);
         }
 
-        console.log(`✅ Product ${product.id} synced successfully`);
+
         return { success: true };
     } catch (error) {
         console.error(`❌ Error syncing product ${product.id}:`, error);
@@ -65,7 +65,7 @@ export async function syncProductToDatabase(product: Stripe.Product) {
  */
 export async function deleteProductFromDatabase(productId: string) {
     try {
-        console.log(`🗑️ Soft deleting product ${productId}...`);
+
 
         await prisma.product.update({
             where: { id: productId },
@@ -84,7 +84,7 @@ export async function deleteProductFromDatabase(productId: string) {
             },
         });
 
-        console.log(`✅ Product ${productId} soft deleted`);
+
         return { success: true };
     } catch (error) {
         console.error(`❌ Error deleting product ${productId}:`, error);
@@ -104,7 +104,7 @@ export async function syncPriceToDatabase(
         const productId =
             typeof price.product === "string" ? price.product : price.product.id;
 
-        console.log(`💰 Syncing price ${price.id} for product ${productId}...`);
+
 
         // If this is the default price, unset other defaults first
         if (isDefault) {
@@ -135,7 +135,7 @@ export async function syncPriceToDatabase(
             },
         });
 
-        console.log(`✅ Price ${price.id} synced successfully`);
+
         return { success: true };
     } catch (error) {
         console.error(`❌ Error syncing price ${price.id}:`, error);
@@ -149,7 +149,7 @@ export async function syncPriceToDatabase(
  */
 export async function deletePriceFromDatabase(priceId: string) {
     try {
-        console.log(`🗑️ Deleting price ${priceId}...`);
+
 
         await prisma.price.update({
             where: { id: priceId },
@@ -159,7 +159,7 @@ export async function deletePriceFromDatabase(priceId: string) {
             },
         });
 
-        console.log(`✅ Price ${priceId} deleted`);
+
         return { success: true };
     } catch (error) {
         console.error(`❌ Error deleting price ${priceId}:`, error);
@@ -173,7 +173,7 @@ export async function deletePriceFromDatabase(priceId: string) {
  */
 export async function syncAllProducts() {
     try {
-        console.log("🔄 Starting full product sync...");
+
 
         // Fetch all active products from Stripe
         const products = await stripe.products.list({
@@ -182,7 +182,7 @@ export async function syncAllProducts() {
             expand: ["data.default_price"],
         });
 
-        console.log(`📦 Found ${products.data.length} products to sync`);
+
 
         let synced = 0;
         let failed = 0;
@@ -196,9 +196,7 @@ export async function syncAllProducts() {
             }
         }
 
-        console.log(
-            `✅ Sync complete: ${synced} synced, ${failed} failed out of ${products.data.length} products`
-        );
+
 
         return { success: true, synced, failed, total: products.data.length };
     } catch (error) {

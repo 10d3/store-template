@@ -11,6 +11,18 @@ import {
 import { sendOrderStatusEmail, sendOwnerOrderNotification } from "./email/order-emails";
 import { generateOrderId } from "./order-id";
 
+// ── Webhook deduplication ────────────────────────────────────────
+// CRUD operations (createPack, updatePack, etc.) sync products to the
+// database directly. Those same Stripe mutations also fire webhooks.
+// This set tracks product/price IDs that were just synced by CRUD so the
+// webhook handler can skip the redundant second sync.
+const recentlySyncedIds = new Set<string>();
+
+export function markAsSynced(id: string) {
+  recentlySyncedIds.add(id);
+  setTimeout(() => recentlySyncedIds.delete(id), 10_000); // 10 s TTL
+}
+
 export default async function handleSubscription(payload: Stripe.Event) {
   const { type, data } = payload;
 
@@ -38,6 +50,8 @@ export default async function handleSubscription(payload: Stripe.Event) {
     // ============ PRODUCT SYNC WEBHOOKS ============
     case "product.created":
     case "product.updated":
+      // Skip if CRUD already synced this product directly
+      if (recentlySyncedIds.has((data.object as Stripe.Product).id)) break;
       await syncProductToDatabase(data.object as Stripe.Product);
       break;
 
@@ -47,6 +61,8 @@ export default async function handleSubscription(payload: Stripe.Event) {
 
     case "price.created":
     case "price.updated":
+      // Skip if CRUD already synced this price directly
+      if (recentlySyncedIds.has((data.object as Stripe.Price).id)) break;
       await syncPriceToDatabase(data.object as Stripe.Price);
       break;
 

@@ -3,7 +3,7 @@ import Footer from "@/components/footer";
 import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
 import Navbar, { Category } from "@/components/shared/nav/navigation-menu";
 import SocialProofProvider from "@/components/shared/social-proof-provider";
-import { listProducts } from "@/lib/product/crud";
+import { getCachedProducts } from "@/lib/product/test-index-product";
 import { Metadata } from "next";
 import React from "react";
 import { auth } from "@/lib/auth";
@@ -38,7 +38,7 @@ export default async function Rootlayout({
 }: {
   children: React.ReactNode;
 }) {
-  const products = await listProducts();
+  const products = await getCachedProducts();
 
   const session = await auth.api.getSession({
     headers: await headers(),

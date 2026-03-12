@@ -67,7 +67,7 @@ export function transformPackToProductData(
 
             // Create a single "bundle" option
             enabledSizes = [{ size: 1, enabled: true, fixedPrice }];
-            console.log(`[pack-transformer] Created single-pack option for fixed bundle ${pack.id} with price ${fixedPrice}`);
+            // Single-pack option created for fixed bundle
         } else {
             console.warn(`No enabled pack sizes for pack ${pack.id}`);
             return null;

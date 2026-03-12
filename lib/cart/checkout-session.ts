@@ -40,20 +40,20 @@ async function getOrCreateStripeCustomer(
     data: { stripeCustomerId: customer.id },
   });
 
-  console.log(`Created new live Stripe customer ${customer.id} for user ${userId}`);
+
   return customer.id;
 }
 
 export async function createCheckoutSession(cart: CartItem[]) {
   const session = await auth.api.getSession({ headers: await headers() });
-  console.log("createCheckoutSession: session found?", !!session);
+
   if (!session) {
     console.error("createCheckoutSession: No session found");
     throw new Error("No session found");
   }
   const cookiesStore = await cookies();
   const referralCode = cookiesStore.get("referral_code")?.value || null;
-  console.log(referralCode)
+
   const line_items = cart.map((item) => ({
     price_data: {
       currency: "usd",
@@ -99,7 +99,7 @@ export async function createCheckoutSession(cart: CartItem[]) {
     }
   });
 
-  console.log("createCheckoutSession: referralCode", referralCode);
+
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: { stripeCustomerId: true, email: true, name: true },
@@ -142,7 +142,7 @@ export async function createCheckoutSessionNow(product: CartItem) {
   }
   const cookiesStore = await cookies();
   const referralCode = cookiesStore.get("referral_code")?.value || null;
-  console.log(referralCode)
+
 
   let line_items: any;
 

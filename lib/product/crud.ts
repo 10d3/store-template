@@ -14,6 +14,7 @@ import { prisma } from "../prisma";
 import { getCachedProducts, revalidateProductCache } from "./cache";
 import { getProductsByIdsFromDB } from "./db-queries";
 import { syncProductToDatabase, syncPriceToDatabase } from "./product-sync";
+import { markAsSynced } from "../subcription";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
@@ -444,6 +445,7 @@ export async function createPack(data: PackFormData) {
             });
 
             // Sync price to database
+            markAsSynced(sizePrice.id);
             await syncPriceToDatabase(sizePrice, false);
 
             return {
@@ -464,9 +466,11 @@ export async function createPack(data: PackFormData) {
       });
 
       // Sync the final product state to the database
+      markAsSynced(finalProduct.id);
       await syncProductToDatabase(finalProduct as Stripe.Product);
     } else {
       // If no pack sizes, still sync the initial product creation
+      markAsSynced(product.id);
       await syncProductToDatabase(product as Stripe.Product);
     }
 
@@ -493,7 +497,7 @@ export async function createPack(data: PackFormData) {
 }
 
 export async function updatePack(id: string, data: PackFormData) {
-  console.log(data);
+
   try {
     // Build pack metadata with new pack configuration
     const packMetadata: Record<string, string> = {
@@ -575,6 +579,7 @@ export async function updatePack(id: string, data: PackFormData) {
             });
 
             // Sync price to database
+            markAsSynced(sizePrice.id);
             await syncPriceToDatabase(sizePrice, false);
 
             return {
@@ -599,6 +604,7 @@ export async function updatePack(id: string, data: PackFormData) {
       const updatedProduct = await stripe.products.retrieve(id, { expand: ["default_price"] });
 
       // Sync to database to ensure storefront has latest data
+      markAsSynced(updatedProduct.id);
       await syncProductToDatabase(updatedProduct as Stripe.Product);
 
       await revalidateProductCache();
@@ -607,6 +613,7 @@ export async function updatePack(id: string, data: PackFormData) {
 
     // Sync normal updates as well
     const updatedSimpleProduct = await stripe.products.retrieve(id, { expand: ["default_price"] });
+    markAsSynced(updatedSimpleProduct.id);
     await syncProductToDatabase(updatedSimpleProduct as Stripe.Product);
 
     await revalidateProductCache();
