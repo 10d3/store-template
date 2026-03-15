@@ -7,7 +7,7 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
 import { useCartStore } from "@/lib/store";
-import { useTranslations } from "@/i18n/client";
+// import { useTranslations } from "@/i18n/client";
 
 interface PackProduct {
   id: string;
@@ -48,8 +48,8 @@ export default function PackCard({
   className,
   onAddToCart,
 }: PackCardProps) {
-  const t = useTranslations("product");
-  const currency = useTranslations("common");
+  // const t = useTranslations("product");
+  // const currency = useTranslations("common");
   const [isHovered, setIsHovered] = React.useState(false);
   const [hoveredProductId, setHoveredProductId] = React.useState<string | null>(
     null
@@ -59,7 +59,7 @@ export default function PackCard({
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: currency("currency"),
+      currency: "USD",
     }).format(price / 100); // Assuming price is in cents
   };
 
@@ -167,7 +167,7 @@ export default function PackCard({
           variant="destructive"
           className="absolute top-3 right-3 z-30 bg-red-500 text-white font-semibold px-3 py-1 text-xs rounded-lg shadow-lg"
         >
-          {bundleDiscount}% {t("discount")}
+          {bundleDiscount}% OFF
         </Badge>
       )}
 
@@ -229,7 +229,7 @@ export default function PackCard({
                   ) : (
                     <Image
                       src={product.hoverMedia.src || "/placeholder.svg"}
-                      alt={`${product.name} - hover ${t("hoverImageAlt")}`}
+                      alt={`${product.name} - hover view`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -239,7 +239,7 @@ export default function PackCard({
               )}
 
               {/* Product Info Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
               {/* Product Name */}
               <div className="absolute bottom-2 left-2 right-2">

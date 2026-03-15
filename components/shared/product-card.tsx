@@ -7,7 +7,7 @@ import { cn, formatPrice } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getTranslations } from "@/i18n/server";
+// import { getTranslations } from "@/i18n/server";
 import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
