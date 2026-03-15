@@ -1,29 +1,35 @@
 # syntax=docker/dockerfile:1
-FROM oven/bun:1-alpine AS base
+FROM node:20-alpine AS base
 RUN apk add --no-cache \
     openssl \
     curl \
     libc6-compat
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
+# Dependencies stage
 FROM base AS deps
 WORKDIR /app
-COPY package.json bun.lock ./
-RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile --ignore-scripts  # ← ADDED
+COPY package.json pnpm-lock.yaml ./
+# No cache mount + ignore scripts = no poisoned cache possible
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
-FROM node:20-alpine AS builder
+# Builder stage
+FROM base AS builder
 WORKDIR /app
 RUN apk add --no-cache openssl libc6-compat
-COPY package.json bun.lock ./
+COPY package.json pnpm-lock.yaml ./
 COPY --from=deps /app/node_modules ./node_modules
 COPY prisma ./prisma/
 ENV PRISMA_SCHEMA_ENGINE_TYPE=binary
 ENV PRISMA_QUERY_ENGINE_TYPE=binary
-RUN npx prisma generate
+# Explicitly run only trusted scripts
+RUN npx prisma generate --generator client
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build --ignore-scripts  # ← ADDED
+RUN pnpm build
 
+# Runner stage
 FROM node:20-alpine AS runner
 WORKDIR /app
 RUN apk add --no-cache curl
