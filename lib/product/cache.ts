@@ -73,27 +73,28 @@ export async function getProductByCategory(slug: string) {
   });
 }
 
-export const getPackBySlug = unstable_cache(async (slug: string) => {
-  const pack = await prisma.product.findUnique({
-    where: {
-      slug
-    },
-    // 1. Fetch the related prices so the types match
-    include: {
-      prices: true,
-      // nutrition: true, // Include this too if your transformer needs it
-    }
-  });
+export const getPackBySlug = unstable_cache(
+  async (slug: string) => {
+    const pack = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        prices: {
+          where: { active: true },
+          orderBy: { isDefault: "desc" },
+        },
+      },
+    });
 
-  // 2. Handle the case where the product wasn't found
-  if (!pack) {
-    return null;
-    // or: throw new Error("Product not found");
+    if (!pack) return null;
+
+    return transformDbProduct(pack);
+  },
+  ["pack-by-slug"],
+  {
+    revalidate: 300,
+    tags: ["products", "packs"],
   }
-
-  // Now 'pack' is guaranteed to be non-null and have 'prices'
-  return transformDbProduct(pack);
-})
+);
 
 export async function transformPacksToProductData(
   packs: StripeProduct[]

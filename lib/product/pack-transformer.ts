@@ -181,7 +181,7 @@ export function transformPackToProductData(
         description: pack.description || "",
         // Default image (first enabled size's image or fallback)
         image: defaultImage,
-        slug: pack.slug || "",
+        slug: pack.slug || pack.metadata?.slug || "",
         images: imagesPerSize,
         imageAlt: pack.name,
         packOptions,
@@ -222,19 +222,50 @@ function getBundlePrice(product: StripeProduct): number | null {
 /**
  * Parse pack_sizes JSON string from metadata
  */
-function parsePackSizes(packSizesStr?: string): PackSizeConfig[] | null {
-    if (!packSizesStr) return null;
+function parsePackSizes(packSizesStr?: string): PackSizeConfig[] {
+    const DEFAULT_PACK: PackSizeConfig = { size: 1, enabled: true };
+
+    if (!packSizesStr) {
+        console.warn("No pack_sizes metadata, using default single pack");
+        return [DEFAULT_PACK];
+    }
 
     try {
         const parsed = JSON.parse(packSizesStr);
-        if (Array.isArray(parsed)) {
-            return parsed as PackSizeConfig[];
-        }
-    } catch (e) {
-        console.error("Failed to parse pack_sizes:", e);
-    }
 
-    return null;
+        if (!Array.isArray(parsed)) {
+            console.warn("pack_sizes is not an array, using default");
+            return [DEFAULT_PACK];
+        }
+
+        if (parsed.length === 0) {
+            console.warn("pack_sizes is empty, using default");
+            return [DEFAULT_PACK];
+        }
+
+        const validConfigs = parsed.filter((config) => {
+            if (typeof config.size !== "number" || config.size < 1) {
+                console.warn(`Invalid pack size: ${config.size}, skipping`);
+                return false;
+            }
+            if (typeof config.enabled !== "boolean") {
+                console.warn(`Pack size ${config.size} missing enabled field, defaulting to true`);
+                config.enabled = true;
+            }
+            return true;
+        });
+
+        if (validConfigs.length === 0) {
+            console.warn("No valid pack_sizes, using default");
+            return [DEFAULT_PACK];
+        }
+
+        return validConfigs as PackSizeConfig[];
+    } catch (e) {
+        console.error("Failed to parse pack_sizes JSON:", e);
+        console.error("Raw pack_sizes value:", packSizesStr);
+        return [DEFAULT_PACK];
+    }
 }
 
 /**

@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import * as React from "react";
+import Link from "next/link";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -32,6 +33,7 @@ interface Price {
 interface PackCardProps {
   id?: string;
   name?: string;
+  slug?: string;
   price?: Price | null | undefined | string;
   products: PackProduct[];
   bundleDiscount?: number;
@@ -42,6 +44,7 @@ interface PackCardProps {
 export default function PackCard({
   id = "pack-bundle",
   name = "BUNDLE PACK",
+  slug,
   price,
   products = [],
   bundleDiscount = 0,
@@ -139,7 +142,7 @@ export default function PackCard({
     );
   }
 
-  return (
+  const cardContent = (
     <Card
       className={cn(
         "m-0 p-0 bg-card relative group rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border-card",
@@ -186,8 +189,6 @@ export default function PackCard({
                 "relative aspect-square overflow-hidden transition-all duration-300",
                 index === 0 && "rounded-l-lg",
                 index === products.length - 1 && "rounded-r-lg"
-                // hoveredProductId === product.id &&
-                //   "ring-2 ring-blue-500 ring-offset-2"
               )}
               onMouseEnter={() => setHoveredProductId(product.id)}
               onMouseLeave={() => setHoveredProductId(null)}
@@ -317,24 +318,17 @@ export default function PackCard({
             </div>
           </div>
         )}
-
-        {/* Add to Cart Button - Full Width on Hover */}
-        {/* <div
-          className={cn(
-            "absolute inset-x-3 bottom-3 transition-all duration-300 ease-in-out",
-            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-          )}
-        >
-          <Button
-            onClick={handleAddToCart}
-            className="w-full bg-black text-white hover:bg-gray-800 transition-colors duration-200 font-bold"
-            size="sm"
-          >
-            <ShoppingCart className="w-4 h-4 mr-2" />
-            {t("product.addToCart")}
-          </Button>
-        </div> */}
       </CardContent>
     </Card>
   );
+
+  if (slug) {
+    return (
+      <Link href={`/pack/${slug}`} className="block">
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return cardContent;
 }

@@ -13,6 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
  */
 export async function syncProductToDatabase(product: Stripe.Product) {
     try {
+        const metadata = product.metadata as Record<string, string>;
 
 
         // Get the default price if it exists
@@ -25,7 +26,7 @@ export async function syncProductToDatabase(product: Stripe.Product) {
             }
         }
 
-        // Upsert the product
+        // Upsert the product - extract commonly queried fields from metadata for indexed columns
         await prisma.product.upsert({
             where: { id: product.id },
             update: {
@@ -34,6 +35,11 @@ export async function syncProductToDatabase(product: Stripe.Product) {
                 images: product.images || [],
                 active: product.active,
                 metadata: product.metadata as object,
+                // Populate indexed columns from metadata for fast queries
+                type: metadata.type || null,
+                slug: metadata.slug || null,
+                category: metadata.category || null,
+                gender: metadata.gender || null,
                 updatedAt: new Date(),
             },
             create: {
@@ -43,6 +49,10 @@ export async function syncProductToDatabase(product: Stripe.Product) {
                 images: product.images || [],
                 active: product.active,
                 metadata: product.metadata as object,
+                type: metadata.type || null,
+                slug: metadata.slug || null,
+                category: metadata.category || null,
+                gender: metadata.gender || null,
             },
         });
 
@@ -121,7 +131,9 @@ export async function syncPriceToDatabase(
                 currency: price.currency,
                 active: price.active,
                 isDefault,
-                image: price.metadata?.image || null,
+                // Don't update image from Stripe metadata - images stored directly in DB
+                // (Stripe metadata has 500 char limit)
+                metadata: price.metadata ?? {},
                 updatedAt: new Date(),
             },
             create: {
@@ -132,6 +144,7 @@ export async function syncPriceToDatabase(
                 active: price.active,
                 isDefault,
                 image: price.metadata?.image || null,
+                metadata: price.metadata ?? {},
             },
         });
 

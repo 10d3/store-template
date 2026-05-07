@@ -20,6 +20,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
 
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .substring(0, 100);
+}
+
 // Helper function to validate and transform metadata
 function validateAndTransformMetadata(
   metadata: Record<string, any> | undefined,
@@ -380,9 +390,10 @@ export async function createPresetCoupon(preset: "4for3" | "15off3") {
 
 export async function createPack(data: PackFormData) {
   try {
-    // Build pack metadata with new pack configuration
+    const slug = generateSlug(data.name);
     const packMetadata: Record<string, string> = {
       type: "bundle",
+      slug,
       contents: data.productIds.join(","),
       discount: data?.discount?.toString() || "0",
     };
@@ -433,6 +444,8 @@ export async function createPack(data: PackFormData) {
         data.packSizes.map(async (sizeConfig) => {
           if (sizeConfig.enabled && sizeConfig.fixedPrice) {
             // Create a price for this pack size
+            // NOTE: We do NOT store image in Stripe metadata (500 char limit)
+            // Image is stored directly in DB after price creation
             const sizePrice = await stripe.prices.create({
               product: product.id,
               unit_amount: sizeConfig.fixedPrice,
@@ -440,13 +453,20 @@ export async function createPack(data: PackFormData) {
               metadata: {
                 pack_size: sizeConfig.size.toString(),
                 generated_for: "pack_size",
-                image: sizeConfig.image || "",
               },
             });
 
-            // Sync price to database
+            // Sync price to database (without image - will be added below)
             markAsSynced(sizePrice.id);
             await syncPriceToDatabase(sizePrice, false);
+
+            // Store image directly in DB (bypass Stripe metadata size limits)
+            if (sizeConfig.image) {
+              await prisma.price.update({
+                where: { id: sizePrice.id },
+                data: { image: sizeConfig.image },
+              });
+            }
 
             return {
               ...sizeConfig,
@@ -499,9 +519,10 @@ export async function createPack(data: PackFormData) {
 export async function updatePack(id: string, data: PackFormData) {
 
   try {
-    // Build pack metadata with new pack configuration
+    const slug = data.metadata?.slug || generateSlug(data.name);
     const packMetadata: Record<string, string> = {
       type: "bundle",
+      slug,
       bundle_type: data.metadata?.bundle_type || "",
       contents: data.productIds.join(","),
       discount: data?.discount?.toString() || "0",
@@ -566,7 +587,7 @@ export async function updatePack(id: string, data: PackFormData) {
             // or at least if we don't implement price update logic (which is complicated). 
             // Creating new prices is safe. Archiving old ones is better hygiene but optional for now.
 
-            // Let's create a new price to be sure it matches the current configuration
+            // Create new price - image stored in DB only (Stripe metadata has 500 char limit)
             const sizePrice = await stripe.prices.create({
               product: id,
               unit_amount: sizeConfig.fixedPrice,
@@ -574,13 +595,20 @@ export async function updatePack(id: string, data: PackFormData) {
               metadata: {
                 pack_size: sizeConfig.size.toString(),
                 generated_for: "pack_size",
-                image: sizeConfig.image || "",
               },
             });
 
             // Sync price to database
             markAsSynced(sizePrice.id);
             await syncPriceToDatabase(sizePrice, false);
+
+            // Store image directly in DB
+            if (sizeConfig.image) {
+              await prisma.price.update({
+                where: { id: sizePrice.id },
+                data: { image: sizeConfig.image },
+              });
+            }
 
             return {
               ...sizeConfig,

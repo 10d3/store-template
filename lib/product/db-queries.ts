@@ -65,7 +65,7 @@ export const listProductsFromDB = cache(async (): Promise<StripeProduct[]> => {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
                 take: 20,
-                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
             nutrition: true,
         },
@@ -95,7 +95,7 @@ export const getProductBySlugFromDB = cache(async (
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
                 take: 20,
-                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
             nutrition: true,
         },
@@ -120,7 +120,7 @@ export async function getProductsByIdsFromDB(
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
                 take: 10,
-                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
             nutrition: true,
         },
@@ -160,7 +160,7 @@ export async function getProductsByCategoryFromDB(
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
                 take: 10,
-                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
             nutrition: true,
         },
@@ -187,7 +187,7 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
                 where: { active: true },
                 orderBy: { isDefault: "desc" },
                 take: 10,
-                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
             nutrition: true,
         },
@@ -198,37 +198,22 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
 }
 
 
-const productCache = new Map<string, StripeProduct>();
-
 export async function getProductsByIdsCached(ids: string[]): Promise<StripeProduct[]> {
-    const result: StripeProduct[] = [];
-
-    const idsToFetch = ids.filter((id) => !productCache.has(id));
-
-    if (idsToFetch.length > 0) {
-        const productsFromDB = await prisma.product.findMany({
-            where: { id: { in: idsToFetch }, active: true },
-            include: {
-                prices: {
-                    where: { active: true },
-                    orderBy: { isDefault: "desc" },
-                    take: 1,
-                    select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true },
-                },
+    const dedupedIds = [...new Set(ids)];
+    
+    const productsFromDB = await prisma.product.findMany({
+        where: { id: { in: dedupedIds }, active: true },
+        include: {
+            prices: {
+                where: { active: true },
+                orderBy: { isDefault: "desc" },
+                take: 1,
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
-        });
+        },
+    });
 
-        for (const prod of productsFromDB) {
-            const transformed = transformDbProduct(prod);
-            productCache.set(prod.id, transformed);
-        }
-    }
-
-    // Return products in the same order as ids
-    for (const id of ids) {
-        const cached = productCache.get(id);
-        if (cached) result.push(cached);
-    }
-
-    return result;
+    const productMap = new Map(productsFromDB.map(p => [p.id, transformDbProduct(p)]));
+    
+    return ids.map(id => productMap.get(id)).filter((p): p is StripeProduct => p !== undefined);
 }

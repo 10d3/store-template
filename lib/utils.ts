@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { JsonValue } from "@prisma/client/runtime/library";
 import { StripeProduct } from "@/types/product";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -87,6 +86,7 @@ type price = {
   currency: string;
   isDefault: boolean;
   image: string | null;
+  metadata?: JsonValue | null;
 }
 export function transformDbProduct(dbProduct: {
   id: string;
@@ -137,7 +137,7 @@ export function transformDbProduct(dbProduct: {
       currency: p.currency,
       is_default: p.isDefault,
       image: p.image ?? null,
-      metadata: {},
+      metadata: (p.metadata as Record<string, string>) ?? {},
     })),
   };
 }

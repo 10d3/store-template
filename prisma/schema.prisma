@@ -79,6 +79,9 @@ model Price {
   active     Boolean @default(true)
   isDefault  Boolean @default(false)
   image      String? // Optional image URL for this specific price variant
+  
+  // Store all Stripe price metadata (pack_size, generated_for, etc.)
+  metadata   Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
