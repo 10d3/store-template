@@ -118,8 +118,10 @@ model Review {
 
 model Order {
   id              String   @id
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customerEmail   String?  // For guest checkout - customer email
+  customerName    String?  // For guest checkout - customer name
   total           Float
   lineItems       Json
   shippingAddress String?
@@ -129,6 +131,7 @@ model Order {
   updatedAt       DateTime
   orderNumber     String   @unique
 
+  @@index([customerEmail]) // Index for quick guest order lookups
   @@map("order")
 }
 

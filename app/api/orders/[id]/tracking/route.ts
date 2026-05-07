@@ -30,7 +30,6 @@ export async function POST(
             );
         }
 
-        // Fetch order from Stripe directly since Admin panel lists PaymentIntents
         const stripe = getStripeClient();
         let paymentIntent;
 
@@ -41,10 +40,27 @@ export async function POST(
             return NextResponse.json({ error: "Order not found in Stripe" }, { status: 404 });
         }
 
-        // Determine the email to send to
-        let customerEmail = paymentIntent.receipt_email || (paymentIntent.metadata && paymentIntent.metadata.email);
+        let friendlyOrderId = paymentIntent.id.slice(-8);
+        let localOrderCustomerEmail: string | null = null;
+        let localOrderCustomerName: string | null = null;
 
-        // If email is still missing, try to fetch it from the Customer object
+        try {
+            const dbOrder = await prisma.order.findUnique({
+                where: { id: paymentIntent.id },
+                select: { orderNumber: true, customerEmail: true, customerName: true }
+            });
+
+            if (dbOrder?.orderNumber) {
+                friendlyOrderId = dbOrder.orderNumber.toString();
+            }
+            localOrderCustomerEmail = dbOrder?.customerEmail ?? null;
+            localOrderCustomerName = dbOrder?.customerName ?? null;
+        } catch (dbError) {
+            console.error("Failed to fetch order number from DB:", dbError);
+        }
+
+        let customerEmail = localOrderCustomerEmail || paymentIntent.receipt_email || (paymentIntent.metadata && paymentIntent.metadata.email);
+
         if (!customerEmail && paymentIntent.customer) {
             try {
                 const customerId = typeof paymentIntent.customer === 'string'
@@ -69,7 +85,6 @@ export async function POST(
             );
         }
 
-        // Parse lineItems if it's stored in metadata
         let orderItems = [];
         try {
             if (paymentIntent.metadata?.line_items) {
@@ -79,24 +94,8 @@ export async function POST(
             console.error("Failed to parse line items from metadata", e);
         }
 
-        // Try to find the friendly order number in our database
-        let friendlyOrderId = paymentIntent.id.slice(-8); // Fallback to last 8 chars of Stripe ID usually
-
-        try {
-            const dbOrder = await prisma.order.findUnique({
-                where: { id: paymentIntent.id },
-                select: { orderNumber: true }
-            });
-
-            if (dbOrder?.orderNumber) {
-                friendlyOrderId = dbOrder.orderNumber.toString();
-            }
-        } catch (dbError) {
-            console.error("Failed to fetch order number from DB:", dbError);
-        }
-
         const emailHtml = TrackingEmail({
-            customerName: paymentIntent.shipping?.name || "Customer",
+            customerName: localOrderCustomerName || paymentIntent.shipping?.name || "Customer",
             orderId: friendlyOrderId,
             orderTotal: paymentIntent.amount / 100,
             trackingNumber,

@@ -59,6 +59,8 @@ export async function PATCH(
     // Prepare common email data from local order if available
     if (localOrder) {
       emailData.orderId = localOrder.orderNumber?.toString();
+      emailData.customerEmail = localOrder.customerEmail;
+      emailData.customerName = localOrder.customerName;
 
       // Parse line items if they exist
       if (localOrder.lineItems) {
@@ -297,6 +299,12 @@ export async function GET(
     const localOrder = await getLocalOrder(orderId);
     if (localOrder) {
       localOrderNumber = localOrder.orderNumber;
+      if (localOrder.customerEmail) {
+        customerEmail = localOrder.customerEmail;
+      }
+      if (localOrder.customerName) {
+        customerName = localOrder.customerName;
+      }
     }
 
     const order = {

@@ -158,6 +158,8 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
       update: {
         status: "failed",
         updatedAt: new Date(),
+        customerEmail: paymentIntent.receipt_email || paymentIntent.metadata?.customerEmail || null,
+        customerName: paymentIntent.metadata?.customerName || null,
         metadata: {
           ...paymentIntent.metadata,
           stripe_status: paymentIntent.status,
@@ -168,7 +170,9 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
       create: {
         id: paymentIntent.id,
         orderNumber: generateOrderId(),
-        userId: paymentIntent.metadata?.user_id || "unknown",
+        userId: paymentIntent.metadata?.user_id || null,
+        customerEmail: paymentIntent.receipt_email || paymentIntent.metadata?.customerEmail || null,
+        customerName: paymentIntent.metadata?.customerName || null,
         total: paymentIntent.amount / 100,
         status: "failed",
         lineItems: paymentIntent.metadata?.line_items
@@ -182,7 +186,7 @@ async function handlePaymentIntentFailed(paymentIntent: any) {
         },
         createdAt: new Date(paymentIntent.created * 1000),
         updatedAt: new Date(),
-      } as any,
+      },
     });
   } catch (error) {
     console.error("Error handling payment failure:", error);
@@ -225,6 +229,8 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       update: {
         status: "completed",
         updatedAt: new Date(),
+        customerEmail: data.customer_details?.email || data.metadata?.customerEmail || null,
+        customerName: data.customer_details?.name || data.metadata?.customerName || null,
         metadata: {
           ...data.metadata,
           stripe_status: data.status,
@@ -234,14 +240,24 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       create: {
         id: data.id,
         orderNumber: generateOrderId(),
-        userId: data?.metadata?.userId as string,
+        userId: (data?.metadata?.userId as string) || null,
+        customerEmail: data.customer_details?.email || data.metadata?.customerEmail || null,
+        customerName: data.customer_details?.name || data.metadata?.customerName || null,
         total: data?.amount_total ? data.amount_total / 100 : 0,
         status: "completed",
         lineItems: data?.metadata?.line_items
           ? JSON.parse(data.metadata.line_items)
           : [],
-        shippingAddress: data?.shipping_address_collection
-          ? JSON.stringify(data.shipping_address_collection)
+        shippingAddress: data?.collected_information?.shipping_details?.address
+          ? JSON.stringify({
+              line1: data.collected_information.shipping_details.address.line1,
+              line2: data.collected_information.shipping_details.address.line2,
+              city: data.collected_information.shipping_details.address.city,
+              state: data.collected_information.shipping_details.address.state,
+              postal_code: data.collected_information.shipping_details.address.postal_code,
+              country: data.collected_information.shipping_details.address.country,
+              name: data.collected_information.shipping_details.name,
+            })
           : null,
         metadata: {
           ...data.metadata,
@@ -250,7 +266,7 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         },
         createdAt: new Date(data.created * 1000),
         updatedAt: new Date(),
-      } as any,
+      },
     });
 
     // Prepare items with images for email
