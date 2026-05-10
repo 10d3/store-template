@@ -1,7 +1,7 @@
 "use server";
 import { cookies, headers } from "next/headers";
 import { auth } from "../auth";
-import { getCachedProducts } from "../product/cache";
+// import { getCachedProducts } from "../product/cache";
 import { CartItem } from "../store";
 import { prisma } from "../prisma";
 import { stripeClient } from "../stripe";
@@ -58,94 +58,60 @@ async function getOrCreateStripeCustomer(
  * Create a guest checkout session (no authentication required).
  * Used when customers want to purchase without creating an account.
  */
-export async function createGuestCheckoutSession(
-  email: string,
-  cart: CartItem[],
-  name?: string
-) {
+export async function createGuestCheckoutSession(cart: CartItem[], name?: string) {
   const cookiesStore = await cookies();
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   const baseUrl = await getBaseUrl();
 
+  const line_items_stripe = cart.map((item) => {
+    if (item.stripePriceId) {
+      return { price: item.stripePriceId, quantity: item.quantity };
+    }
+    let imageUrl = item.image;
+    if (imageUrl?.startsWith("/")) imageUrl = `${baseUrl}${imageUrl}`;
+    return {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: item.name,
+          images: imageUrl ? [imageUrl] : [],
+          metadata: { productId: item.id, ...item.metadata },
+        },
+        unit_amount: item.price,
+      },
+      quantity: item.quantity,
+    };
+  });
+
   const line_items = cart.map((item) => ({
     price_data: {
       currency: "usd",
-      product_data: {
-        id: item.id,
-        name: item.name,
-        images: [item?.image as string],
-      },
-      unit_amount: item.price
+      product_data: { name: item.name, images: [item?.image as string] },
+      unit_amount: item.price,
     },
     quantity: item.quantity,
   }));
 
-  const line_items_stripe = cart.map((item) => {
-    if (item.stripePriceId) {
-      return {
-        price: item.stripePriceId,
-        quantity: item.quantity
-      };
-    } else {
-      let imageUrl = item.image;
-      if (imageUrl && imageUrl.startsWith("/")) {
-        imageUrl = `${baseUrl}${imageUrl}`;
-      }
-
-      return {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-            images: imageUrl ? [imageUrl] : [],
-            metadata: {
-              productId: item.id,
-              ...item.metadata
-            }
-          },
-          unit_amount: item.price
-        },
-        quantity: item.quantity
-      };
-    }
+  const sessionStripe = await stripeClient.checkout.sessions.create({
+    payment_method_types: ["card", "link"],
+    // No `customer` or `customer_email` — Stripe collects it during checkout
+    shipping_address_collection: {
+      allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR"],
+    },
+    line_items: line_items_stripe,
+    mode: "payment",
+    success_url: `${baseUrl}/success`,
+    cancel_url: baseUrl,
+    metadata: {
+      userId: "",
+      isGuest: "true",
+      customerName: name || "",
+      line_items: JSON.stringify(line_items),
+      referralCode,
+    },
   });
 
-  try {
-    const customer = await stripeClient.customers.create({
-      email,
-      name: name ?? undefined,
-      metadata: { 
-        guest: "true",
-        guestEmail: email,
-        guestName: name || ""
-      },
-    });
-
-    const sessionStripe = await stripeClient.checkout.sessions.create({
-      payment_method_types: ["card", "link"],
-      customer: customer.id,
-      shipping_address_collection: {
-        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR"],
-      },
-      line_items: line_items_stripe,
-      mode: "payment",
-      success_url: `${baseUrl}/success`,
-      cancel_url: baseUrl,
-      metadata: {
-        userId: "",
-        isGuest: "true",
-        customerEmail: email,
-        customerName: name || "",
-        line_items: JSON.stringify(line_items),
-        referralCode
-      },
-    });
-
-    return sessionStripe.url;
-  } catch (error) {
-    console.error("createGuestCheckoutSession: Error creating Stripe session:", error);
-    throw error;
-  }
+  return sessionStripe.url;
 }
 
 /**
@@ -153,7 +119,6 @@ export async function createGuestCheckoutSession(
  * Used for "Buy Now" functionality without an account.
  */
 export async function createGuestCheckoutSessionNow(
-  email: string,
   product: CartItem,
   name?: string
 ) {
@@ -191,21 +156,11 @@ export async function createGuestCheckoutSessionNow(
   }
 
   try {
-    const customer = await stripeClient.customers.create({
-      email,
-      name: name ?? undefined,
-      metadata: { 
-        guest: "true",
-        guestEmail: email,
-        guestName: name || ""
-      },
-    });
-
     const sessionStripe = await stripeClient.checkout.sessions.create({
       payment_method_types: ["card", "link"],
-      customer: customer.id,
+      // customer_email: "required",
       shipping_address_collection: {
-        allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR"],
+        allowed_countries: ["US", "CA"],
       },
       line_items: [line_items],
       mode: "payment",
@@ -214,7 +169,6 @@ export async function createGuestCheckoutSessionNow(
       metadata: {
         userId: "",
         isGuest: "true",
-        customerEmail: email,
         customerName: name || "",
         line_items: JSON.stringify([line_items]),
         referralCode

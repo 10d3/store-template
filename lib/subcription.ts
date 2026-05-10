@@ -231,6 +231,17 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         updatedAt: new Date(),
         customerEmail: data.customer_details?.email || data.metadata?.customerEmail || null,
         customerName: data.customer_details?.name || data.metadata?.customerName || null,
+        shippingAddress: data?.collected_information?.shipping_details?.address
+    ? JSON.stringify({
+        line1: data.collected_information.shipping_details.address.line1,
+        line2: data.collected_information.shipping_details.address.line2,
+        city: data.collected_information.shipping_details.address.city,
+        state: data.collected_information.shipping_details.address.state,
+        postal_code: data.collected_information.shipping_details.address.postal_code,
+        country: data.collected_information.shipping_details.address.country,
+        name: data.collected_information.shipping_details.name,
+      })
+    : null,
         metadata: {
           ...data.metadata,
           stripe_status: data.status,

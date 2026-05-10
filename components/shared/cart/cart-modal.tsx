@@ -14,56 +14,27 @@ import { useSession } from "@/lib/auth-client";
 
 export default function CartModal() {
   const [isLoading, setIsLoading] = useState(false);
-  const [showGuestForm, setShowGuestForm] = useState(false);
-  const [guestEmail, setGuestEmail] = useState("");
-  const [guestName, setGuestName] = useState("");
   const { cart, getTotalPrice, clearCart, getItemCount } = useCartStore();
   const { data: session } = useSession();
   const router = useRouter();
 
   const createCheckoutUrl = async () => {
-    if (session?.user) {
-      try {
-        setIsLoading(true);
-        const url = await createCheckoutSession(cart);
-        router.push(url as string);
-      } catch (error: any) {
-        toast.error(error.message || "An error occurred during checkout");
-        console.error("Error creating checkout session:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setShowGuestForm(true);
-    }
-  };
-
-  const handleGuestCheckout = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!guestEmail) {
-      toast.error("Please enter your email");
-      return;
-    }
     try {
       setIsLoading(true);
-      const url = await createGuestCheckoutSession(guestEmail, cart, guestName || undefined);
-      router.push(url as string);
+      if (session?.user) {
+        const url = await createCheckoutSession(cart);
+        router.push(url as string);
+      } else {
+        const url = await createGuestCheckoutSession(cart);
+        router.push(url as string);
+      }
     } catch (error: any) {
       toast.error(error.message || "An error occurred during checkout");
-      console.error("Error creating guest checkout session:", error);
+      console.error("Error creating checkout session:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  // const stripeCheckoutSession = useQuery({
-  //   queryKey: ["stripe-checkout-session"],
-  //   queryFn: async () => {
-  //     const session = await createCheckoutSession(cart);
-  //     return session;
-  //   },
-  // });
-
-  // console.log(stripeCheckoutSession.data)
 
   return (
     <CartAsideContainer>
@@ -119,56 +90,27 @@ export default function CartModal() {
           )}
         </div>
 
-        {showGuestForm ? (
-          <form onSubmit={handleGuestCheckout} className="border-t border-border pt-6 space-y-4">
-            <p className="text-sm text-muted-foreground">Enter your email to checkout as a guest</p>
-            <input
-              type="email"
-              placeholder="Email address"
-              value={guestEmail}
-              onChange={(e) => setGuestEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Name (optional)"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md"
-            />
-            <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setShowGuestForm(false)} className="flex-1">
-                Back
-              </Button>
-              <Button type="submit" disabled={isLoading} className="flex-1">
-                {isLoading ? <Loader2 className="animate-spin" /> : "Continue"}
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <div className="border-t border-border pt-6">
-            <div className="flex justify-between text-base">
-              <p className="font-medium">Subtotal</p>
-              <p className="font-medium">{formatPrice(getTotalPrice() * 100)}</p>
-            </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Shipping and taxes calculated at checkout
-            </p>
-            <Button
-              onClick={createCheckoutUrl}
-              disabled={isLoading}
-              size="lg"
-              className="mt-6 w-full rounded-full"
-            >
-              {isLoading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Proceed to Checkout"
-              )}
-            </Button>
+        <div className="border-t border-border pt-6">
+          <div className="flex justify-between text-base">
+            <p className="font-medium">Subtotal</p>
+            <p className="font-medium">{formatPrice(getTotalPrice() * 100)}</p>
           </div>
-        )}
+          <p className="mt-1 text-sm text-muted-foreground">
+            Shipping and taxes calculated at checkout
+          </p>
+          <Button
+            onClick={createCheckoutUrl}
+            disabled={isLoading}
+            size="lg"
+            className="mt-6 w-full rounded-full"
+          >
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Proceed to Checkout"
+            )}
+          </Button>
+        </div>
       </div>
     </CartAsideContainer>
   );
