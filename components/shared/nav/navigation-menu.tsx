@@ -3,22 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { Menu, Search, User } from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronRight } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
@@ -44,7 +34,7 @@ interface NavbarProps {
   isAffiliate?: boolean;
 }
 
-export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: NavbarProps) {
+export default function Navbar({ isAdmin, isAffiliate }: NavbarProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
 
   const session = useSession();
@@ -181,7 +171,7 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[320px] sm:w-[380px] p-0">
+              <SheetContent side="left" className="w-[320px] sm:w-95 p-0">
                 <div className="flex flex-col h-full">
                   {/* Header */}
                   <div className="px-6 py-4 border-b bg-muted/20">
@@ -223,12 +213,12 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
                       </Collapsible> */}
 
                       {/* Collections */}
-                      <Link
-                        href="/collections"
-                        className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200"
-                      >
-                        Collections
-                      </Link>
+                      {/* <Link */}
+                      {/*   href="/collections" */}
+                      {/*   className="flex items-center px-3 py-3 text-base font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200" */}
+                      {/* > */}
+                      {/*   Collections */}
+                      {/* </Link> */}
 
                       {/* About */}
                       <Link
@@ -278,25 +268,25 @@ export default function Navbar({ shopCategories = [], isAdmin, isAffiliate }: Na
   );
 }
 
-function ListItem({
-  title,
-  children,
-  href,
-  ...props
-}: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
-  return (
-    <li {...props}>
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-}
+// function ListItem({
+//   title,
+//   children,
+//   href,
+//   ...props
+// }: React.ComponentPropsWithoutRef<"li"> & { href: string }) {
+//   return (
+//     <li {...props}>
+//       <NavigationMenuLink asChild>
+//         <Link
+//           href={href}
+//           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+//         >
+//           <div className="text-sm font-medium leading-none">{title}</div>
+//           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+//             {children}
+//           </p>
+//         </Link>
+//       </NavigationMenuLink>
+//     </li>
+//   );
+// }

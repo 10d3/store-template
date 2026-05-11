@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { CartAsideContainer } from "./cart-aside-container";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
@@ -62,7 +62,7 @@ export default function CartModal() {
             <ul className="-my-6 divide-y divide-border">
               {cart.map((item) => (
                 <li key={item.id} className="flex py-6">
-                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border">
                     <Image
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
