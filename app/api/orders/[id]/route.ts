@@ -321,6 +321,7 @@ export async function GET(
       created: new Date(paymentIntent.created * 1000),
       metadata: paymentIntent.metadata,
       lineItems,
+      shippingAdress: localOrder?.shippingAddress,
       paymentMethod: paymentIntent.payment_method_types?.[0] || "unknown",
       receiptUrl: expandedPaymentIntent.charges?.data?.[0]?.receipt_url,
       refunds: refunds.map((refund: any) => ({

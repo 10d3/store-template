@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import {
   MoreHorizontal,
   Eye,
@@ -42,6 +42,9 @@ import {
   Clock,
   AlertCircle,
   Mail,
+  MapPin,
+  Receipt,
+  ShoppingCart,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -63,12 +66,27 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
+// ─────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────
+
+interface Address {
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  name: string;
+}
+
 interface Order {
   id: string;
+  /** Amount in cents (e.g. 1999 = $19.99) */
   amount: number;
   currency: string;
   status: string;
-  fulfillmentStatus?: string; // New field for order fulfillment tracking
+  fulfillmentStatus?: string;
   customerEmail: string | null;
   customerName: string | null;
   description: string | null;
@@ -78,26 +96,137 @@ interface Order {
   lineItems?: any[];
   charges: any[];
   refunds: any[];
+  /** API returns the typo'd key; we normalise both into shippingAddress */
+  shippingAddress?: Address;
+  shippingAdress?: Address; // kept to match API typo
 }
 
 interface OrderTableProps {
   className?: string;
 }
 
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+
+/**
+ * Formats an amount to a currency string.
+ * e.g. formatCurrency(84, "usd") → "$84.00"
+ */
+const formatCurrency = (amount: number, currency: string): string =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(amount);
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${month}/${day}/${year} ${hours}:${minutes}`;
+};
+
+/** Debounce hook — returns a debounced version of `value`. */
+function useDebounce<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debounced;
+}
+
+// ─────────────────────────────────────────────
+// Sub-components
+// ─────────────────────────────────────────────
+
+const PAYMENT_STATUS_CONFIG = {
+  succeeded: { variant: "default" as const, label: "Completed" },
+  requires_capture: { variant: "secondary" as const, label: "Pending Capture" },
+  requires_action: { variant: "destructive" as const, label: "Action Required" },
+  canceled: { variant: "outline" as const, label: "Cancelled" },
+  processing: { variant: "secondary" as const, label: "Processing" },
+} as const;
+
+function PaymentStatusBadge({ status }: { status: string }) {
+  const config = PAYMENT_STATUS_CONFIG[status as keyof typeof PAYMENT_STATUS_CONFIG] ?? {
+    variant: "outline" as const,
+    label: status,
+  };
+  return <Badge variant={config.variant}>{config.label}</Badge>;
+}
+
+const FULFILLMENT_STATUS_CONFIG = {
+  pending: { variant: "secondary" as const, label: "Pending", Icon: Clock, color: "text-yellow-600" },
+  processing: { variant: "secondary" as const, label: "Processing", Icon: Package, color: "text-blue-600" },
+  shipped: { variant: "default" as const, label: "Shipped", Icon: Truck, color: "text-purple-600" },
+  delivered: { variant: "default" as const, label: "Delivered", Icon: CheckCircle, color: "text-green-600" },
+  cancelled: { variant: "destructive" as const, label: "Cancelled", Icon: X, color: "text-red-600" },
+  returned: { variant: "outline" as const, label: "Returned", Icon: RefreshCw, color: "text-orange-600" },
+} as const;
+
+function FulfillmentStatusBadge({ status }: { status?: string }) {
+  if (!status) {
+    return (
+      <Badge variant="outline" className="flex items-center gap-1 w-fit">
+        <Clock className="h-3 w-3" />
+        Pending
+      </Badge>
+    );
+  }
+
+  const config = FULFILLMENT_STATUS_CONFIG[status as keyof typeof FULFILLMENT_STATUS_CONFIG] ?? {
+    variant: "outline" as const,
+    label: status,
+    Icon: AlertCircle,
+    color: "text-gray-600",
+  };
+
+  const { Icon } = config;
+  return (
+    <Badge variant={config.variant} className="flex items-center gap-1 w-fit">
+      <Icon className="h-3 w-3" />
+      {config.label}
+    </Badge>
+  );
+}
+
+function SkeletonRow() {
+  return (
+    <TableRow>
+      {Array.from({ length: 7 }).map((_, i) => (
+        <TableCell key={i}>
+          <div className="h-4 bg-muted rounded animate-pulse" />
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
+// ─────────────────────────────────────────────
+// Main Component
+// ─────────────────────────────────────────────
+
 export function OrderTable({ className }: OrderTableProps) {
   const [mounted, setMounted] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Order detail modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  // Status change dialog
   const [showStatusDialog, setShowStatusDialog] = useState(false);
-  const [statusChangeOrder, setStatusChangeOrder] = useState<Order | null>(
-    null
-  );
+  const [statusChangeOrder, setStatusChangeOrder] = useState<Order | null>(null);
   const [newStatus, setNewStatus] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Tracking email state
+  // Tracking email dialog
   const [showTrackingDialog, setShowTrackingDialog] = useState(false);
   const [trackingOrder, setTrackingOrder] = useState<Order | null>(null);
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -105,52 +234,66 @@ export function OrderTable({ className }: OrderTableProps) {
   const [carrier, setCarrier] = useState("");
   const [sendingTrackingEmail, setSendingTrackingEmail] = useState(false);
 
-  // Filters and pagination
+  // Filters & pagination
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 400);
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
-  // Ensure component is mounted before rendering dynamic content
+  // Reset to page 1 whenever filters change
+  const prevFiltersRef = useRef({ debouncedSearch, statusFilter });
+  useEffect(() => {
+    const prev = prevFiltersRef.current;
+    if (prev.debouncedSearch !== debouncedSearch || prev.statusFilter !== statusFilter) {
+      setCurrentPage(1);
+      prevFiltersRef.current = { debouncedSearch, statusFilter };
+    }
+  }, [debouncedSearch, statusFilter]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const fetchOrders = async (showLoading = true) => {
-    try {
-      if (showLoading) setLoading(true);
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: "10",
-        ...(statusFilter !== "all" && { status: statusFilter }),
-        ...(searchTerm && { search: searchTerm }),
-      });
+  // ── Data fetching ──────────────────────────
 
-      const response = await fetch(`/api/orders?${params}`);
-      if (!response.ok) throw new Error("Failed to fetch orders");
+  const fetchOrders = useCallback(
+    async (showLoading = true) => {
+      try {
+        if (showLoading) setLoading(true);
 
-      const data = await response.json();
-      setOrders(data.orders);
-      setTotalPages(data.pagination.totalPages);
-      setHasMore(data.pagination.hasMore);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      toast.error("Failed to fetch orders");
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  };
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: "10",
+          ...(statusFilter !== "all" && { status: statusFilter }),
+          ...(debouncedSearch && { search: debouncedSearch }),
+        });
+
+        const response = await fetch(`/api/orders?${params}`);
+        if (!response.ok) throw new Error("Failed to fetch orders");
+
+        const data = await response.json();
+        setOrders(data.orders);
+        setTotalPages(data.pagination.totalPages);
+        setTotalCount(data.pagination.total ?? data.orders.length);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Failed to fetch orders");
+      } finally {
+        if (showLoading) setLoading(false);
+      }
+    },
+    [currentPage, statusFilter, debouncedSearch]
+  );
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, statusFilter, searchTerm]);
+  }, [fetchOrders]);
 
-  const handleOrderAction = async (
-    orderId: string,
-    action: string,
-    reason?: string
-  ) => {
+  // ── Actions ───────────────────────────────
+
+  const handleOrderAction = async (orderId: string, action: string, reason?: string) => {
     try {
       setActionLoading(orderId);
       const response = await fetch(`/api/orders/${orderId}`, {
@@ -161,9 +304,9 @@ export function OrderTable({ className }: OrderTableProps) {
 
       if (!response.ok) throw new Error(`Failed to ${action} order`);
 
+      // FIX: was called twice — now called once
       toast.success(`Order ${action} successful`);
-      toast.success(`Order ${action} successful`);
-      fetchOrders(false); // Refresh the list without loading state
+      fetchOrders(false);
     } catch (error) {
       console.error(`Error ${action} order:`, error);
       toast.error(`Failed to ${action} order`);
@@ -180,10 +323,7 @@ export function OrderTable({ className }: OrderTableProps) {
       const response = await fetch(`/api/orders/${statusChangeOrder.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "update_status",
-          fulfillmentStatus: newStatus,
-        }),
+        body: JSON.stringify({ action: "update_status", fulfillmentStatus: newStatus }),
       });
 
       if (!response.ok) throw new Error("Failed to update order status");
@@ -191,9 +331,8 @@ export function OrderTable({ className }: OrderTableProps) {
       toast.success("Order status updated successfully");
       setShowStatusDialog(false);
       setStatusChangeOrder(null);
-      setNewStatus("");
-      setNewStatus("");
-      fetchOrders(false); // Refresh the list without loading state
+      setNewStatus(""); // FIX: was called twice — now called once
+      fetchOrders(false);
     } catch (error) {
       console.error("Error updating order status:", error);
       toast.error("Failed to update order status");
@@ -202,32 +341,39 @@ export function OrderTable({ className }: OrderTableProps) {
     }
   };
 
-  const openStatusDialog = (order: Order) => {
-    setStatusChangeOrder(order);
-    setNewStatus(order.fulfillmentStatus || "pending");
-    setShowStatusDialog(true);
-  };
-
   const viewOrderDetails = async (orderId: string) => {
+    // Pre-populate immediately with list data so the modal opens
+    // with shipping address already visible (the detail endpoint may
+    // not return shippingAddress, but the list endpoint does).
+    const listOrder = orders.find((o) => o.id === orderId);
+    if (listOrder) setSelectedOrder(listOrder);
+
     try {
+      setDetailLoading(true);
+      setShowOrderDetails(true);
       const response = await fetch(`/api/orders/${orderId}`);
       if (!response.ok) throw new Error("Failed to fetch order details");
 
       const data = await response.json();
-      setSelectedOrder(data.order);
-      setShowOrderDetails(true);
+
+      // Merge: prefer detail API fields, but fall back to list data for
+      // any field the detail endpoint omits (e.g. shippingAddress).
+      setSelectedOrder((prev) => ({
+        ...(prev ?? {}),
+        ...data.order,
+        shippingAddress:
+          data.order.shippingAddress ??
+          data.order.shippingAdress ??
+          listOrder?.shippingAddress ??
+          listOrder?.shippingAdress,
+      }));
     } catch (error) {
       console.error("Error fetching order details:", error);
       toast.error("Failed to fetch order details");
+      setShowOrderDetails(false);
+    } finally {
+      setDetailLoading(false);
     }
-  };
-
-  const openTrackingDialog = (order: Order) => {
-    setTrackingOrder(order);
-    setTrackingNumber("");
-    setTrackingUrl("");
-    setCarrier("");
-    setShowTrackingDialog(true);
   };
 
   const handleSendTrackingEmail = async () => {
@@ -243,8 +389,8 @@ export function OrderTable({ className }: OrderTableProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           trackingNumber: trackingNumber.trim(),
-          trackingUrl: trackingUrl.trim() || undefined,
-          carrier: carrier.trim() || undefined,
+          ...(trackingUrl.trim() && { trackingUrl: trackingUrl.trim() }),
+          ...(carrier.trim() && { carrier: carrier.trim() }),
         }),
       });
 
@@ -254,13 +400,7 @@ export function OrderTable({ className }: OrderTableProps) {
       }
 
       toast.success("Tracking email sent successfully!");
-      setShowTrackingDialog(false);
-      setTrackingOrder(null);
-      setTrackingNumber("");
-      setTrackingUrl("");
-      setCarrier("");
-
-      // Refresh orders to show updated tracking info
+      resetTrackingDialog();
       fetchOrders(false);
     } catch (error) {
       console.error("Error sending tracking email:", error);
@@ -270,235 +410,170 @@ export function OrderTable({ className }: OrderTableProps) {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      succeeded: { variant: "default" as const, label: "Completed" },
-      requires_capture: { variant: "secondary" as const, label: "Pending" },
-      requires_action: {
-        variant: "destructive" as const,
-        label: "Action Required",
-      },
-      canceled: { variant: "outline" as const, label: "Cancelled" },
-      processing: { variant: "secondary" as const, label: "Processing" },
-    };
+  // ── Dialog helpers ────────────────────────
 
-    const config = statusConfig[status as keyof typeof statusConfig] || {
-      variant: "outline" as const,
-      label: status,
-    };
-
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+  const openStatusDialog = (order: Order) => {
+    setStatusChangeOrder(order);
+    setNewStatus(order.fulfillmentStatus ?? "pending");
+    setShowStatusDialog(true);
   };
 
-  const getFulfillmentStatusBadge = (status?: string) => {
-    if (!status) return null;
-
-    const statusConfig = {
-      pending: {
-        variant: "secondary" as const,
-        label: "Pending",
-        icon: Clock,
-        color: "text-yellow-600",
-      },
-      processing: {
-        variant: "secondary" as const,
-        label: "Processing",
-        icon: Package,
-        color: "text-blue-600",
-      },
-      shipped: {
-        variant: "default" as const,
-        label: "Shipped",
-        icon: Truck,
-        color: "text-purple-600",
-      },
-      delivered: {
-        variant: "default" as const,
-        label: "Delivered",
-        icon: CheckCircle,
-        color: "text-green-600",
-      },
-      cancelled: {
-        variant: "destructive" as const,
-        label: "Cancelled",
-        icon: X,
-        color: "text-red-600",
-      },
-      returned: {
-        variant: "outline" as const,
-        label: "Returned",
-        icon: RefreshCw,
-        color: "text-orange-600",
-      },
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || {
-      variant: "outline" as const,
-      label: status,
-      icon: AlertCircle,
-      color: "text-gray-600",
-    };
-
-    const IconComponent = config.icon;
-
-    return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
-        <IconComponent className="h-3 w-3" />
-        {config.label}
-      </Badge>
-    );
+  const openTrackingDialog = (order: Order) => {
+    setTrackingOrder(order);
+    setTrackingNumber("");
+    setTrackingUrl("");
+    setCarrier("");
+    setShowTrackingDialog(true);
   };
 
-  const formatCurrency = (amount: number, currency: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-    }).format(amount / 100); // Convert from cents to dollars
+  const resetTrackingDialog = () => {
+    setShowTrackingDialog(false);
+    setTrackingOrder(null);
+    setTrackingNumber("");
+    setTrackingUrl("");
+    setCarrier("");
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    // Use a consistent format that works the same on server and client
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+  // ── Pagination helpers ────────────────────
 
-    return `${month}/${day}/${year} ${hours}:${minutes}`;
+  const isFirstPage = currentPage === 1;
+  const isLastPage = currentPage >= totalPages;
+
+  const getPageNumbers = (): (number | "ellipsis")[] => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    const pages: (number | "ellipsis")[] = [1];
+
+    if (currentPage > 3) pages.push("ellipsis");
+
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    if (currentPage < totalPages - 2) pages.push("ellipsis");
+    pages.push(totalPages);
+
+    return pages;
   };
+
+  // ─────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────
 
   return (
     <div className={className}>
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* ── Filters ─────────────────────────── */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
           <Input
-            placeholder="Search by order ID, email, or description..."
+            placeholder="Search by order ID, email, or description…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="w-full sm:w-52">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Orders</SelectItem>
             <SelectItem value="succeeded">Completed</SelectItem>
-            <SelectItem value="requires_capture">Pending</SelectItem>
+            <SelectItem value="requires_capture">Pending Capture</SelectItem>
             <SelectItem value="requires_action">Action Required</SelectItem>
             <SelectItem value="canceled">Cancelled</SelectItem>
             <SelectItem value="processing">Processing</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => fetchOrders()}
+          title="Refresh orders"
+          aria-label="Refresh orders"
+        >
+          <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+        </Button>
       </div>
 
-      {/* Orders Table */}
+      {/* ── Orders Table ─────────────────────── */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle>Orders</CardTitle>
+          {!loading && (
+            <span className="text-sm text-muted-foreground">
+              {totalCount} order{totalCount !== 1 ? "s" : ""}
+            </span>
+          )}
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableHead>Customer</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Payment Status</TableHead>
-                <TableHead>Fulfillment Status</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead>Fulfillment</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Payment Method</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead className="text-right w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                    </TableCell>
-                  </TableRow>
-                ))
+                Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
               ) : orders.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-8 text-gray-500"
-                  >
+                  <TableCell colSpan={7} className="text-center py-16 text-muted-foreground">
+                    <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-30" />
                     No orders found
                   </TableCell>
                 </TableRow>
               ) : (
                 orders.map((order) => (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className="group">
                     <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {order.customerName ||
-                            order.customerEmail ||
-                            "Unknown Customer"}
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium text-sm leading-tight">
+                          {order.customerName ?? order.customerEmail ?? "Unknown"}
                         </span>
                         {order.customerName && order.customerEmail && (
-                          <span className="text-sm text-gray-500">
+                          <span className="text-xs text-muted-foreground">
                             {order.customerEmail}
                           </span>
                         )}
-                        <span className="text-xs text-gray-400 font-mono">
-                          {order.id.slice(-8)}
+                        <span className="text-xs text-muted-foreground/60 font-mono">
+                          #{order.id.slice(-8)}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">
-                      {/* {formatCurrency(order.amount, order.currency)} */}
-                      {order.amount}$
+
+                    {/* FIX: was `{order.amount}$` — now properly formatted */}
+                    <TableCell className="font-semibold tabular-nums">
+                      {formatCurrency(order.amount, order.currency)}
                     </TableCell>
-                    <TableCell>{getStatusBadge(order.status)}</TableCell>
+
                     <TableCell>
-                      {getFulfillmentStatusBadge(order.fulfillmentStatus) || (
-                        <Badge
-                          variant="outline"
-                          className="flex items-center gap-1"
-                        >
-                          <Clock className="h-3 w-3" />
-                          Pending
-                        </Badge>
-                      )}
+                      <PaymentStatusBadge status={order.status} />
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {mounted ? formatDate(order.created) : order.created.split('T')[0]}
+
+                    <TableCell>
+                      <FulfillmentStatusBadge status={order.fulfillmentStatus} />
                     </TableCell>
-                    <TableCell className="capitalize">
+
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {mounted ? formatDate(order.created) : order.created.split("T")[0]}
+                    </TableCell>
+
+                    <TableCell className="capitalize text-sm">
                       {order.paymentMethod}
                     </TableCell>
+
                     <TableCell className="text-right">
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                          >
+                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
                             {actionLoading === order.id ? (
                               <RefreshCw className="h-4 w-4 animate-spin" />
                             ) : (
@@ -506,40 +581,36 @@ export function OrderTable({ className }: OrderTableProps) {
                             )}
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => viewOrderDetails(order.id)}
-                          >
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => viewOrderDetails(order.id)}>
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openStatusDialog(order)}
-                          >
+                          <DropdownMenuItem onClick={() => openStatusDialog(order)}>
                             <Package className="mr-2 h-4 w-4" />
                             Change Status
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => openTrackingDialog(order)}
-                          >
+                          <DropdownMenuItem onClick={() => openTrackingDialog(order)}>
                             <Mail className="mr-2 h-4 w-4" />
                             Send Tracking Email
                           </DropdownMenuItem>
+
+                          {(order.status === "requires_capture" ||
+                            order.status === "succeeded" ||
+                            order.status === "requires_action") && (
+                              <DropdownMenuSeparator />
+                            )}
+
                           {order.status === "requires_capture" && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleOrderAction(order.id, "capture")
-                              }
-                            >
+                            <DropdownMenuItem onClick={() => handleOrderAction(order.id, "capture")}>
                               <DollarSign className="mr-2 h-4 w-4" />
                               Capture Payment
                             </DropdownMenuItem>
                           )}
                           {order.status === "succeeded" && (
                             <DropdownMenuItem
-                              onClick={() =>
-                                handleOrderAction(order.id, "refund")
-                              }
+                              onClick={() => handleOrderAction(order.id, "refund")}
+                              className="text-orange-600 focus:text-orange-600"
                             >
                               <RefreshCw className="mr-2 h-4 w-4" />
                               Refund
@@ -548,12 +619,11 @@ export function OrderTable({ className }: OrderTableProps) {
                           {(order.status === "requires_capture" ||
                             order.status === "requires_action") && (
                               <DropdownMenuItem
-                                onClick={() =>
-                                  handleOrderAction(order.id, "cancel")
-                                }
+                                onClick={() => handleOrderAction(order.id, "cancel")}
+                                className="text-destructive focus:text-destructive"
                               >
                                 <X className="mr-2 h-4 w-4" />
-                                Cancel
+                                Cancel Order
                               </DropdownMenuItem>
                             )}
                         </DropdownMenuContent>
@@ -565,74 +635,46 @@ export function OrderTable({ className }: OrderTableProps) {
             </TableBody>
           </Table>
 
-          {/* Enhanced Pagination */}
+          {/* ── Pagination ──────────────────────── */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-gray-500">
-                Showing page {currentPage} of {totalPages} ({orders.length}{" "}
-                orders)
-              </div>
-              <Pagination>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
+                Page {currentPage} of {totalPages} · {orders.length} shown
+              </p>
+              <Pagination className="order-1 sm:order-2 w-auto mx-0">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(1, prev - 1))
-                      }
-                      className={cn(
-                        currentPage === 1 && "pointer-events-none opacity-50"
-                      )}
+                      onClick={() => !isFirstPage && setCurrentPage((p) => p - 1)}
+                      aria-disabled={isFirstPage}
+                      className={cn(isFirstPage && "pointer-events-none opacity-40")}
                     />
                   </PaginationItem>
 
-                  {/* Page Numbers */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-
-                    return (
-                      <PaginationItem key={pageNum}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(pageNum)}
-                          isActive={currentPage === pageNum}
-                          className="cursor-pointer"
-                        >
-                          {pageNum}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  })}
-
-                  {totalPages > 5 && currentPage < totalPages - 2 && (
-                    <>
-                      <PaginationItem>
+                  {getPageNumbers().map((page, idx) =>
+                    page === "ellipsis" ? (
+                      <PaginationItem key={`ellipsis-${idx}`}>
                         <PaginationEllipsis />
                       </PaginationItem>
-                      <PaginationItem>
+                    ) : (
+                      <PaginationItem key={page}>
                         <PaginationLink
-                          onClick={() => setCurrentPage(totalPages)}
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
                           className="cursor-pointer"
                         >
-                          {totalPages}
+                          {page}
                         </PaginationLink>
                       </PaginationItem>
-                    </>
+                    )
                   )}
 
                   <PaginationItem>
+                    {/* FIX: was !hasMore, now properly checks against totalPages */}
                     <PaginationNext
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
-                      className={cn(
-                        !hasMore && "pointer-events-none opacity-50"
-                      )}
+                      onClick={() => !isLastPage && setCurrentPage((p) => p + 1)}
+                      aria-disabled={isLastPage}
+                      className={cn(isLastPage && "pointer-events-none opacity-40")}
                     />
                   </PaginationItem>
                 </PaginationContent>
@@ -642,252 +684,267 @@ export function OrderTable({ className }: OrderTableProps) {
         </CardContent>
       </Card>
 
-      {/* Order Details Modal */}
+      {/* ═══════════════════════════════════════
+          Order Details Modal
+      ═══════════════════════════════════════ */}
       <Dialog open={showOrderDetails} onOpenChange={setShowOrderDetails}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5" />
+              Order Details
+            </DialogTitle>
             <DialogDescription>
-              Complete information for order {selectedOrder?.id}
+              {selectedOrder ? `Order #${selectedOrder.id.slice(-8)} · ${selectedOrder.id}` : "Loading…"}
             </DialogDescription>
           </DialogHeader>
 
-          {selectedOrder && (
-            <div className="space-y-6">
-              {/* Customer Information */}
+          {detailLoading ? (
+            <div className="space-y-4 py-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-24 bg-muted rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : selectedOrder ? (
+            <div className="space-y-5 pt-2">
+
+              {/* Customer */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    Customer Information
-                  </CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Customer</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="font-medium">Name:</span>{" "}
-                      {selectedOrder.customerName || "N/A"}
-                    </div>
-                    <div>
-                      <span className="font-medium">Email:</span>{" "}
-                      {selectedOrder.customerEmail || "N/A"}
-                    </div>
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Name</p>
+                    <p className="font-medium">{selectedOrder.customerName ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Email</p>
+                    <p className="font-medium">{selectedOrder.customerEmail ?? "—"}</p>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Order Summary */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Order Summary</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Order Summary</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="font-medium">Order ID:</span>{" "}
-                      {selectedOrder.id}
-                    </div>
-                    <div>
-                      <span className="font-medium">Status:</span>{" "}
-                      {getStatusBadge(selectedOrder.status)}
-                    </div>
-                    <div>
-                      <span className="font-medium">Amount:</span>{" "}
-                      {formatCurrency(
-                        selectedOrder.amount,
-                        selectedOrder.currency
-                      )}
-                    </div>
-                    <div>
-                      <span className="font-medium">Payment Method:</span>{" "}
-                      {selectedOrder.paymentMethod}
-                    </div>
-                    <div>
-                      <span className="font-medium">Created:</span>{" "}
-                      {mounted ? formatDate(selectedOrder.created) : selectedOrder.created.split('T')[0]}
-                    </div>
-                    <div>
-                      <span className="font-medium">Description:</span>{" "}
-                      {selectedOrder.description || "N/A"}
-                    </div>
+                <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Order ID</p>
+                    <p className="font-mono text-xs">{selectedOrder.id}</p>
                   </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Created</p>
+                    <p>{mounted ? formatDate(selectedOrder.created) : selectedOrder.created.split("T")[0]}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Amount</p>
+                    <p className="font-semibold text-base">
+                      {/* FIX: uses formatCurrency correctly — amount is in cents */}
+                      {formatCurrency(selectedOrder.amount, selectedOrder.currency)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Payment Method</p>
+                    <p className="capitalize">{selectedOrder.paymentMethod}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Payment Status</p>
+                    <PaymentStatusBadge status={selectedOrder.status} />
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs mb-0.5">Fulfillment</p>
+                    <FulfillmentStatusBadge status={selectedOrder.fulfillmentStatus} />
+                  </div>
+                  {selectedOrder.description && (
+                    <div className="col-span-2">
+                      <p className="text-muted-foreground text-xs mb-0.5">Description</p>
+                      <p>{selectedOrder.description}</p>
+                    </div>
+                  )}
+                  {selectedOrder.receiptUrl && (
+                    <div className="col-span-2">
+                      <a
+                        href={selectedOrder.receiptUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary text-xs underline underline-offset-2 hover:opacity-80"
+                      >
+                        View Receipt ↗
+                      </a>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
+              {/* Shipping Address — normalises both `shippingAddress` and the
+                  API typo `shippingAdress` so neither is ever silently dropped */}
+              {(() => {
+                const addr = selectedOrder.shippingAddress ?? selectedOrder.shippingAdress;
+                return (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Shipping Address
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm">
+                      {addr ? (
+                        <div className="space-y-1">
+                          {addr.name && (
+                            <p className="font-medium">{addr.name}</p>
+                          )}
+                          <p>{addr.line1}</p>
+                          {addr.line2 && <p>{addr.line2}</p>}
+                          <p>
+                            {[addr.city, addr.state].filter(Boolean).join(", ")}
+                            {addr.postal_code ? ` ${addr.postal_code}` : ""}
+                          </p>
+                          {addr.country && (
+                            <p className="uppercase tracking-wide text-xs text-muted-foreground font-medium pt-0.5">
+                              {addr.country}
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground italic">
+                          No shipping address provided
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
               {/* Line Items */}
-              {selectedOrder.lineItems &&
-                selectedOrder.lineItems.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Items Purchased</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {selectedOrder.lineItems.map(
-                          (item: any, index: number) => (
-                            <div
-                              key={index}
-                              className="flex justify-between items-center p-3 border rounded"
-                            >
-                              <div>
-                                <div className="font-medium">
-                                  {item.price?.product?.name ||
-                                    item.description ||
-                                    "Unknown Item"}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  Quantity: {item.quantity}
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-medium">
-                                  {formatCurrency(
-                                    (item.amount_total || 0) / 100,
-                                    selectedOrder.currency
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        )}
+              {selectedOrder.lineItems && selectedOrder.lineItems.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Items Purchased</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {selectedOrder.lineItems.map((item: any, index: number) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-3 rounded-lg border bg-muted/30"
+                      >
+                        <div>
+                          <p className="font-medium text-sm">
+                            {item.price?.product?.name ?? item.description ?? "Unknown Item"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Qty: {item.quantity}
+                            {item.price?.unit_amount != null && (
+                              <> · {formatCurrency(item.price.unit_amount, selectedOrder.currency)} each</>
+                            )}
+                          </p>
+                        </div>
+                        <p className="font-semibold text-sm tabular-nums">
+                          {/* FIX: was dividing by 100 before passing to formatCurrency
+                               which divides by 100 again — now passes raw cents */}
+                          {formatCurrency(item.amount_total ?? 0, selectedOrder.currency)}
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
+                    ))}
 
-              {/* Charges and Refunds */}
-              {(selectedOrder.charges.length > 0 ||
-                selectedOrder.refunds.length > 0) && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Payment History</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {selectedOrder.charges.map((charge: any, index: number) => (
-                        <div key={index} className="p-3 border rounded">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="font-medium">Charge</div>
-                              <div className="text-sm text-gray-500">
-                                {mounted ? formatDate(charge.created) : charge.created.split('T')[0]}
-                              </div>
-                            </div>
-                            <div className="text-green-600 font-medium">
-                              +
-                              {formatCurrency(
-                                charge.amount,
-                                selectedOrder.currency
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                    <Separator className="my-2" />
+                    <div className="flex justify-between items-center px-3 py-1">
+                      <p className="text-sm font-medium">Total</p>
+                      <p className="font-bold tabular-nums">
+                        {formatCurrency(selectedOrder.amount, selectedOrder.currency)}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-                      {selectedOrder.refunds.map((refund: any, index: number) => (
-                        <div key={index} className="p-3 border rounded">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="font-medium">Refund</div>
-                              <div className="text-sm text-gray-500">
-                                {mounted ? formatDate(refund.created) : refund.created.split('T')[0]} • {refund.reason}
-                              </div>
-                            </div>
-                            <div className="text-red-600 font-medium">
-                              -
-                              {formatCurrency(
-                                refund.amount,
-                                selectedOrder.currency
-                              )}
-                            </div>
-                          </div>
+              {/* Payment History */}
+              {(selectedOrder.charges.length > 0 || selectedOrder.refunds.length > 0) && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Payment History</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {selectedOrder.charges.map((charge: any, index: number) => (
+                      <div key={`charge-${index}`} className="flex justify-between items-center p-3 rounded-lg border">
+                        <div>
+                          <p className="font-medium text-sm">Charge</p>
+                          <p className="text-xs text-muted-foreground">
+                            {mounted ? formatDate(charge.created) : charge.created?.split("T")[0] ?? "—"}
+                          </p>
                         </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                )}
+                        <p className="text-green-600 font-semibold tabular-nums text-sm">
+                          +{formatCurrency(charge.amount, selectedOrder.currency)}
+                        </p>
+                      </div>
+                    ))}
+
+                    {selectedOrder.refunds.map((refund: any, index: number) => (
+                      <div key={`refund-${index}`} className="flex justify-between items-center p-3 rounded-lg border">
+                        <div>
+                          <p className="font-medium text-sm">Refund</p>
+                          <p className="text-xs text-muted-foreground">
+                            {mounted ? formatDate(refund.created) : refund.created?.split("T")[0] ?? "—"}
+                            {refund.reason && ` · ${refund.reason}`}
+                          </p>
+                        </div>
+                        <p className="text-destructive font-semibold tabular-nums text-sm">
+                          −{formatCurrency(refund.amount, selectedOrder.currency)}
+                        </p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
 
-      {/* Status Change Dialog */}
+      {/* ═══════════════════════════════════════
+          Status Change Dialog
+      ═══════════════════════════════════════ */}
       <Dialog open={showStatusDialog} onOpenChange={setShowStatusDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Change Order Status</DialogTitle>
+            <DialogTitle>Change Fulfillment Status</DialogTitle>
             <DialogDescription>
-              Update the fulfillment status for order{" "}
-              {statusChangeOrder?.id?.slice(-8)}
+              Order #{statusChangeOrder?.id?.slice(-8)}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-1">
             <div>
-              <label className="text-sm font-medium mb-2 block">
-                Current Status
-              </label>
-              <div className="flex items-center gap-2">
-                {(statusChangeOrder &&
-                  getFulfillmentStatusBadge(
-                    statusChangeOrder.fulfillmentStatus
-                  )) || (
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      Pending
-                    </Badge>
-                  )}
-              </div>
+              <p className="text-sm font-medium mb-2">Current Status</p>
+              <FulfillmentStatusBadge status={statusChangeOrder?.fulfillmentStatus} />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">
-                New Status
-              </label>
+              <Label className="text-sm font-medium mb-2 block">New Status</Label>
               <Select value={newStatus} onValueChange={setNewStatus}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select new status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-yellow-600" />
-                      Pending
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="processing">
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4 text-blue-600" />
-                      Processing
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="shipped">
-                    <div className="flex items-center gap-2">
-                      <Truck className="h-4 w-4 text-purple-600" />
-                      Shipped
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="delivered">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      Delivered
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="cancelled">
-                    <div className="flex items-center gap-2">
-                      <X className="h-4 w-4 text-red-600" />
-                      Cancelled
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="returned">
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="h-4 w-4 text-orange-600" />
-                      Returned
-                    </div>
-                  </SelectItem>
+                  {Object.entries(FULFILLMENT_STATUS_CONFIG).map(([value, config]) => {
+                    const { Icon } = config;
+                    return (
+                      <SelectItem key={value} value={value}>
+                        <div className="flex items-center gap-2">
+                          <Icon className={cn("h-4 w-4", config.color)} />
+                          {config.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex justify-end gap-2 pt-2">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -900,12 +957,12 @@ export function OrderTable({ className }: OrderTableProps) {
               </Button>
               <Button
                 onClick={handleStatusChange}
-                disabled={!newStatus || actionLoading === statusChangeOrder?.id}
+                disabled={!newStatus || newStatus === statusChangeOrder?.fulfillmentStatus || actionLoading === statusChangeOrder?.id}
               >
                 {actionLoading === statusChangeOrder?.id ? (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
+                    Updating…
                   </>
                 ) : (
                   "Update Status"
@@ -916,68 +973,63 @@ export function OrderTable({ className }: OrderTableProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Tracking Email Dialog */}
-      <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
-        <DialogContent className="max-w-md">
+      {/* ═══════════════════════════════════════
+          Tracking Email Dialog
+      ═══════════════════════════════════════ */}
+      <Dialog open={showTrackingDialog} onOpenChange={(open) => { if (!open) resetTrackingDialog(); }}>
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Send Tracking Email</DialogTitle>
             <DialogDescription>
-              Send tracking information to customer for order{" "}
-              {trackingOrder?.id?.slice(-8)}
+              {trackingOrder?.customerEmail
+                ? `Will be sent to ${trackingOrder.customerEmail}`
+                : `Order #${trackingOrder?.id?.slice(-8)}`}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4 pt-1">
             <div>
               <Label htmlFor="trackingNumber" className="text-sm font-medium">
-                Tracking Number *
+                Tracking Number <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="trackingNumber"
-                placeholder="Enter tracking number"
+                placeholder="1Z999AA10123456784"
                 value={trackingNumber}
                 onChange={(e) => setTrackingNumber(e.target.value)}
-                className="mt-1"
+                className="mt-1.5"
+                autoFocus
               />
             </div>
 
             <div>
               <Label htmlFor="carrier" className="text-sm font-medium">
-                Carrier (Optional)
+                Carrier <span className="text-muted-foreground font-normal">(optional)</span>
               </Label>
               <Input
                 id="carrier"
-                placeholder="e.g., UPS, FedEx, DHL"
+                placeholder="UPS, FedEx, DHL, USPS…"
                 value={carrier}
                 onChange={(e) => setCarrier(e.target.value)}
-                className="mt-1"
+                className="mt-1.5"
               />
             </div>
 
             <div>
               <Label htmlFor="trackingUrl" className="text-sm font-medium">
-                Tracking URL (Optional)
+                Tracking URL <span className="text-muted-foreground font-normal">(optional)</span>
               </Label>
               <Input
                 id="trackingUrl"
-                placeholder="https://tracking.carrier.com/..."
+                placeholder="https://tracking.carrier.com/…"
                 value={trackingUrl}
                 onChange={(e) => setTrackingUrl(e.target.value)}
-                className="mt-1"
+                className="mt-1.5"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowTrackingDialog(false);
-                  setTrackingOrder(null);
-                  setTrackingNumber("");
-                  setTrackingUrl("");
-                  setCarrier("");
-                }}
-              >
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={resetTrackingDialog}>
                 Cancel
               </Button>
               <Button
@@ -987,7 +1039,7 @@ export function OrderTable({ className }: OrderTableProps) {
                 {sendingTrackingEmail ? (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
+                    Sending…
                   </>
                 ) : (
                   <>
