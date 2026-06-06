@@ -113,6 +113,11 @@ export default function FooterSection() {
                     <Image src="/fedex.svg" alt="FedEx" width={40} height={25} />
                 </div>
 
+                {/* FDA Disclaimer Card */}
+                <div className="my-8 rounded-xl border border-foreground p-5 text-center text-xs text-muted-foreground leading-relaxed max-w-3xl mx-auto">
+                    These statements have not been evaluated by the Food and Drug Administration (FDA). Vitanou products are not intended to diagnose, treat, cure, or prevent any disease. The information provided by Vitanou is for educational and wellness purposes only and should not be considered medical advice. Always consult your healthcare provider before using any dietary supplement, especially if you are pregnant, nursing, taking medication, or have a medical condition. Individual results may vary.
+                </div>
+
                 <span className="text-muted-foreground block text-center text-sm"> © {new Date().getFullYear()} Vitanou, All rights reserved</span>
             </div>
         </footer>
