@@ -1,14 +1,10 @@
 import AddToCartButton from "@/components/shared/add-to-cart-button";
-import CarousselVariants from "@/components/shared/caroussel-variants";
 import QuantityManagement from "@/components/shared/quantity-management";
 // import VideoReviewMasonry from "@/components/shared/review-section";
-import SelectVariant from "@/components/shared/select-variant";
 import {
   Card,
   CardContent,
   CardDescription,
-  // CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -287,25 +283,10 @@ export default async function page(props: {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    {selectedVariants.length > 1 && (
-                      <div className="flex-1">
-                        <SelectVariant variants={selectedVariants} />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <QuantityManagement product={variants[0]} />
-                    </div>
+                  <div className="flex-1">
+                    <QuantityManagement product={variants[0]} />
                   </div>
                 </CardContent>
-
-                {selectedVariants.length > 1 && (
-                  <CardFooter className="pt-0 pb-0">
-                    <div className="w-full space-y-4">
-                      <CarousselVariants products={variants} />
-                    </div>
-                  </CardFooter>
-                )}
               </Card>
             </div>
             <div className="mt-6 md:hidden grid gap-2">
@@ -438,25 +419,10 @@ export default async function page(props: {
                   </CardHeader>
 
                   <CardContent className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      {selectedVariants.length > 1 && (
-                        <div className="flex-1">
-                          <SelectVariant variants={selectedVariants} />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <QuantityManagement product={variants[0]} />
-                      </div>
-                    </div>
-                  </CardContent>
-
-                  {selectedVariants.length > 1 && (
-                    <CardFooter className="pt-0 pb-0">
-                      <div className="w-full space-y-4">
-                        <CarousselVariants products={variants} />
-                      </div>
-                    </CardFooter>
-                  )}
+                  <div className="flex-1">
+                    <QuantityManagement product={variants[0]} />
+                  </div>
+                </CardContent>
                 </Card>
               </div>
 
