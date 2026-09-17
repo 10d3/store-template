@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import Stripe from "stripe";
+import { headers } from "next/headers";
 import {
   CouponFormData,
   PackFormData,
@@ -12,13 +13,26 @@ import { transformMetadataForSubmission } from "@/lib/metadata/form-utils";
 import { ProductCrudError } from "./errors";
 import { prisma } from "../prisma";
 import { getCachedProducts, revalidateProductCache } from "./cache";
-import { getProductsByIdsFromDB } from "./db-queries";
+import {
+  getProductsByIdsFromDB,
+  getFeaturedProductsFromDB,
+  getProductsByCollectionFromDB,
+  getCollectionsFromDB,
+} from "./db-queries";
 import { syncProductToDatabase, syncPriceToDatabase } from "./product-sync";
 import { markAsSynced } from "../subcription";
+import { auth } from "../auth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
+
+async function requireAdmin() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user || session.user.role !== "admin") {
+    throw new Error("Unauthorized");
+  }
+}
 
 function generateSlug(name: string): string {
   return name
@@ -84,6 +98,7 @@ function transformCoupon(coupon: Stripe.Coupon): StripeCoupon {
 
 export async function createProduct(data: ProductFormData) {
   try {
+    await requireAdmin();
     const validatedMetadata = validateAndTransformMetadata(
       data.metadata,
       "product"
@@ -131,6 +146,8 @@ export async function createProduct(data: ProductFormData) {
       },
     };
 
+    await syncProductToDatabase(productWithNutrition);
+
     await revalidateProductCache();
     return transformProduct(productWithNutrition);
   } catch (error) {
@@ -154,6 +171,7 @@ export async function updateProduct(
   data: Partial<ProductFormData>
 ) {
   try {
+    await requireAdmin();
     const validatedMetadata = data.metadata
       ? validateAndTransformMetadata(data.metadata, "product")
       : undefined;
@@ -162,7 +180,7 @@ export async function updateProduct(
     const newPrice = await stripe.prices.create({
       product: id, // Use the product ID directly
       unit_amount: data.price,
-      currency: "usd",
+      currency: data.currency ?? "usd",
       active: true,
     });
 
@@ -210,6 +228,8 @@ export async function updateProduct(
       },
     };
 
+    await syncProductToDatabase(productWithNutrition);
+
     await revalidateProductCache();
     return transformProduct(productWithNutrition);
   } catch (error) {
@@ -233,6 +253,7 @@ export async function updateProduct(
 
 export async function unarchiveProduct(id: string) {
   try {
+    await requireAdmin();
     const product = await stripe.products.update(id, { active: true });
     await revalidateProductCache();
     return transformProduct(product);
@@ -252,6 +273,7 @@ export async function unarchiveProduct(id: string) {
 
 export async function archiveProduct(id: string) {
   try {
+    await requireAdmin();
     const product = await stripe.products.update(id, { active: false });
     await revalidateProductCache();
     return transformProduct(product);
@@ -271,6 +293,7 @@ export async function archiveProduct(id: string) {
 
 export async function createCoupon(data: CouponFormData) {
   try {
+    await requireAdmin();
     const validatedMetadata = validateAndTransformMetadata(
       data.metadata,
       "coupon"
@@ -302,6 +325,7 @@ export async function createCoupon(data: CouponFormData) {
 
 export async function updateCoupon(id: string, data: CouponFormData) {
   try {
+    await requireAdmin();
     const validatedMetadata = data.metadata
       ? validateAndTransformMetadata(data.metadata, "coupon")
       : undefined;
@@ -331,6 +355,7 @@ export async function updateCoupon(id: string, data: CouponFormData) {
 
 export async function createPresetCoupon(preset: "4for3" | "15off3") {
   try {
+    await requireAdmin();
     if (preset === "4for3") {
       const validatedMetadata = validateAndTransformMetadata(
         {
@@ -390,6 +415,7 @@ export async function createPresetCoupon(preset: "4for3" | "15off3") {
 
 export async function createPack(data: PackFormData) {
   try {
+    await requireAdmin();
     const slug = generateSlug(data.name);
     const packMetadata: Record<string, string> = {
       type: "bundle",
@@ -519,6 +545,7 @@ export async function createPack(data: PackFormData) {
 export async function updatePack(id: string, data: PackFormData) {
 
   try {
+    await requireAdmin();
     const slug = data.metadata?.slug || generateSlug(data.name);
     const packMetadata: Record<string, string> = {
       type: "bundle",
@@ -843,19 +870,8 @@ export async function getProductsByCollection(
   collectionSlug: string
 ): Promise<StripeProduct[]> {
   try {
-    const products = await listProducts();
-    const collectionProducts = products
-      .filter(
-        (product) =>
-          product.metadata?.collection === collectionSlug &&
-          product.metadata?.type !== "bundle" // Exclude bundles
-      )
-      .sort((a, b) => {
-        const orderA = parseInt(a.metadata?.collection_order || "999");
-        const orderB = parseInt(b.metadata?.collection_order || "999");
-        return orderA - orderB;
-      });
-    return collectionProducts;
+    // Uses the indexed `collection` / `collectionOrder` columns (DB-backed).
+    return await getProductsByCollectionFromDB(collectionSlug);
   } catch (error) {
     console.error("Error fetching collection products:", error);
     return [];
@@ -919,12 +935,8 @@ export async function getFeaturedProducts(
   limit: number = 8
 ): Promise<StripeProduct[]> {
   try {
-    const products = await listProducts();
-    const featured = products.filter(
-      (p) =>
-        p.metadata?.featured === "true" && p.metadata?.type !== "bundle"
-    );
-    return featured.slice(0, limit);
+    // Uses the indexed `featured` column (DB-backed).
+    return await getFeaturedProductsFromDB(limit);
   } catch (error) {
     console.error("Error fetching featured products:", error);
     return [];
@@ -938,20 +950,8 @@ export async function getCollections(): Promise<
   { slug: string; productCount: number }[]
 > {
   try {
-    const products = await listProducts();
-    const collectionMap = new Map<string, number>();
-
-    products.forEach((product) => {
-      const collection = product.metadata?.collection;
-      if (collection && product.metadata?.type !== "bundle") {
-        collectionMap.set(collection, (collectionMap.get(collection) || 0) + 1);
-      }
-    });
-
-    return Array.from(collectionMap.entries()).map(([slug, productCount]) => ({
-      slug,
-      productCount,
-    }));
+    // Grouped on the indexed `collection` column (DB-backed).
+    return await getCollectionsFromDB();
   } catch (error) {
     console.error("Error fetching collections:", error);
     return [];

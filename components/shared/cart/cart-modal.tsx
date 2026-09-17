@@ -14,7 +14,7 @@ import { useSession } from "@/lib/auth-client";
 
 export default function CartModal() {
   const [isLoading, setIsLoading] = useState(false);
-  const { cart, getTotalPrice, clearCart, getItemCount } = useCartStore();
+  const { cart, coupon, getTotalPrice, clearCart, getItemCount } = useCartStore();
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -22,10 +22,10 @@ export default function CartModal() {
     try {
       setIsLoading(true);
       if (session?.user) {
-        const url = await createCheckoutSession(cart);
+        const url = await createCheckoutSession(cart, coupon?.id);
         router.push(url as string);
       } else {
-        const url = await createGuestCheckoutSession(cart);
+        const url = await createGuestCheckoutSession(cart, undefined, coupon?.id);
         router.push(url as string);
       }
     } catch (error: any) {

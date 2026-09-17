@@ -12,6 +12,11 @@ export const sideBarCentralizedNav = {
         icon: "List",
       },
       {
+        title: "CJ Import",
+        url: "/admin/product/cj",
+        icon: "Package",
+      },
+      {
         title: "Bundle",
         url: "/admin/bundle",
         icon: "BarChart3",
@@ -25,6 +30,11 @@ export const sideBarCentralizedNav = {
         title: "Order",
         url: "/admin/order",
         icon: "Users",
+      },
+      {
+        title: "Fulfillments",
+        url: "/admin/fulfillment",
+        icon: "Truck",
       },
       {
         title: "Affiliate",

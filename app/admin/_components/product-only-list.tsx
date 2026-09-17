@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Archive } from "lucide-react";
+import { Edit, Archive, Layers } from "lucide-react";
 import { StripeProduct } from "@/types/product";
 import { PiRoadHorizon } from "react-icons/pi";
 
@@ -14,6 +14,7 @@ interface ProductOnlyListProps {
   onEdit: (product: StripeProduct) => void;
   onArchive: (id: string) => void;
   onUnarchive: (id: string) => void;
+  onManageVariants?: (product: StripeProduct) => void;
   isLoading?: boolean;
   title?: string;
   description?: string;
@@ -25,6 +26,7 @@ export function ProductOnlyList({
   onEdit,
   onArchive,
   onUnarchive,
+  onManageVariants,
   isLoading,
   title = "Products",
   description,
@@ -108,6 +110,17 @@ export function ProductOnlyList({
                       disabled={isLoading}
                     >
                       <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {!isArchived && onManageVariants && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onManageVariants(product)}
+                      disabled={isLoading}
+                      title="Manage variants"
+                    >
+                      <Layers className="h-4 w-4" />
                     </Button>
                   )}
                   {isArchived ? (

@@ -1,4 +1,8 @@
 import { getProductsByCollection, getCollections } from "@/lib/product/crud";
+import {
+    COLLECTION_NAMES,
+    getCollectionDisplay,
+} from "@/lib/product/collection-names";
 import ProductCollection from "@/components/shared/product-collection";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Package } from "lucide-react";
@@ -6,30 +10,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-
-// Collection display names
-const COLLECTION_NAMES: Record<string, { name: string; description: string }> = {
-    "new-arrivals": {
-        name: "New Arrivals",
-        description: "Check out our latest products, fresh off the shelf",
-    },
-    "best-sellers": {
-        name: "Best Sellers",
-        description: "Our most popular products loved by customers",
-    },
-    "summer-essentials": {
-        name: "Summer Essentials",
-        description: "Everything you need for the perfect summer",
-    },
-    "gift-ideas": {
-        name: "Gift Ideas",
-        description: "Perfect presents for any occasion",
-    },
-    sale: {
-        name: "Sale",
-        description: "Great products at amazing prices",
-    },
-};
 
 export async function generateStaticParams() {
     const collections = await getCollections();
@@ -44,9 +24,9 @@ export async function generateMetadata(props: {
     const params = await props.params;
     const slug = params.slug;
 
-    const collectionInfo = COLLECTION_NAMES[slug];
-    const collectionName = collectionInfo?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    const collectionDescription = collectionInfo?.description || `Browse our ${collectionName} collection`;
+    const collectionDisplay = getCollectionDisplay(slug);
+    const collectionName = collectionDisplay.name;
+    const collectionDescription = collectionDisplay.description;
 
     return {
         title: `${collectionName} | Our Store`,
@@ -71,14 +51,14 @@ export default async function CollectionPage(props: {
     const slug = params.slug;
 
     const products = await getProductsByCollection(slug);
-    const collectionInfo = COLLECTION_NAMES[slug];
+    const collectionDisplay = getCollectionDisplay(slug);
 
-    if (!collectionInfo && products.length === 0) {
+    if (!COLLECTION_NAMES[slug] && products.length === 0) {
         notFound();
     }
 
-    const collectionName = collectionInfo?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-    const collectionDescription = collectionInfo?.description || `Browse our ${collectionName} collection`;
+    const collectionName = collectionDisplay.name;
+    const collectionDescription = collectionDisplay.description;
 
     return (
         <div className="container mx-auto px-4 py-8">

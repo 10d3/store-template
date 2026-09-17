@@ -1,7 +1,12 @@
-"use server";
 import { headers } from "next/headers";
 import { prisma } from "../prisma";
 import { inngest } from "../inngest/client";
+
+// NOTE: intentionally NOT a "use server" module. This function mutates
+// money-bearing state (balances/earnings) and must never be invocable from
+// the client. It is only called from trusted server/webhook code
+// (lib/subcription.ts), and orderValue is always sourced from the stored
+// Order total — never from caller-supplied prices.
 
 export async function trackPurchase({
   userId,
@@ -28,6 +33,10 @@ export async function trackPurchase({
     throw new Error("No referral code found");
   }
 
+  // Normalize empty-string ids (guest flows send "") to null so the
+  // self-referral guard and lookups behave identically for guests.
+  const uid = userId || null;
+
   const headersList = await headers();
   const ipAddress =
     headersList.get("x-forwarded-for") ||
@@ -43,18 +52,42 @@ export async function trackPurchase({
     throw new Error("Affiliate not active");
   }
 
-  // 2️⃣ Prevent self-referral
-  if (userId && affiliate.userId === userId) {
+  // 2️⃣ Prevent self-referral (guard on normalized uid, not raw userId)
+  if (uid && affiliate.userId === uid) {
     throw new Error("Self-referral not allowed");
   }
 
   // 3️⃣ Begin transaction
   const result = await prisma.$transaction(async (tx) => {
+    // ⚠️ Idempotency guard FIRST: Stripe redelivers webhook events and every
+    // delivery used to mint a fresh commission. The Commission model has no
+    // orderId/productId columns, so the linkage lives in the description
+    // prefix we control below ("Purchase commission for order <id> - product
+    // <id>"). Skip creation when a commission for this order+product exists.
+    const existingCommission = await tx.commission.findFirst({
+      where: {
+        affiliateId: affiliate.id,
+        description: {
+          startsWith: `Purchase commission for order ${orderId} - product ${productId}`,
+        },
+      },
+    });
+
+    if (existingCommission) {
+      return {
+        referralId: existingCommission.referralId,
+        affiliateId: affiliate.id,
+        commissionAmount: 0,
+        commissionId: existingCommission.id,
+        duplicate: true,
+      };
+    }
+
     // Check existing referral
     let referral = null;
-    if (userId) {
+    if (uid) {
       referral = await tx.referral.findFirst({
-        where: { affiliateId: affiliate.id, userId },
+        where: { affiliateId: affiliate.id, userId: uid },
       });
     } else if (email) {
       referral = await tx.referral.findFirst({
@@ -67,7 +100,7 @@ export async function trackPurchase({
       referral = await tx.referral.create({
         data: {
           affiliateId: affiliate.id,
-          userId,
+          userId: uid,
           email,
           status: "COMPLETED",
           orderValue,
@@ -97,7 +130,9 @@ export async function trackPurchase({
     }
     commissionAmount = Math.round(commissionAmount * 100) / 100;
 
-    // Create commission record (APPROVED)
+    // Create commission record (APPROVED). The description embeds the
+    // orderId + productId — it is the dedup key consumed above and by the
+    // refund clawback in lib/subcription.ts.
     const commission = await tx.commission.create({
       data: {
         affiliateId: affiliate.id,
@@ -106,7 +141,7 @@ export async function trackPurchase({
         type: affiliate.commissionType,
         rate: affiliate.commissionRate,
         status: "APPROVED",
-        description: `Purchase commission for order ${orderId} - $${orderValue.toFixed(
+        description: `Purchase commission for order ${orderId} - product ${productId} - $${orderValue.toFixed(
           2
         )}`,
       },
@@ -138,6 +173,7 @@ export async function trackPurchase({
       affiliateId: affiliate.id,
       commissionAmount,
       commissionId: commission.id,
+      duplicate: false,
     };
   });
 

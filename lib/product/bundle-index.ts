@@ -1,56 +1,45 @@
-// import type { StripeProduct } from "@/types/stripe";
-import { getCachedProducts } from "@/lib/product/cache";
 import { StripeProduct } from "@/types/product";
+import { unstable_cache } from "next/cache";
+import { getPacksFromDB } from "./db-queries";
+import { getCachedProducts } from "./cache";
 
-/**
- * In-memory bundle index:
- * productId -> StripeProduct[]
- */
-let bundleIndex: Map<string, StripeProduct[]> | null = null;
-
-/**
- * Build the bundle index once per runtime
- */
-async function buildBundleIndex(): Promise<Map<string, StripeProduct[]>> {
-    const products = await getCachedProducts();
-    const index = new Map<string, StripeProduct[]>();
-
-    for (const product of products) {
-        const metadata = product.metadata;
-        if (!metadata) continue;
-        if (metadata.type !== "bundle") continue;
-        if (!metadata.contents) continue;
-
-        const contents = metadata.contents
-            .split(",")
-            .map((id: string) => id.trim())
-            .filter(Boolean);
-
-        for (const productId of contents) {
-            if (!index.has(productId)) {
-                index.set(productId, []);
-            }
-            index.get(productId)!.push(product);
-        }
-    }
-
-    return index;
-}
-
-/**
- * Get bundle index (cached in memory)
- */
-async function getBundleIndex(): Promise<Map<string, StripeProduct[]>> {
-    if (!bundleIndex) {
-        bundleIndex = await buildBundleIndex();
-    }
-    return bundleIndex;
-}
+const USE_DATABASE = true;
 
 /**
  * Public API: get bundles that include a product
  */
-export async function getPack(productId: string): Promise<StripeProduct[]> {
-    const index = await getBundleIndex();
-    return index.get(productId) ?? [];
-}
+export const getPack = unstable_cache(
+    async (productId: string): Promise<StripeProduct[]> => {
+        try {
+            let bundles: StripeProduct[] = [];
+            
+            if (USE_DATABASE) {
+                bundles = await getPacksFromDB();
+            } else {
+                const allProducts = await getCachedProducts();
+                bundles = allProducts.filter(p => p.metadata?.type === "bundle");
+            }
+            
+            // Filter bundles to only those containing the productId
+            return bundles.filter(bundle => {
+                const contents = bundle.metadata?.contents;
+                if (!contents) return false;
+                
+                const includedIds = contents
+                    .split(",")
+                    .map((id: string) => id.trim())
+                    .filter(Boolean);
+                    
+                return includedIds.includes(productId);
+            });
+        } catch (error) {
+            console.error("Error fetching packs:", error);
+            return [];
+        }
+    },
+    ["packs-for-product"],
+    {
+        revalidate: 300,
+        tags: ["products"],
+    }
+);

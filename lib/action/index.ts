@@ -1,5 +1,7 @@
 "use server"
 import { prisma } from "../prisma";
+import { headers } from "next/headers";
+import { auth } from "../auth";
 
 export const fsindBlog = async (id: string | undefined) => {
   if (!id) {
@@ -17,7 +19,7 @@ export const fsindBlog = async (id: string | undefined) => {
 
 export const findBlogs = async () => {
   try {
-    const blogs = prisma.blog.findMany({
+    const blogs = await prisma.blog.findMany({
       orderBy: {
         createdAt: "desc",
       },
@@ -25,6 +27,7 @@ export const findBlogs = async () => {
     return blogs;
   } catch (error) {
     console.error(error);
+    return undefined;
   }
 };
 
@@ -91,6 +94,11 @@ export const findBlogBySlug = async (
 
 export const publishBlog = async (id: string) => {
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (session?.user?.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
     await prisma.blog.update({
       where: { id },
       data: {

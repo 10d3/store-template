@@ -10,13 +10,11 @@ import { useRouter } from "next/navigation";
 
 interface ReviewFormProps {
   productId: string;
-  userId: string;
   onSuccess?: () => void;
 }
 
 export default function ReviewForm({
   productId,
-  userId,
   onSuccess,
 }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
@@ -36,7 +34,6 @@ export default function ReviewForm({
 
     try {
       await createReview({
-        userId,
         productId,
         rating,
         comment: comment.trim() || undefined,

@@ -1,4 +1,4 @@
-import { BarChart3, Folder, LayoutDashboard, List, Users } from "lucide-react";
+import { BarChart3, Folder, LayoutDashboard, List, Package, Truck, Users } from "lucide-react";
 import { FcMoneyTransfer } from "react-icons/fc";
 import { PiArticleNyTimesDuotone } from "react-icons/pi";
 import { IoIosLink } from "react-icons/io";
@@ -10,6 +10,8 @@ export const iconMapping: Record<string, React.ComponentType> = {
   List,
   BarChart3,
   Folder,
+  Package,
+  Truck,
   Users,
   FcMoneyTransfer,
   PiArticleNyTimesDuotone,

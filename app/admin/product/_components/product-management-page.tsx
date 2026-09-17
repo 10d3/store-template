@@ -19,6 +19,7 @@ import ProductForm from "../../_components/form/product-form"
 import { StripeProduct } from "@/types/product"
 import { ProductFormData } from "@/lib/product/product.schema"
 import { ProductOnlyList } from "../../_components/product-only-list";
+import ManageVariantsDialog from "../../_components/manage-variants-dialog";
 import {
     Dialog,
     DialogContent,
@@ -30,6 +31,7 @@ export default function ProductManagementPage() {
     const queryClient = useQueryClient()
     const [editingProduct, setEditingProduct] = useState<StripeProduct | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [variantsProduct, setVariantsProduct] = useState<StripeProduct | null>(null)
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -149,6 +151,7 @@ export default function ProductManagementPage() {
                     onEdit={onEditProduct}
                     onArchive={handleArchiveProduct}
                     onUnarchive={handleUnarchiveProduct}
+                    onManageVariants={setVariantsProduct}
                     isLoading={creatingProduct || updatingProduct}
                     title="Active Products"
                     description="Manage your individual products here"
@@ -166,8 +169,18 @@ export default function ProductManagementPage() {
                 />
             </div>
 
+            {variantsProduct && (
+                <ManageVariantsDialog
+                    productId={variantsProduct.id}
+                    productName={variantsProduct.name}
+                    trackInventory={variantsProduct.trackInventory ?? false}
+                    open={!!variantsProduct}
+                    onOpenChange={(o) => !o && setVariantsProduct(null)}
+                />
+            )}
+
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{editingProduct ? "Edit Product" : "Create New Product"}</DialogTitle>
                     </DialogHeader>

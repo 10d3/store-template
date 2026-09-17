@@ -19,10 +19,13 @@ export async function updateAffiliateStatus(
             headers: await headers(),
         });
 
-        if (!session?.user?.id /* || session.user.role !== "ADMIN" */) {
-            // Assuming role check is handled or we rely on page protection.
-            // Ideally check role here. 
-            // return { error: "Unauthorized" };
+        if (!session?.user?.id || session.user.role !== "admin") {
+            return { error: "Unauthorized" };
+        }
+
+        const allowedStatuses: AffiliateStatus[] = ["ACTIVE", "REJECTED"];
+        if (!allowedStatuses.includes(status)) {
+            return { error: "Invalid status" };
         }
 
         const affiliate = await prisma.affiliate.findUnique({

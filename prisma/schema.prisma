@@ -51,11 +51,23 @@ model Product {
   type        String?
   gender      String?
 
-  // All Stripe metadata stored as JSON
+  // Promoted from metadata for fast indexed filtering/sorting (see also category/gender/type).
+  collection      String?
+  collectionOrder Int?
+  featured        Boolean  @default(false)
+  tags            String[]
+
+  // All Stripe metadata stored as JSON (long-tail / display-only fields)
   metadata Json?
+
+  // Catalog source: "MANUAL" (admin-created via Stripe) or "CJ" (CJ Dropshipping)
+  source         String  @default("MANUAL")
+  cjProductId    String? // CJ product id (pid) when source = "CJ"
+  trackInventory Boolean @default(false)
 
   // Relations
   prices    Price[]
+  variants  ProductVariant[]
   nutrition ProductNutrition?
 
   // Timestamps
@@ -66,7 +78,43 @@ model Product {
   @@index([slug])
   @@index([category])
   @@index([type])
+  @@index([source])
+  @@index([cjProductId])
+  @@index([collection])
+  @@index([featured])
   @@map("products")
+}
+
+// Real product variants (size/color/option combos) + inventory.
+// Replaces the previous "slug-grouping + multiple prices" variant hack.
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Links to the Stripe Price (and our Price row) used for this variant at checkout.
+  // Not an enforced FK so import/backfill ordering stays flexible (cf. ProductNutrition).
+  stripePriceId String? @unique
+
+  sku     String?
+  options Json    @default("{}") // structured options, e.g. { "color": "Black", "size": "XL" }
+
+  // CJ Dropshipping linkage (null for MANUAL products)
+  cjVariantId String?
+  cjSku       String?
+  cost        Int? // supplier cost in cents
+
+  stock  Int     @default(0) // available inventory
+  image  String?
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([cjVariantId])
+  @@index([productId, active])
+  @@map("product_variants")
 }
 
 model Price {
@@ -131,8 +179,52 @@ model Order {
   updatedAt       DateTime
   orderNumber     String   @unique
 
+  fulfillments Fulfillment[]
+
   @@index([customerEmail]) // Index for quick guest order lookups
   @@map("order")
+}
+
+// Links an Order to a supplier-side fulfillment (e.g. a CJ Dropshipping order).
+// Supports multiple shipments per order.
+model Fulfillment {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  provider String // "CJ" | "MANUAL"
+
+  // CJ linkage
+  cjOrderId  String? // CJ internal order id
+  cjOrderNum String? // CJ customer-facing order number
+
+  status         String // CREATED, UNSHIPPED, SHIPPED, DELIVERED, CANCELLED, ...
+  trackingNumber String?
+  trackingUrl    String?
+  carrier        String?
+
+  raw Json? // last raw provider payload, for debugging
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([provider, status])
+  @@index([cjOrderId])
+  @@map("fulfillments")
+}
+
+// Single-row store for the CJ Dropshipping API token (shared across instances).
+// `id` is pinned to "cj" so there is only ever one row.
+model CjAuth {
+  id               String   @id @default("cj")
+  accessToken      String
+  refreshToken     String
+  accessExpiresAt  DateTime
+  refreshExpiresAt DateTime
+  updatedAt        DateTime @updatedAt
+
+  @@map("cj_auth")
 }
 
 model Wishlist {

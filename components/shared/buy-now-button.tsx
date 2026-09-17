@@ -6,6 +6,7 @@ import { CreditCard } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
+import { useCartStore } from "@/lib/store";
 
 export default function BuyNowButton({
   product,
@@ -14,6 +15,7 @@ export default function BuyNowButton({
 }) {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
+  const coupon = useCartStore((s) => s.coupon);
 
   const getPrice = () => {
     if (
@@ -41,10 +43,10 @@ export default function BuyNowButton({
     try {
       setLoading(true);
       if (session?.user) {
-        const url = await createCheckoutSessionNow(transformProductDatatoCartItem(product));
+        const url = await createCheckoutSessionNow(transformProductDatatoCartItem(product), coupon?.id);
         window.location.href = url as string;
       } else {
-        const url = await createGuestCheckoutSessionNow(transformProductDatatoCartItem(product));
+        const url = await createGuestCheckoutSessionNow(transformProductDatatoCartItem(product), undefined, coupon?.id);
         window.location.href = url as string;
       }
     } catch (error: any) {

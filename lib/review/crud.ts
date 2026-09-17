@@ -2,9 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath, unstable_cache } from "next/cache";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export interface ReviewData {
-    userId: string;
     productId: string;
     rating: number;
     comment?: string;
@@ -29,7 +30,20 @@ export interface ReviewWithUser {
  * Create a new review
  */
 export async function createReview(data: ReviewData) {
-    const { userId, productId, rating, comment } = data;
+    const { productId, rating, comment } = data;
+
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userId = session?.user?.id;
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!productId || typeof productId !== "string") {
+        throw new Error("Invalid product");
+    }
+    if (typeof rating !== "number" || !Number.isFinite(rating) || rating <= 0 || rating > 5) {
+        throw new Error("Rating must be between 0.5 and 5");
+    }
 
     // Check if user already reviewed this product
     const existingReview = await prisma.review.findFirst({
@@ -122,7 +136,13 @@ export const getAverageRating = unstable_cache(async (
 /**
  * Delete a review (only by owner)
  */
-export async function deleteReview(reviewId: string, userId: string) {
+export async function deleteReview(reviewId: string) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userId = session?.user?.id;
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
+
     const review = await prisma.review.findUnique({
         where: { id: reviewId },
     });

@@ -57,6 +57,17 @@ import { transformDbProduct } from "../utils";
 /**
  * List all active products
  */
+const variantSelect = {
+    id: true,
+    stripePriceId: true,
+    sku: true,
+    options: true,
+    stock: true,
+    cost: true,
+    image: true,
+    active: true,
+} as const;
+
 export const listProductsFromDB = cache(async (): Promise<StripeProduct[]> => {
     const products = await prisma.product.findMany({
         where: { active: true },
@@ -67,6 +78,7 @@ export const listProductsFromDB = cache(async (): Promise<StripeProduct[]> => {
                 take: 20,
                 select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
+            variants: { where: { active: true }, select: variantSelect },
             nutrition: true,
         },
         orderBy: { createdAt: "desc" },
@@ -97,6 +109,7 @@ export const getProductBySlugFromDB = cache(async (
                 take: 20,
                 select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
             },
+            variants: { where: { active: true }, select: variantSelect },
             nutrition: true,
         },
     });
@@ -197,6 +210,69 @@ export async function getPacksFromDB(): Promise<StripeProduct[]> {
     return products.map(transformDbProduct);
 }
 
+
+/**
+ * Featured products (uses the indexed `featured` column).
+ */
+export async function getFeaturedProductsFromDB(
+    limit: number = 8
+): Promise<StripeProduct[]> {
+    const products = await prisma.product.findMany({
+        where: { active: true, featured: true, type: { not: "bundle" } },
+        include: {
+            prices: {
+                where: { active: true },
+                orderBy: { isDefault: "desc" },
+                take: 10,
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
+            },
+            variants: { where: { active: true }, select: variantSelect },
+            nutrition: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+    });
+    return products.map(transformDbProduct);
+}
+
+/**
+ * Products in a collection (uses indexed `collection` + `collectionOrder`).
+ */
+export async function getProductsByCollectionFromDB(
+    collectionSlug: string
+): Promise<StripeProduct[]> {
+    const products = await prisma.product.findMany({
+        where: { active: true, collection: collectionSlug, type: { not: "bundle" } },
+        include: {
+            prices: {
+                where: { active: true },
+                orderBy: { isDefault: "desc" },
+                take: 10,
+                select: { id: true, unitAmount: true, currency: true, isDefault: true, image: true, metadata: true },
+            },
+            variants: { where: { active: true }, select: variantSelect },
+            nutrition: true,
+        },
+        orderBy: [{ collectionOrder: "asc" }, { createdAt: "desc" }],
+    });
+    return products.map(transformDbProduct);
+}
+
+/**
+ * All collections with product counts (grouped on the `collection` column).
+ */
+export async function getCollectionsFromDB(): Promise<
+    { slug: string; productCount: number }[]
+> {
+    const rows = await prisma.product.groupBy({
+        by: ["collection"],
+        where: { active: true, collection: { not: null }, type: { not: "bundle" } },
+        _count: { _all: true },
+    });
+    return rows
+        .filter((r) => r.collection)
+        .map((r) => ({ slug: r.collection as string, productCount: r._count._all }));
+}
 
 export async function getProductsByIdsCached(ids: string[]): Promise<StripeProduct[]> {
     const dedupedIds = [...new Set(ids)];

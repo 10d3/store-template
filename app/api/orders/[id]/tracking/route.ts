@@ -1,8 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { sendEmail } from "@/lib/action/send-email";
-import { TrackingEmail } from "@/components/mails/tracking-email";
+import { sendTrackingEmail } from "@/lib/order/send-tracking";
 import { getStripeClient } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
@@ -94,20 +93,15 @@ export async function POST(
             console.error("Failed to parse line items from metadata", e);
         }
 
-        const emailHtml = TrackingEmail({
+        await sendTrackingEmail({
+            customerEmail,
             customerName: localOrderCustomerName || paymentIntent.shipping?.name || "Customer",
-            orderId: friendlyOrderId,
+            orderNumber: friendlyOrderId,
             orderTotal: paymentIntent.amount / 100,
             trackingNumber,
             trackingUrl,
             carrier,
             orderItems,
-        });
-
-        await sendEmail({
-            to: customerEmail,
-            subject: `Shipping Update: Order #${friendlyOrderId}`,
-            react: emailHtml as any,
         });
 
         // Optionally update Stripe metadata to store tracking info

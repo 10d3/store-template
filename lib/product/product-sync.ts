@@ -1,5 +1,4 @@
-"use server";
-
+// SECURITY: no "use server" here on purpose — these are internal helpers for webhooks/server modules; adding the directive would expose DB writes as public actions.
 import Stripe from "stripe";
 import { prisma } from "../prisma";
 
@@ -15,6 +14,17 @@ export async function syncProductToDatabase(product: Stripe.Product) {
     try {
         const metadata = product.metadata as Record<string, string>;
 
+        // Promote selected metadata into indexed columns for fast filtering.
+        const promoted = {
+            collection: metadata.collection || null,
+            collectionOrder: metadata.collection_order
+                ? parseInt(metadata.collection_order, 10) || null
+                : null,
+            featured: metadata.featured === "true",
+            tags: metadata.tags
+                ? metadata.tags.split(",").map((t) => t.trim()).filter(Boolean)
+                : [],
+        };
 
         // Get the default price if it exists
         let defaultPrice: Stripe.Price | null = null;
@@ -40,6 +50,7 @@ export async function syncProductToDatabase(product: Stripe.Product) {
                 slug: metadata.slug || null,
                 category: metadata.category || null,
                 gender: metadata.gender || null,
+                ...promoted,
                 updatedAt: new Date(),
             },
             create: {
@@ -53,6 +64,7 @@ export async function syncProductToDatabase(product: Stripe.Product) {
                 slug: metadata.slug || null,
                 category: metadata.category || null,
                 gender: metadata.gender || null,
+                ...promoted,
             },
         });
 
@@ -188,19 +200,28 @@ export async function syncAllProducts() {
     try {
 
 
-        // Fetch all active products from Stripe
-        const products = await stripe.products.list({
-            active: true,
-            limit: 100,
-            expand: ["data.default_price"],
-        });
+        // Fetch ALL active products — Stripe caps a single list() page at 100.
+        const allProducts: Stripe.Product[] = [];
+        let startingAfter: string | undefined = undefined;
 
-
+        do {
+            const page: Stripe.Response<Stripe.ApiList<Stripe.Product>> =
+                await stripe.products.list({
+                    active: true,
+                    limit: 100,
+                    expand: ["data.default_price"],
+                    ...(startingAfter ? { starting_after: startingAfter } : {}),
+                });
+            allProducts.push(...page.data);
+            startingAfter = page.has_more
+                ? page.data[page.data.length - 1].id
+                : undefined;
+        } while (startingAfter);
 
         let synced = 0;
         let failed = 0;
 
-        for (const product of products.data) {
+        for (const product of allProducts) {
             const result = await syncProductToDatabase(product);
             if (result.success) {
                 synced++;
@@ -209,9 +230,22 @@ export async function syncAllProducts() {
             }
         }
 
+        // Deactivate DB rows missing from Stripe (covers missed product.deleted webhooks).
+        const deactivated = await prisma.product.updateMany({
+            where: {
+                active: true,
+                id: { notIn: allProducts.map((p) => p.id) },
+            },
+            data: { active: false, updatedAt: new Date() },
+        });
 
-
-        return { success: true, synced, failed, total: products.data.length };
+        return {
+            success: true,
+            synced,
+            failed,
+            total: allProducts.length,
+            deactivated: deactivated.count,
+        };
     } catch (error) {
         console.error("❌ Error during full sync:", error);
         return { success: false, error };

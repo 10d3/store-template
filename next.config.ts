@@ -48,6 +48,22 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "utfs.io",
         pathname: "**"
+      },
+      // CJ Dropshipping product image CDNs
+      {
+        protocol: "https",
+        hostname: "**.cjdropshipping.com",
+        pathname: "**"
+      },
+      {
+        protocol: "https",
+        hostname: "**.alicdn.com",
+        pathname: "**"
+      },
+      {
+        protocol: "https",
+        hostname: "**.aliyuncs.com",
+        pathname: "**"
       }
     ],
   },

@@ -88,6 +88,16 @@ type price = {
   image: string | null;
   metadata?: JsonValue | null;
 }
+type dbVariant = {
+  id: string;
+  stripePriceId: string | null;
+  sku: string | null;
+  options: JsonValue | null;
+  stock: number;
+  cost: number | null;
+  image: string | null;
+  active: boolean;
+};
 export function transformDbProduct(dbProduct: {
   id: string;
   name: string;
@@ -98,7 +108,10 @@ export function transformDbProduct(dbProduct: {
   slug: string | null;
   subtitle: string | null;
   tagline: string | null;
+  source?: string;
+  trackInventory?: boolean;
   prices: price[];
+  variants?: dbVariant[];
   nutrition?: { nutrition: string } | null;
 }): StripeProduct {
   const baseMetadata =
@@ -114,6 +127,24 @@ export function transformDbProduct(dbProduct: {
   const defaultPrice =
     dbProduct.prices.find((p) => p.isDefault) ?? dbProduct.prices[0];
 
+  // Resolve each variant's price (unit_amount/currency) from the linked Price row.
+  const priceById = new Map(dbProduct.prices.map((p) => [p.id, p]));
+  const productVariants = (dbProduct.variants ?? []).map((v) => {
+    const linked = v.stripePriceId ? priceById.get(v.stripePriceId) : undefined;
+    return {
+      id: v.id,
+      stripePriceId: v.stripePriceId,
+      sku: v.sku,
+      options: (v.options as Record<string, string>) ?? {},
+      stock: v.stock,
+      cost: v.cost,
+      image: v.image,
+      active: v.active,
+      unit_amount: linked?.unitAmount ?? null,
+      currency: linked?.currency ?? "usd",
+    };
+  });
+
   return {
     id: dbProduct.id,
     name: dbProduct.name,
@@ -124,6 +155,8 @@ export function transformDbProduct(dbProduct: {
     slug: dbProduct.slug ?? undefined,
     subtitle: dbProduct.subtitle ?? undefined,
     tagline: dbProduct.tagline ?? undefined,
+    source: dbProduct.source,
+    trackInventory: dbProduct.trackInventory,
     default_price: defaultPrice
       ? {
         id: defaultPrice.id,
@@ -139,6 +172,7 @@ export function transformDbProduct(dbProduct: {
       image: p.image ?? null,
       metadata: (p.metadata as Record<string, string>) ?? {},
     })),
+    productVariants,
   };
 }
 

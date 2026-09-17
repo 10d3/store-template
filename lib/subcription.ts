@@ -2,6 +2,8 @@
 import Stripe from "stripe";
 import { prisma } from "./prisma";
 import { trackPurchase } from "./affiliation/track-purshase";
+import { refund } from "./affiliation/refund";
+import { stripeClient } from "./stripe";
 import {
   syncProductToDatabase,
   deleteProductFromDatabase,
@@ -10,6 +12,7 @@ import {
 } from "./product/product-sync";
 import { sendOrderStatusEmail, sendOwnerOrderNotification } from "./email/order-emails";
 import { generateOrderId } from "./order-id";
+import { inngest } from "./inngest/client";
 
 // ── Webhook deduplication ────────────────────────────────────────
 // CRUD operations (createPack, updatePack, etc.) sync products to the
@@ -163,27 +166,10 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
   console.log("[webhook] checkout.session.completed:", data.id);
 
   try {
-    // ── Affiliate tracking ──────────────────────────────────────
     const lineItemsRaw = parseLineItems(data.metadata?.line_items);
-    for (const item of lineItemsRaw) {
-      try {
-        const itemTotal =
-          ((item.price_data?.unit_amount ?? 0) * (item.quantity ?? 0)) / 100;
-        await trackPurchase({
-          userId: data.metadata?.userId ?? "",
-          email: data.customer_details?.email ?? "",
-          orderValue: itemTotal,
-          orderId: data.id,
-          productId: item.price_data?.product_data?.id as string,
-          productName: item.price_data?.product_data?.name as string,
-          referralCode: data.metadata?.referralCode ?? null,
-        });
-      } catch (err) {
-        console.error(`[affiliate] tracking failed for item ${item.price_data?.product_data?.id}:`, err);
-      }
-    }
 
-    // ── Upsert order ────────────────────────────────────────────
+    // SECURITY: order + total come from trusted Stripe amounts only.
+    // Client-controlled metadata prices must never drive money math.
     const shippingAddress = buildShippingAddress(
       data.collected_information?.shipping_details
     );
@@ -205,7 +191,7 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       create: {
         id: data.id,
         orderNumber: generateOrderId(),
-        userId: (data.metadata?.userId as string) ?? null,
+        userId: (data.metadata?.userId as string) || null,
         customerEmail: data.customer_details?.email ?? data.metadata?.customerEmail ?? null,
         customerName: data.customer_details?.name ?? data.metadata?.customerName ?? null,
         total: data.amount_total ? data.amount_total / 100 : 0,
@@ -221,6 +207,36 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         updatedAt: new Date(),
       },
     });
+
+    // ── Affiliate tracking (AFTER the order exists) ─────────────
+    // orderValue is the stored Order total (Stripe amount_total), with the
+    // session amount as fallback. One commission per order on that trusted
+    // total; trackPurchase() dedupes on orderId+productId so Stripe
+    // redeliveries cannot double-credit.
+    const trustedOrderValue =
+      order.total || (data.amount_total ? data.amount_total / 100 : 0);
+    const firstItem = lineItemsRaw[0];
+    const affiliateProductId =
+      (firstItem?.price_data?.product_data?.metadata?.productId ??
+        firstItem?.price_data?.product_data?.id ??
+        "") as string;
+
+    if (firstItem && affiliateProductId && trustedOrderValue > 0) {
+      try {
+        await trackPurchase({
+          userId: data.metadata?.userId ?? "",
+          email: data.customer_details?.email ?? "",
+          orderValue: trustedOrderValue,
+          orderId: data.id,
+          productId: affiliateProductId,
+          productName:
+            (firstItem.price_data?.product_data?.name as string) ?? "Product",
+          referralCode: data.metadata?.referralCode ?? null,
+        });
+      } catch (err) {
+        console.error(`[affiliate] tracking failed for order ${data.id}:`, err);
+      }
+    }
 
     const orderItems = buildOrderItems(lineItemsRaw);
     const orderTotal = data.amount_total ? data.amount_total / 100 : 0;
@@ -249,6 +265,18 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
         orderItems,
       })
     );
+
+    // ── CJ auto-fulfillment (Phase 4) ───────────────────────────
+    // Fire-and-forget: the Inngest function resolves CJ line items and
+    // no-ops if the order contains none. Keeps the webhook fast/resilient.
+    try {
+      await inngest.send({
+        name: "cj/order.fulfill",
+        data: { orderId: order.id, sessionId: data.id },
+      });
+    } catch (err) {
+      console.error("[webhook] failed to enqueue cj/order.fulfill:", err);
+    }
   } catch (error) {
     console.error("[webhook] handleCheckoutCompletedSession error:", error);
   }
@@ -425,13 +453,60 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     const paymentIntentId = charge.payment_intent as string | null;
     if (!paymentIntentId) return;
 
-    await prisma.order.updateMany({
-      where: { id: paymentIntentId },
-      data: {
-        status: "refunded",
-        updatedAt: new Date(),
-      },
-    });
+    // Orders are keyed by session id (cs_…) for Checkout payments and by
+    // payment-intent id (pi_…) for direct PI payments. Resolve the owning
+    // Checkout session so clawback can find commissions tracked under it.
+    let sessionOrderId: string | null = null;
+    try {
+      const sessions = await stripeClient.checkout.sessions.list({
+        payment_intent: paymentIntentId,
+        limit: 1,
+      });
+      sessionOrderId = sessions.data[0]?.id ?? null;
+    } catch (err) {
+      console.error("[webhook] failed to resolve checkout session for refund:", err);
+    }
+
+    const orderIds = [
+      ...new Set(
+        [paymentIntentId, sessionOrderId].filter((id): id is string => !!id)
+      ),
+    ];
+
+    for (const orderId of orderIds) {
+      await prisma.order.updateMany({
+        where: { id: orderId },
+        data: {
+          status: "refunded",
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    // ── Commission clawback ─────────────────────────────────────
+    // Reverse every commission attributed to the refunded order. Commissions
+    // carry no orderId column; they are located via the description prefix
+    // written by trackPurchase(). refund() is idempotent per commission.
+    for (const orderId of orderIds) {
+      const commissions = await prisma.commission.findMany({
+        where: {
+          description: { startsWith: `Purchase commission for order ${orderId}` },
+        },
+        select: { id: true },
+      });
+
+      for (const c of commissions) {
+        try {
+          await refund({
+            orderId,
+            commissionId: c.id,
+            reason: `Order refunded (charge ${charge.id})`,
+          });
+        } catch (err) {
+          console.error(`[affiliate] clawback failed for commission ${c.id}:`, err);
+        }
+      }
+    }
   } catch (error) {
     console.error("[webhook] handleChargeRefunded error:", error);
   }

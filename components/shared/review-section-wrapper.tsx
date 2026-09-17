@@ -34,7 +34,7 @@ export default function ReviewSection({ productId }: ReviewSectionProps) {
                 <CardTitle className="text-lg">Write a Review</CardTitle>
             </CardHeader>
             <CardContent>
-                <ReviewForm productId={productId} userId={session.user.id} />
+                <ReviewForm productId={productId} />
             </CardContent>
         </Card>
     );

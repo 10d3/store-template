@@ -1,6 +1,6 @@
 import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
-import { getPackBySlug } from "@/lib/product/cache";
+import { getPackBySlug, transformPacksToProductData } from "@/lib/product/cache";
 import { getRelatedProducts } from "@/lib/product/related-index";
 import { getAverageRating, getReviewsByProductId } from "@/lib/review/crud";
 import {
@@ -28,11 +28,10 @@ import CardAnyText from "@/components/shared/card-any-text";
 import { Markdown } from "@/components/shared/markdown";
 import { MarkdownNutrition } from "@/components/shared/nutrition-label";
 import RelatedProductsClient from "@/components/shared/related-product-client";
-// import { PackCardNew } from "@/components/shared/product/product-card";
+import { PackCardNew } from "@/components/shared/product/product-card";
 import ReviewsClient from "@/components/shared/review-client";
 import { getBaseURL, stripMarkdown } from "@/lib/utils";
 import { Metadata } from "next";
-import relatedProducts from "@/components/shared/related-products";
 
 export async function generateMetadata(props: {
     params: Promise<{ slug: string }>;
@@ -119,6 +118,10 @@ export default async function page(props: {
 
     const { average: averageRating, count: reviewCount } = ratingData;
 
+    // Build the pack pricing/size data so customers can pick a pack size (2/3/6…)
+    // and get the right discounted price + Stripe price at checkout.
+    const [packData] = await transformPacksToProductData([pack]);
+
     const images = pack?.images?.slice(0, 5) ?? [];
 
 
@@ -175,30 +178,21 @@ export default async function page(props: {
                                 </CardHeader>
 
                                 <CardContent className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        {/* {selectedVariants.length > 1 && (
+                                    {packData ? (
+                                        <PackCardNew product={packData} defaultPurchaseType="onetime" />
+                                    ) : (
+                                        <>
                                             <div className="flex-1">
-                                                <SelectVariant variants={selectedVariants} />
+                                                <QuantityManagement product={pack} />
                                             </div>
-                                        )} */}
-                                        <div className="flex-1">
-                                            <QuantityManagement product={pack} />
-                                        </div>
-                                    </div>
+                                            <div className="grid gap-2">
+                                                <BuyNowButton product={pack} />
+                                                <AddToCartButton product={pack} />
+                                            </div>
+                                        </>
+                                    )}
                                 </CardContent>
-
-                                {/* {selectedVariants.length > 1 && (
-                                    <CardFooter className="pt-0 pb-0">
-                                        <div className="w-full space-y-4">
-                                            <CarousselVariants products={variants} />
-                                        </div>
-                                    </CardFooter>
-                                )} */}
                             </Card>
-                        </div>
-                        <div className="mt-6 md:hidden grid gap-2">
-                            <BuyNowButton product={pack} />
-                            <AddToCartButton product={pack} />
                         </div>
                         <BadgeTrust className="md:hidden" />
 
@@ -320,32 +314,21 @@ export default async function page(props: {
                                     </CardHeader>
 
                                     <CardContent className="space-y-6">
-                                        <div className="flex items-center gap-4">
-                                            {/* {selectedVariants.length > 1 && (
+                                        {packData ? (
+                                            <PackCardNew product={packData} defaultPurchaseType="onetime" />
+                                        ) : (
+                                            <>
                                                 <div className="flex-1">
-                                                    <SelectVariant variants={selectedVariants} />
+                                                    <QuantityManagement product={pack} />
                                                 </div>
-                                            )} */}
-                                            <div className="flex-1">
-                                                <QuantityManagement product={pack} />
-                                            </div>
-                                        </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <BuyNowButton product={pack} />
+                                                    <AddToCartButton product={pack} />
+                                                </div>
+                                            </>
+                                        )}
                                     </CardContent>
-
-                                    {/* {selectedVariants.length > 1 && (
-                                        <CardFooter className="pt-0 pb-0">
-                                            <div className="w-full space-y-4">
-                                                <CarousselVariants products={variants} />
-                                            </div>
-                                        </CardFooter>
-                                    )} */}
                                 </Card>
-                            </div>
-
-                            {/* Add to Cart */}
-                            <div className="mt-6 hidden md:grid grid-cols-2 gap-4">
-                                <BuyNowButton product={pack} />
-                                <AddToCartButton product={pack} />
                             </div>
                             <BadgeTrust className="hidden md:block" />
                         </div>

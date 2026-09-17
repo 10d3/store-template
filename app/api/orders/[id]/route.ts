@@ -4,6 +4,20 @@ import { getStripeClient } from "@/lib/stripe";
 import { sendOrderStatusEmail } from "@/lib/email/order-emails";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+async function requireAdminSession() {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session || session.user.role !== "admin") {
+    return null;
+  }
+
+  return session;
+}
 
 // Helper to find local order by Stripe ID (PaymentIntent or Session)
 async function getLocalOrder(stripeId: string) {
@@ -45,6 +59,11 @@ export async function PATCH(
 ) {
   let orderId: string | undefined;
   try {
+    const session = await requireAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { action, reason, fulfillmentStatus } = await request.json();
     const { id } = await params;
     orderId = id;
@@ -231,6 +250,11 @@ export async function GET(
 ) {
   let orderId: string | undefined;
   try {
+    const session = await requireAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     orderId = id;
     const stripe = getStripeClient();

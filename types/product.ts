@@ -25,6 +25,25 @@ export interface StripeProduct {
     image?: string | null;
     metadata?: Record<string, string>;
   }[];
+
+  // Catalog source ("MANUAL" | "CJ") and real per-product variants (DB model).
+  source?: string;
+  trackInventory?: boolean;
+  productVariants?: ProductVariantData[];
+}
+
+// A real product variant from the ProductVariant table (size/color/option + inventory).
+export interface ProductVariantData {
+  id: string;
+  stripePriceId: string | null;
+  sku: string | null;
+  options: Record<string, string>;
+  stock: number;
+  cost: number | null;
+  image: string | null;
+  active: boolean;
+  unit_amount: number | null; // resolved from the linked Price
+  currency: string;
 }
 
 export interface StripeProductVariant {

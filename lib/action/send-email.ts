@@ -1,5 +1,3 @@
-"use server"
-
 import { ReactElement } from "react";
 import { resend } from "../email/order-emails"
 

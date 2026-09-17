@@ -10,10 +10,11 @@ interface CardAnyTextProps {
   title: string;
   children: React.ReactNode;
   className?: string;
+  defaultOpen?: boolean;
 }
 
-export default function CardAnyText({ title, children, className }: CardAnyTextProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
+export default function CardAnyText({ title, children, className, defaultOpen = false }: CardAnyTextProps) {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
     <Card className={className}>

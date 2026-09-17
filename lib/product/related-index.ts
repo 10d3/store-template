@@ -1,98 +1,78 @@
-// import type { StripeProduct } from "@/types/stripe";
-import { getCachedProducts } from "@/lib/product/cache";
 import { StripeProduct } from "@/types/product";
+import { unstable_cache } from "next/cache";
+import { getProductsByIdsFromDB, getProductsByCategoryFromDB } from "./db-queries";
+import { getCachedProducts } from "./cache";
+
+const USE_DATABASE = true;
 
 /**
- * Indexes
+ * Public API - Fetches related products directly from the DB
  */
-let productByIdIndex: Map<string, StripeProduct> | null = null;
-let categoryIndex: Map<string, StripeProduct[]> | null = null;
-let explicitRelatedIndex: Map<string, string[]> | null = null;
+export const getRelatedProducts = unstable_cache(
+    async (productId: string, limit: number = 4): Promise<StripeProduct[]> => {
+        try {
+            if (USE_DATABASE) {
+                // First get the target product to check its metadata
+                const [product] = await getProductsByIdsFromDB([productId]);
+                if (!product) return [];
 
-/**
- * Build all indexes once per runtime
- */
-async function buildIndexes() {
-    const products = await getCachedProducts();
+                const metadata = product.metadata ?? {};
 
-    productByIdIndex = new Map();
-    categoryIndex = new Map();
-    explicitRelatedIndex = new Map();
+                // 1️⃣ Explicit related products (highest priority)
+                if (metadata.related_products) {
+                    const explicitIds = metadata.related_products
+                        .split(",")
+                        .map((id: string) => id.trim())
+                        .filter(Boolean);
 
-    for (const product of products) {
-        productByIdIndex.set(product.id, product);
+                    if (explicitIds.length > 0) {
+                        const explicitProducts = await getProductsByIdsFromDB(explicitIds);
+                        const validProducts = explicitProducts.filter(p => p.id !== productId);
+                        if (validProducts.length > 0) {
+                            return validProducts.slice(0, limit);
+                        }
+                    }
+                }
 
-        const metadata = product.metadata ?? {};
+                // 2️⃣ Same category fallback
+                const category = metadata.category;
+                if (category && metadata.type !== "bundle") {
+                    const categoryProducts = await getProductsByCategoryFromDB(category);
+                    return categoryProducts
+                        .filter(p => p.id !== productId)
+                        .slice(0, limit);
+                }
 
-        /** Category index */
-        if (metadata.category && metadata.type !== "bundle") {
-            if (!categoryIndex.has(metadata.category)) {
-                categoryIndex.set(metadata.category, []);
+                return [];
+            } else {
+                // Fallback to fetch all and filter if DB fails or is disabled
+                const allProducts = await getCachedProducts();
+                const product = allProducts.find(p => p.id === productId);
+                if (!product) return [];
+
+                const metadata = product.metadata ?? {};
+                if (metadata.related_products) {
+                    const explicitIds = metadata.related_products.split(",").map((id: string) => id.trim());
+                    const explicitProducts = allProducts.filter(p => explicitIds.includes(p.id) && p.id !== productId);
+                    if (explicitProducts.length > 0) return explicitProducts.slice(0, limit);
+                }
+
+                if (metadata.category && metadata.type !== "bundle") {
+                    return allProducts
+                        .filter(p => p.metadata?.category === metadata.category && p.id !== productId)
+                        .slice(0, limit);
+                }
+
+                return [];
             }
-            categoryIndex.get(metadata.category)!.push(product);
+        } catch (error) {
+            console.error("Error fetching related products:", error);
+            return [];
         }
-
-        /** Explicit related products index */
-        if (metadata.related_products) {
-            const relatedIds = metadata.related_products
-                .split(",")
-                .map((id: string) => id.trim())
-                .filter(Boolean);
-
-            explicitRelatedIndex.set(product.id, relatedIds);
-        }
+    },
+    ["related-products"],
+    {
+        revalidate: 300,
+        tags: ["products"],
     }
-}
-
-/**
- * Ensure indexes exist
- */
-async function ensureIndexes() {
-    if (!productByIdIndex || !categoryIndex || !explicitRelatedIndex) {
-        await buildIndexes();
-    }
-}
-
-/**
- * Public API
- */
-export async function getRelatedProducts(
-    productId: string,
-    limit: number = 4
-): Promise<StripeProduct[]> {
-    try {
-        await ensureIndexes();
-
-        const product = productByIdIndex!.get(productId);
-        if (!product) return [];
-
-        /** 1️⃣ Explicit related products (highest priority) */
-        const explicitIds = explicitRelatedIndex!.get(productId);
-        if (explicitIds?.length) {
-            const explicitProducts = explicitIds
-                .map((id) => productByIdIndex!.get(id))
-                .filter(
-                    (p): p is StripeProduct =>
-                        Boolean(p) && p?.id !== productId
-                );
-
-            if (explicitProducts.length) {
-                return explicitProducts.slice(0, limit);
-            }
-        }
-
-        /** 2️⃣ Same category fallback */
-        const category = product.metadata?.category;
-        if (category && categoryIndex!.has(category)) {
-            return categoryIndex!
-                .get(category)!
-                .filter((p) => p.id !== productId)
-                .slice(0, limit);
-        }
-
-        return [];
-    } catch (error) {
-        console.error("Error fetching related products:", error);
-        return [];
-    }
-}
+);

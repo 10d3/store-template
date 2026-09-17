@@ -44,6 +44,7 @@ import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
 import { uploadThemes } from "@/lib/theme/upload-theme";
 import RelatedProductsSelector from "@/components/shared/related-products-selector";
+import MarkdownField from "./markdown-field";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
@@ -293,10 +294,11 @@ export default function ProductForm({
                     Description
                   </FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter product description"
-                      className="min-h-[100px] border-2 focus:border-blue-500 transition-colors resize-none"
-                      {...field}
+                    <MarkdownField
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      placeholder="Describe the product — what it is, who it's for, key benefits. Markdown supported."
                     />
                   </FormControl>
                   <FormMessage />
@@ -940,11 +942,12 @@ export default function ProductForm({
                       Nutrition Details
                     </FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Enter product description"
-                        className="min-h-[100px] border-2 focus:border-blue-500 transition-colors resize-none"
-                        {...field}
+                      <MarkdownField
                         value={field.value ?? ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        placeholder="Nutrition facts as a table — use Insert ▸ Nutrition table to start."
+                        helperText="Renders as a styled table on the product page. Use Insert ▸ Nutrition table for the skeleton."
                       />
                     </FormControl>
                     <FormMessage />
