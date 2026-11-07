@@ -25,6 +25,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
+  reviews       Review[]
 
   @@map("user")
 }
@@ -122,6 +123,9 @@ model Product {
   collections    Collection[]
   images         ProductImage[]
   variants       ProductVariant[]
+  reviews        Review[]
+  rating         Float?
+  reviewCount    Int              @default(0)
   seoTitle       String?
   seoDescription String?
   createdAt      DateTime         @default(now())
@@ -165,6 +169,34 @@ model ProductVariant {
 
   @@index([productId, active])
   @@map("product_variants")
+}
+
+// ── Reviews ────────────────────────────────────────────────────────────────
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id               String       @id @default(cuid())
+  productId        String
+  product          Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating           Int
+  title            String?
+  body             String?      @db.Text
+  status           ReviewStatus @default(PENDING)
+  verifiedPurchase Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([productId, userId])
+  @@index([productId, status])
+  @@index([userId])
+  @@map("reviews")
 }
 
 // ── Orders ─────────────────────────────────────────────────────────────────

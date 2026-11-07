@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { formatMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
+import { StarRating } from "@/components/store/star-rating";
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const image = product.images[0]?.url;
@@ -44,6 +45,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       </div>
       <div className="mt-3 space-y-1">
         <h3 className="text-sm font-medium leading-snug">{product.name}</h3>
+        {product.reviewCount > 0 && (
+          <StarRating rating={product.rating ?? 0} count={product.reviewCount} />
+        )}
         <div className="flex items-center gap-2 text-sm">
           <span className={cn(compareAt && compareAt > price && "text-destructive")}>
             {formatMoney(price)}

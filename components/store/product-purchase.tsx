@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import { ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { StarRating } from "@/components/store/star-rating";
 import { useCartStore } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/checkout";
 import { formatMoney } from "@/lib/money";
@@ -26,6 +27,8 @@ interface PurchaseProduct {
   slug: string;
   images: { url: string; alt: string | null }[];
   variants: PurchaseVariant[];
+  rating: number | null;
+  reviewCount: number;
 }
 
 export function ProductPurchase({ product }: { product: PurchaseProduct }) {
@@ -134,6 +137,13 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
           <h1 className="font-serif text-3xl leading-tight sm:text-4xl">
             {product.name}
           </h1>
+          {product.reviewCount > 0 && (
+            <StarRating
+              rating={product.rating ?? 0}
+              count={product.reviewCount}
+              className="mt-2"
+            />
+          )}
           {variant && (
             <div className="mt-3 flex items-center gap-3">
               <span className="text-xl font-medium">

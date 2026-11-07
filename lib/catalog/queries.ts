@@ -29,6 +29,12 @@ const productDetailInclude = {
     where: { active: true },
     orderBy: { position: "asc" },
   },
+  reviews: {
+    where: { status: "APPROVED" },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    include: { user: { select: { name: true } } },
+  },
 } satisfies Prisma.ProductInclude;
 
 export type ProductCardData = Prisma.ProductGetPayload<{
