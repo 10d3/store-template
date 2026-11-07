@@ -5,7 +5,7 @@ import { inngest } from "../inngest/client";
 // NOTE: intentionally NOT a "use server" module. This function mutates
 // money-bearing state (balances/earnings) and must never be invocable from
 // the client. It is only called from trusted server/webhook code
-// (lib/subcription.ts), and orderValue is always sourced from the stored
+// (lib/subscription.ts), and orderValue is always sourced from the stored
 // Order total — never from caller-supplied prices.
 
 export async function trackPurchase({
@@ -132,7 +132,7 @@ export async function trackPurchase({
 
     // Create commission record (APPROVED). The description embeds the
     // orderId + productId — it is the dedup key consumed above and by the
-    // refund clawback in lib/subcription.ts.
+    // refund clawback in lib/subscription.ts.
     const commission = await tx.commission.create({
       data: {
         affiliateId: affiliate.id,

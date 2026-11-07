@@ -1,5 +1,4 @@
 import { headers } from "next/headers";
-import { auth } from "../auth";
 import { prisma } from "../prisma";
 
 export async function trackClick({
@@ -11,10 +10,6 @@ export async function trackClick({
 }) {
   try {
     const headersList = await headers();
-    const session = await auth.api.getSession({ headers: headersList });
-    if (!session?.user) {
-      throw new Error("User not found");
-    }
 
     const affiliate = await prisma.affiliate.findUnique({
       where: { referralCode },
