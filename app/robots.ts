@@ -1,16 +1,14 @@
-import { getBaseURL } from "@/lib/utils";
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = getBaseURL();
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    "http://localhost:3000"
+  ).replace(/\/$/, "");
+
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: "/admin/",
-      },
-    ],
-    sitemap: [`${baseUrl}/sitemap.xml`, `${baseUrl}/blog/sitemap.xml`],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin/", "/api/"] }],
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }

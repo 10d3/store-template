@@ -1,19 +1,7 @@
 import { ThemeProvider } from "@/components/shared/theme-provider";
-import { TanstackProvider } from "@/components/tanstack-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { CartModalProvider } from "@/context/cart-modal";
-// import { IntlClientProvider } from "@/i18n/client";
-// import { getMessages, getLocale } from "@/i18n/server";
-// import { NextIntlClientProvider } from "next-intl";
 
-export default async function Provider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // const messages = await getMessages();
-  // const locale = await getLocale();
-
+export default function Provider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
@@ -21,12 +9,8 @@ export default async function Provider({
       enableSystem
       disableTransitionOnChange
     >
-      {/* <IntlClientProvider messages={messages} locale={locale}> */}
-      <TanstackProvider>
-        <CartModalProvider>{children}</CartModalProvider>
-        <Toaster />
-      </TanstackProvider>
-      {/* </IntlClientProvider> */}
+      {children}
+      <Toaster position="top-center" richColors />
     </ThemeProvider>
   );
 }

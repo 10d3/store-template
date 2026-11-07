@@ -1,5 +1,4 @@
-import { NextConfig } from "next";
-import createNextIntlPlugin from "next-intl/plugin";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -21,53 +20,21 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "6ay8a7s9vf.ufs.sh",
+        hostname: "utfs.io",
         pathname: "**",
       },
       {
         protocol: "https",
-        hostname: "flowbite.s3.amazonaws.com",
+        hostname: "**.ufs.sh",
         pathname: "**",
-      },
-      {
-        protocol: "https",
-        hostname: "l2yvnapk4q.ufs.sh",
-        pathname: "**"
-      },
-      {
-        protocol: "https",
-        hostname: "jca7xz6ir5.ufs.sh",
-        pathname: "**"
       },
       {
         protocol: "https",
         hostname: "example.com",
         pathname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "utfs.io",
-        pathname: "**"
-      },
-      // CJ Dropshipping product image CDNs
-      {
-        protocol: "https",
-        hostname: "**.cjdropshipping.com",
-        pathname: "**"
-      },
-      {
-        protocol: "https",
-        hostname: "**.alicdn.com",
-        pathname: "**"
-      },
-      {
-        protocol: "https",
-        hostname: "**.aliyuncs.com",
-        pathname: "**"
-      }
     ],
   },
 };
 
-const withNextIntl = createNextIntlPlugin();
-export default withNextIntl(nextConfig);
+export default nextConfig;
