@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vitanou store
 
-## Getting Started
+A standard Next.js ecommerce store: catalog, product variants, cart, Stripe Checkout, orders, customer accounts, and an admin panel.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router, React 19)
+- Prisma + PostgreSQL
+- Better Auth (email/password, Google, admin role)
+- Stripe Checkout + webhooks
+- Resend email
+- UploadThing image uploads
+- Tailwind CSS 4 + shadcn/Radix
+- Zustand cart (persisted in localStorage)
+
+## Local setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env
+# fill in DATABASE_URL, BETTER_AUTH_SECRET, and Stripe/Resend/UploadThing keys
+pnpm exec prisma migrate dev
+pnpm seed
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The seed creates an admin account:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Email: `admin@vitanou.com`
+- Password: `admin12345`
 
-## Learn More
+Change that password before deploying.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Start the dev server |
+| `pnpm build` | Generate Prisma Client and build |
+| `pnpm start` | Start the production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm seed` | Seed categories, collections, products, variants, and the admin user |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Stripe
 
-## Deploy on Vercel
+Point a Stripe webhook at:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+POST /api/webhooks/stripe
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Subscribe to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, and `charge.refunded`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+
+For local testing:
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+Use Stripe test keys while developing. Checkout is disabled without a secret key.
+
+## Database
+
+The app uses a fresh schema. To reset locally:
+
+```bash
+pnpm exec prisma migrate reset
+pnpm seed
+```
+
+Back up any database you care about before resetting it.
+
+## Project structure
+
+- `app/(store)/` — storefront, cart, checkout success, auth, account, static pages
+- `app/admin/` — admin dashboard, products, categories, collections, orders, customers
+- `app/api/webhooks/stripe/` — payment webhook
+- `lib/catalog/` — catalog queries
+- `lib/cart/` — client cart store
+- `lib/admin/` — admin server actions
+- `prisma/schema.prisma` — database schema
+- `prisma/seed.mjs` — seed data
