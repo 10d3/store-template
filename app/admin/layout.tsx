@@ -1,46 +1,58 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppSidebar } from "@/components/shared/sidebar/app-sidebar";
-import { BreadcrumbNav } from "@/components/shared/sidebar/breadcrumb-nav";
-import { Separator } from "@/components/ui/separator";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
-import { sideBarCentralizedNav } from "@/lib/const/sidebar";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import { requireAdmin } from "@/lib/session";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
+const links = [
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/products", label: "Products" },
+  { href: "/admin/categories", label: "Categories" },
+  { href: "/admin/collections", label: "Collections" },
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/customers", label: "Customers" },
+];
 
-export default async function Layout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  if (session.user.role !== "admin") {
-    redirect("/");
-  }
+  const session = await requireAdmin();
 
   return (
-    <SidebarProvider>
-      <AppSidebar sidebarData={sideBarCentralizedNav.admin as any} collapsible="icon" />
-      <main className="flex-1 w-full">
-        <div className="flex flex-col min-h-screen">
-          <div className="flex items-center p-1 border-b bg-card">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <BreadcrumbNav activeTenat={"admin"} />
+    <div className="min-h-screen bg-muted/30">
+      <header className="border-b border-border/60 bg-background">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-6">
+            <Link href="/admin" className="font-serif text-lg">
+              Vitanou admin
+            </Link>
+            <Link href="/" className="text-sm text-muted-foreground hover:underline">
+              View store
+            </Link>
           </div>
-          <div className="flex-1 flex justify-center px-4">
-            <div className="w-full">{children}</div>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="hidden text-muted-foreground sm:inline">
+              {session.user.email}
+            </span>
+            <SignOutButton />
           </div>
         </div>
-      </main>
-    </SidebarProvider>
+      </header>
+
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[190px_1fr]">
+        <nav className="flex gap-1 overflow-x-auto lg:flex-col">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="whitespace-nowrap rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-background hover:text-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <main className="min-w-0">{children}</main>
+      </div>
+    </div>
   );
 }
