@@ -8,383 +8,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Blog {
-  id             String     @id @default(cuid())
-  slug           String     @unique
-  title          String
-  coverImage     String?
-  content        String?    @db.Text
-  seoTitle       String?
-  seoDescription String?
-  authorId       String
-  published      Boolean    @default(false)
-  views          Int        @default(0)
-  author         User       @relation(fields: [authorId], references: [id])
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  BlogView       BlogView[]
-}
-
-model BlogView {
-  id               String   @id @default(cuid())
-  blogId           String
-  blog             Blog     @relation(fields: [blogId], references: [id])
-  viewerIdentifier String // This could be an IP address or a session ID
-  createdAt        DateTime @default(now())
-
-  @@unique([blogId, viewerIdentifier]) // Ensures a unique view per blog per viewer
-}
-
-// ============ PRODUCT STORAGE ============
-// Products synced from Stripe for fast database reads
-
-model Product {
-  id          String   @id // Stripe product ID (prod_xxx)
-  name        String
-  description String?  @db.Text
-  subtitle    String?
-  tagline     String?
-  images      String[] // Array of image URLs
-  active      Boolean  @default(true)
-  slug        String?  @unique
-  category    String?
-  type        String?
-  gender      String?
-
-  // Promoted from metadata for fast indexed filtering/sorting (see also category/gender/type).
-  collection      String?
-  collectionOrder Int?
-  featured        Boolean  @default(false)
-  tags            String[]
-
-  // All Stripe metadata stored as JSON (long-tail / display-only fields)
-  metadata Json?
-
-  // Catalog source: "MANUAL" (admin-created via Stripe) or "CJ" (CJ Dropshipping)
-  source      String  @default("MANUAL")
-  cjProductId String? // CJ product id (pid) when source = "CJ"
-
-  // ── NEW ─────────────────────────────────────────────────────────
-  // Nutrition / ingredient info stored directly here (replaces ProductNutrition table).
-  // Populated by backfill migration from ProductNutrition.
-  nutrition String? @db.Text
-
-  // When true this product is a composite kit made up of other products via BundleItem.
-  isBundle Boolean @default(false)
-  // ────────────────────────────────────────────────────────────────
-
-  // Relations
-  prices        Price[]
-  variants      ProductVariant[]
-  nutrition_old ProductNutrition? @relation("nutrition_old") // kept temporarily during migration; remove after backfill
-
-  // Bundle relations
-  bundleItems BundleItem[] @relation("BundleParent") // items this bundle contains
-  bundledIn   BundleItem[] @relation("BundleComponent") // bundles that reference this product
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([active])
-  @@index([slug])
-  @@index([category])
-  @@index([type])
-  @@index([source])
-  @@index([cjProductId])
-  @@index([collection])
-  @@index([featured])
-  @@index([isBundle])
-  @@map("products")
-}
-
-// A purchasable variant of a product (size, color, pack-size, etc.)
-// Every product has at least one variant. "Simple" products have a single
-// variant with title "Default". Price & inventory live here — NOT on Product.
-model ProductVariant {
-  id        String  @id @default(cuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  // Human-readable label shown in selectors (e.g. "Default", "3-Pack", "Black / XL")
-  title String @default("Default")
-
-  // Display ordering within the product
-  position Int @default(0)
-
-  // ── Commercial fields ────────────────────────────────────────────
-  // Canonical selling price in cents. Required — every variant must have a price.
-  price Int @default(0)
-
-  // Optional strikethrough / "was" price in cents (for discount display)
-  compareAtPrice Int?
-
-  // Supplier cost in cents (for margin calculations)
-  cost Int?
-  // ────────────────────────────────────────────────────────────────
-
-  // ── Inventory ────────────────────────────────────────────────────
-  stock          Int     @default(0)
-  trackInventory Boolean @default(false) // moved from Product
-  // ────────────────────────────────────────────────────────────────
-
-  // ── Options (structured JSON) ─────────────────────────────────────
-  // e.g. { "Size": "XL", "Color": "Black" } or { "Pack": "3 Bottles" }
-  options Json @default("{}")
-  // ────────────────────────────────────────────────────────────────
-
-  sku   String? // unique human-readable stock-keeping unit
-  image String? // variant-specific image (falls back to product.images[0])
-
-  // ── External provider linkages ────────────────────────────────────
-  // Links to the Stripe Price object used at checkout.
-  stripePriceId String? @unique
-
-  // CJ Dropshipping linkage (null for MANUAL products)
-  cjVariantId String?
-  cjSku       String?
-  // ────────────────────────────────────────────────────────────────
-
-  active Boolean @default(true)
-
-  // Relations
-  bundleItems BundleItem[] // if this specific variant is referenced in a bundle
-  lineItems   OrderLineItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([productId])
-  @@index([productId, active])
-  @@index([cjVariantId])
-  @@index([stripePriceId])
-  @@map("product_variants")
-}
-
-model Price {
-  id        String  @id // Stripe price ID (price_xxx)
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  unitAmount Int // Amount in cents
-  currency   String  @default("usd")
-  active     Boolean @default(true)
-  isDefault  Boolean @default(false)
-  image      String? // Optional image URL for this specific price variant
-
-  // Store all Stripe price metadata (pack_size, generated_for, etc.)
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([productId])
-  @@index([active])
-  @@index([productId, active])
-  @@index([productId, isDefault])
-  @@map("prices")
-}
-
-// MIGRATION NOTE: This table is kept alive during the migration period.
-// Data will be backfilled into Product.nutrition then this table will be dropped.
-model ProductNutrition {
-  id        String  @id @default(uuid())
-  productId String  @unique
-  product   Product @relation("nutrition_old", fields: [productId], references: [id], onDelete: Cascade)
-  nutrition String
-}
-
-// ── Cross-product bundle component linker ──────────────────────────────────
-// Links a bundle Product to its component Products (and optionally a specific variant).
-// e.g. "Daily Vitality Stack" bundle → 1x Prostate Support (Default) + 1x Vitamin D3 (Default)
-model BundleItem {
-  id String @id @default(cuid())
-
-  // The parent bundle product
-  bundleProductId String
-  bundleProduct   Product @relation("BundleParent", fields: [bundleProductId], references: [id], onDelete: Cascade)
-
-  // The component product included in the bundle
-  componentProductId String
-  componentProduct   Product @relation("BundleComponent", fields: [componentProductId], references: [id], onDelete: Cascade)
-
-  // Optional: pin to a specific variant of the component (e.g. the "Default" or "1-Bottle" variant)
-  componentVariantId String?
-  componentVariant   ProductVariant? @relation(fields: [componentVariantId], references: [id], onDelete: SetNull)
-
-  quantity Int @default(1) // how many of this component are in the bundle
-
-  position Int @default(0) // display order within the bundle
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([bundleProductId])
-  @@index([componentProductId])
-  @@map("bundle_items")
-}
-
-// ── Typed order line items ────────────────────────────────────────────────
-// Replaces the untyped JSON `lineItems` blob on Order.
-// Snapshot of variant details at purchase time so receipts never mutate.
-model OrderLineItem {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  // Soft link to the variant — kept for analytics & fulfillment lookups.
-  // SetNull so historical line items survive product/variant archival.
-  variantId String?
-  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
-
-  // Snapshot fields (never mutate even if product/variant is edited)
-  productName  String
-  variantTitle String  @default("Default")
-  sku          String?
-  image        String?
-  unitPrice    Int // cents at time of purchase
-  quantity     Int
-  totalPrice   Int // unitPrice × quantity (cents)
-
-  createdAt DateTime @default(now())
-
-  @@index([orderId])
-  @@index([variantId])
-  @@map("order_line_items")
-}
-
-model Review {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId   String
-  rating      Float
-  comment     String?
-  otherRating Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([productId, userId])
-}
-
-model Order {
-  id              String   @id
-  userId          String?
-  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customerEmail   String? // For guest checkout - customer email
-  customerName    String? // For guest checkout - customer name
-  total           Float
-  lineItems       Json // legacy JSON blob — kept for backward compat; new orders also write OrderLineItem rows
-  shippingAddress String?
-  metadata        Json?
-  status          String
-  createdAt       DateTime
-  updatedAt       DateTime
-  orderNumber     String   @unique
-
-  fulfillments   Fulfillment[]
-  orderLineItems OrderLineItem[] // typed line items (new — written alongside legacy JSON)
-
-  @@index([customerEmail]) // Index for quick guest order lookups
-  @@index([status])
-  @@map("order")
-}
-
-// Links an Order to a supplier-side fulfillment (e.g. a CJ Dropshipping order).
-// Supports multiple shipments per order.
-model Fulfillment {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  provider String // "CJ" | "MANUAL"
-
-  // CJ linkage
-  cjOrderId  String? // CJ internal order id
-  cjOrderNum String? // CJ customer-facing order number
-
-  status         String // CREATED, UNSHIPPED, SHIPPED, DELIVERED, CANCELLED, ...
-  trackingNumber String?
-  trackingUrl    String?
-  carrier        String?
-
-  raw Json? // last raw provider payload, for debugging
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orderId])
-  @@index([provider, status])
-  @@index([cjOrderId])
-  @@map("fulfillments")
-}
-
-// Single-row store for the CJ Dropshipping API token (shared across instances).
-// `id` is pinned to "cj" so there is only ever one row.
-model CjAuth {
-  id               String   @id @default("cj")
-  accessToken      String
-  refreshToken     String
-  accessExpiresAt  DateTime
-  refreshExpiresAt DateTime
-  updatedAt        DateTime @updatedAt
-
-  @@map("cj_auth")
-}
-
-model Wishlist {
-  id        String   @id
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId String[]
-  createdAt DateTime
-  updatedAt DateTime
-}
+// ── Auth (Better Auth) ──────────────────────────────────────────────────────
 
 model User {
-  id            String     @id @default(cuid())
+  id            String    @id
   name          String
-  email         String
-  emailVerified Boolean
+  email         String    @unique
+  emailVerified Boolean   @default(false)
   image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
+  role          String?   @default("user")
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
   orders        Order[]
-  reviews       Review[]
-  wishlist      Wishlist[]
 
-  stripeCustomerId String? @unique
-
-  role       String?
-  banned     Boolean?
-  banReason  String?
-  banExpires DateTime?
-  Blog       Blog[]
-  affiliate  Affiliate?
-  referredBy Referral?  @relation("ReferredUser")
-  Referral   Referral?  @relation(fields: [referralId], references: [id])
-  referralId String?
-
-  @@unique([email])
   @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   impersonatedBy String?
+  createdAt      DateTime
+  updatedAt      DateTime
 
-  @@unique([token])
   @@map("session")
 }
 
@@ -418,320 +74,171 @@ model Verification {
   @@map("verification")
 }
 
-// affilation
+// ── Catalog ────────────────────────────────────────────────────────────────
 
-model Affiliate {
-  id     String @id @default(cuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Affiliate details
-  referralCode   String          @unique
-  status         AffiliateStatus @default(PENDING)
-  commissionRate Float           @default(10.0) // percentage or fixed amount
-  commissionType CommissionType  @default(PERCENTAGE)
-
-  // Payment info
-  paypalEmail   String?
-  bankAccount   String?
-  paymentMethod PaymentMethod?
-
-  // Social Media
-  tiktok    String?
-  instagram String?
-  twitter   String?
-  youtube   String?
-
-  // Statistics
-  totalClicks      Int   @default(0)
-  totalConversions Int   @default(0)
-  totalEarnings    Float @default(0)
-  availableBalance Float @default(0)
-  lifetimeEarnings Float @default(0)
-
-  // Metadata
-  notes      String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  approvedAt DateTime?
-
-  // Relations
-  referrals   Referral[]
-  commissions Commission[]
-  payouts     Payout[]
-  clicks      AffiliateClick[]
-  ledger      LedgerEntry[]
-
-  @@index([referralCode])
-  @@index([status])
-  @@map("affiliates")
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
 }
 
-// Track referral clicks
-model AffiliateClick {
+model Category {
   id          String    @id @default(cuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
-
-  // Click details
-  ipAddress   String?
-  userAgent   String?
-  referer     String?
-  landingPage String?
-
-  // Tracking
-  converted   Boolean   @default(false)
-  convertedAt DateTime?
-
-  createdAt DateTime @default(now())
-
-  @@index([affiliateId])
-  @@index([ipAddress, createdAt])
-  @@index([converted])
-  @@map("affiliate_clicks")
-}
-
-// Purchase referral record (main conversion)
-model Referral {
-  id          String    @id @default(cuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
-
-  // Customer info
-  userId String? @unique
-  user   User?   @relation("ReferredUser", fields: [userId], references: [id], onDelete: SetNull)
-  email  String?
-
-  // Purchase details
-  status      ReferralStatus @default(PENDING)
-  orderValue  Float          @default(0) // Total purchase amount
-  productId   String // Product identifier
-  productName String // Product name
-  quantity    Int            @default(1) // Quantity of products purchased
-
-  // Tracking
-  ipAddress   String?
-  convertedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  commissions Commission[]
-  User        User[]
-
-  @@index([affiliateId])
-  @@index([email])
-  @@index([status])
-  @@index([convertedAt])
-  @@map("referrals")
-}
-
-// Commission records (payment to affiliate)
-model Commission {
-  id          String    @id @default(cuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
-
-  referralId String
-  referral   Referral @relation(fields: [referralId], references: [id], onDelete: Cascade)
-
-  // Commission details
-  amount Float
-  type   CommissionType
-  rate   Float // Rate at time of commission
-  status CommissionStatus @default(PENDING)
-
-  // Payout tracking
-  payoutId String?
-  payout   Payout? @relation(fields: [payoutId], references: [id], onDelete: SetNull)
-
-  // Metadata
+  name        String
+  slug        String    @unique
   description String?
-  notes       String?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  paidAt    DateTime?
-
-  @@index([affiliateId])
-  @@index([referralId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("commissions")
-}
-
-// Payout records (batch payments to affiliates)
-model Payout {
-  id          String    @id @default(cuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
-
-  // Payout details
-  amount Float
-  method PaymentMethod
-  status PayoutStatus  @default(PENDING)
-
-  // Payment details
-  transactionId  String?
-  paymentEmail   String?
-  paymentAccount String?
-  batchId        String?
-
-  // Metadata
-  notes         String?
-  failureReason String?
-
+  image       String?
+  position    Int       @default(0)
+  products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  processedAt DateTime?
-  completedAt DateTime?
 
-  // Relations
-  commissions Commission[]
-  batch       PayoutBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
-
-  @@index([affiliateId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("payouts")
+  @@map("categories")
 }
 
-model LedgerEntry {
+model Collection {
   id          String    @id @default(cuid())
-  affiliateId String
-  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  position    Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  type   LedgerType // CREDIT, DEBIT, PAYOUT_HOLD, PAYOUT_SENT
-  amount Float
-
-  referenceType String // "COMMISSION", "PAYOUT"
-  referenceId   String
-
-  createdAt DateTime @default(now())
-
-  @@index([affiliateId])
-  @@index([referenceType, referenceId])
+  @@map("collections")
 }
 
-model PayoutBatch {
-  id     String      @id @default(cuid())
-  status BatchStatus @default(PENDING)
+model Product {
+  id             String           @id @default(cuid())
+  name           String
+  slug           String           @unique
+  description    String?          @db.Text
+  status         ProductStatus    @default(DRAFT)
+  featured       Boolean          @default(false)
+  categoryId     String?
+  category       Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  collections    Collection[]
+  images         ProductImage[]
+  variants       ProductVariant[]
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  totalAmount Float @default(0)
-  totalCount  Int   @default(0)
-
-  createdAt  DateTime  @default(now())
-  startedAt  DateTime?
-  finishedAt DateTime?
-
-  payouts Payout[]
+  @@index([status, featured])
+  @@index([categoryId])
+  @@map("products")
 }
 
-// Support Requests
-model SupportRequest {
-  id        String               @id @default(cuid())
-  name      String
-  email     String
-  subject   String
-  message   String               @db.Text
-  status    SupportRequestStatus @default(PENDING)
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  position  Int     @default(0)
 
-  @@index([email])
-  @@index([status])
-  @@index([createdAt])
-  @@map("support_requests")
+  @@index([productId])
+  @@map("product_images")
 }
 
-// Newsletter Subscriptions
-model NewsletterSubscription {
-  id        String                       @id @default(cuid())
-  email     String                       @unique
-  source    String? // Where the subscription came from (e.g., "hero", "footer", "popup")
-  status    NewsletterSubscriptionStatus @default(ACTIVE)
-  createdAt DateTime                     @default(now())
-  updatedAt DateTime                     @updatedAt
+model ProductVariant {
+  id             String      @id @default(cuid())
+  productId      String
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  title          String      @default("Default")
+  sku            String?     @unique
+  price          Int
+  compareAtPrice Int?
+  cost           Int?
+  stock          Int         @default(0)
+  trackInventory Boolean     @default(true)
+  options        Json        @default("{}")
+  image          String?
+  position       Int         @default(0)
+  active         Boolean     @default(true)
+  orderItems     OrderItem[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
-  @@index([email])
-  @@index([status])
-  @@index([createdAt])
-  @@map("newsletter_subscriptions")
+  @@index([productId, active])
+  @@map("product_variants")
 }
 
-enum LedgerType {
-  CREDIT
-  DEBIT
-  PAYOUT_HOLD
-  PAYOUT_SENT
-}
+// ── Orders ─────────────────────────────────────────────────────────────────
 
-enum BatchStatus {
+enum OrderStatus {
   PENDING
-  IN_PROGRESS
-  COMPLETED
-  FAILED
-}
-
-enum NewsletterSubscriptionStatus {
-  ACTIVE // Subscribed and receiving emails
-  UNSUBSCRIBED // User unsubscribed
-  BOUNCED // Email bounced
-}
-
-enum SupportRequestStatus {
-  PENDING // New request, not yet reviewed
-  IN_REVIEW // Currently being reviewed
-  RESOLVED // Issue resolved
-  CLOSED // Request closed
-}
-
-// Enums
-enum AffiliateStatus {
-  PENDING // Waiting for admin approval
-  ACTIVE // Can earn commissions
-  SUSPENDED // Temporarily disabled
-  REJECTED // Application rejected
-}
-
-enum ReferralStatus {
-  PENDING // Purchase initiated but not completed
-  COMPLETED // Purchase completed successfully
-  CANCELLED // Purchase cancelled
-  REFUNDED // Purchase refunded
-}
-
-enum CommissionType {
-  PERCENTAGE // Commission based on percentage of sale
-  FIXED // Fixed amount per sale
-}
-
-enum CommissionStatus {
-  PENDING // Awaiting approval
-  APPROVED // Approved, ready for payout
-  PAID // Already paid out
-  CANCELLED // Cancelled (e.g., due to refund)
-}
-
-enum PaymentMethod {
-  PAYPAL
-  BANK_TRANSFER
-  STRIPE
-  CRYPTO
-}
-
-enum PayoutStatus {
-  PENDING // Waiting to be processed
-  PROCESSING // Currently being processed
-  COMPLETED // Successfully completed
-  FAILED // Payment failed
-  CANCELLED // Payout cancelled
-}
-
-enum Status {
-  PENDING
-  PROCESSING
-  COMPLETED
+  PAID
+  FULFILLED
   CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum FulfillmentStatus {
+  UNFULFILLED
+  SHIPPED
+  DELIVERED
+}
+
+model Order {
+  id                    String            @id @default(cuid())
+  orderNumber           String            @unique
+  userId                String?
+  user                  User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email                 String
+  name                  String?
+  status                OrderStatus       @default(PENDING)
+  paymentStatus         PaymentStatus     @default(UNPAID)
+  fulfillmentStatus     FulfillmentStatus @default(UNFULFILLED)
+  currency              String            @default("usd")
+  subtotal              Int
+  discount              Int               @default(0)
+  shipping              Int               @default(0)
+  tax                   Int               @default(0)
+  total                 Int
+  shippingAddress       Json?
+  billingAddress        Json?
+  stripeSessionId       String?           @unique
+  stripePaymentIntentId String?           @unique
+  trackingNumber        String?
+  trackingUrl           String?
+  carrier               String?
+  notes                 String?
+  items                 OrderItem[]
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([email, createdAt])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String          @id @default(cuid())
+  orderId      String
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId    String?
+  variant      ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName  String
+  variantTitle String          @default("Default")
+  sku          String?
+  image        String?
+  unitPrice    Int
+  quantity     Int
+  total        Int
+  createdAt    DateTime        @default(now())
+
+  @@index([orderId])
+  @@index([variantId])
+  @@map("order_items")
 }
