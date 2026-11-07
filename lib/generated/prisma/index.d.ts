@@ -44,6 +44,16 @@ export type Price = $Result.DefaultSelection<Prisma.$PricePayload>
  */
 export type ProductNutrition = $Result.DefaultSelection<Prisma.$ProductNutritionPayload>
 /**
+ * Model BundleItem
+ * 
+ */
+export type BundleItem = $Result.DefaultSelection<Prisma.$BundleItemPayload>
+/**
+ * Model OrderLineItem
+ * 
+ */
+export type OrderLineItem = $Result.DefaultSelection<Prisma.$OrderLineItemPayload>
+/**
  * Model Review
  * 
  */
@@ -468,6 +478,26 @@ export class PrismaClient<
     * ```
     */
   get productNutrition(): Prisma.ProductNutritionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.bundleItem`: Exposes CRUD operations for the **BundleItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BundleItems
+    * const bundleItems = await prisma.bundleItem.findMany()
+    * ```
+    */
+  get bundleItem(): Prisma.BundleItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.orderLineItem`: Exposes CRUD operations for the **OrderLineItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OrderLineItems
+    * const orderLineItems = await prisma.orderLineItem.findMany()
+    * ```
+    */
+  get orderLineItem(): Prisma.OrderLineItemDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.review`: Exposes CRUD operations for the **Review** model.
@@ -1095,6 +1125,8 @@ export namespace Prisma {
     ProductVariant: 'ProductVariant',
     Price: 'Price',
     ProductNutrition: 'ProductNutrition',
+    BundleItem: 'BundleItem',
+    OrderLineItem: 'OrderLineItem',
     Review: 'Review',
     Order: 'Order',
     Fulfillment: 'Fulfillment',
@@ -1131,7 +1163,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "blog" | "blogView" | "product" | "productVariant" | "price" | "productNutrition" | "review" | "order" | "fulfillment" | "cjAuth" | "wishlist" | "user" | "session" | "account" | "verification" | "affiliate" | "affiliateClick" | "referral" | "commission" | "payout" | "ledgerEntry" | "payoutBatch" | "supportRequest" | "newsletterSubscription"
+      modelProps: "blog" | "blogView" | "product" | "productVariant" | "price" | "productNutrition" | "bundleItem" | "orderLineItem" | "review" | "order" | "fulfillment" | "cjAuth" | "wishlist" | "user" | "session" | "account" | "verification" | "affiliate" | "affiliateClick" | "referral" | "commission" | "payout" | "ledgerEntry" | "payoutBatch" | "supportRequest" | "newsletterSubscription"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1576,6 +1608,154 @@ export namespace Prisma {
           count: {
             args: Prisma.ProductNutritionCountArgs<ExtArgs>
             result: $Utils.Optional<ProductNutritionCountAggregateOutputType> | number
+          }
+        }
+      }
+      BundleItem: {
+        payload: Prisma.$BundleItemPayload<ExtArgs>
+        fields: Prisma.BundleItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BundleItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BundleItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          findFirst: {
+            args: Prisma.BundleItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BundleItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          findMany: {
+            args: Prisma.BundleItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>[]
+          }
+          create: {
+            args: Prisma.BundleItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          createMany: {
+            args: Prisma.BundleItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BundleItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>[]
+          }
+          delete: {
+            args: Prisma.BundleItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          update: {
+            args: Prisma.BundleItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.BundleItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BundleItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BundleItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.BundleItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BundleItemPayload>
+          }
+          aggregate: {
+            args: Prisma.BundleItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBundleItem>
+          }
+          groupBy: {
+            args: Prisma.BundleItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BundleItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BundleItemCountArgs<ExtArgs>
+            result: $Utils.Optional<BundleItemCountAggregateOutputType> | number
+          }
+        }
+      }
+      OrderLineItem: {
+        payload: Prisma.$OrderLineItemPayload<ExtArgs>
+        fields: Prisma.OrderLineItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OrderLineItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OrderLineItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          findFirst: {
+            args: Prisma.OrderLineItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OrderLineItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          findMany: {
+            args: Prisma.OrderLineItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+          }
+          create: {
+            args: Prisma.OrderLineItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          createMany: {
+            args: Prisma.OrderLineItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OrderLineItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+          }
+          delete: {
+            args: Prisma.OrderLineItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          update: {
+            args: Prisma.OrderLineItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.OrderLineItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OrderLineItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OrderLineItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.OrderLineItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+          }
+          aggregate: {
+            args: Prisma.OrderLineItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOrderLineItem>
+          }
+          groupBy: {
+            args: Prisma.OrderLineItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OrderLineItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OrderLineItemCountArgs<ExtArgs>
+            result: $Utils.Optional<OrderLineItemCountAggregateOutputType> | number
           }
         }
       }
@@ -3013,6 +3193,8 @@ export namespace Prisma {
     productVariant?: ProductVariantOmit
     price?: PriceOmit
     productNutrition?: ProductNutritionOmit
+    bundleItem?: BundleItemOmit
+    orderLineItem?: OrderLineItemOmit
     review?: ReviewOmit
     order?: OrderOmit
     fulfillment?: FulfillmentOmit
@@ -3144,11 +3326,15 @@ export namespace Prisma {
   export type ProductCountOutputType = {
     prices: number
     variants: number
+    bundleItems: number
+    bundledIn: number
   }
 
   export type ProductCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prices?: boolean | ProductCountOutputTypeCountPricesArgs
     variants?: boolean | ProductCountOutputTypeCountVariantsArgs
+    bundleItems?: boolean | ProductCountOutputTypeCountBundleItemsArgs
+    bundledIn?: boolean | ProductCountOutputTypeCountBundledInArgs
   }
 
   // Custom InputTypes
@@ -3176,6 +3362,60 @@ export namespace Prisma {
     where?: ProductVariantWhereInput
   }
 
+  /**
+   * ProductCountOutputType without action
+   */
+  export type ProductCountOutputTypeCountBundleItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BundleItemWhereInput
+  }
+
+  /**
+   * ProductCountOutputType without action
+   */
+  export type ProductCountOutputTypeCountBundledInArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BundleItemWhereInput
+  }
+
+
+  /**
+   * Count Type ProductVariantCountOutputType
+   */
+
+  export type ProductVariantCountOutputType = {
+    bundleItems: number
+    lineItems: number
+  }
+
+  export type ProductVariantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    bundleItems?: boolean | ProductVariantCountOutputTypeCountBundleItemsArgs
+    lineItems?: boolean | ProductVariantCountOutputTypeCountLineItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ProductVariantCountOutputType without action
+   */
+  export type ProductVariantCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductVariantCountOutputType
+     */
+    select?: ProductVariantCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ProductVariantCountOutputType without action
+   */
+  export type ProductVariantCountOutputTypeCountBundleItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BundleItemWhereInput
+  }
+
+  /**
+   * ProductVariantCountOutputType without action
+   */
+  export type ProductVariantCountOutputTypeCountLineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderLineItemWhereInput
+  }
+
 
   /**
    * Count Type OrderCountOutputType
@@ -3183,10 +3423,12 @@ export namespace Prisma {
 
   export type OrderCountOutputType = {
     fulfillments: number
+    orderLineItems: number
   }
 
   export type OrderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     fulfillments?: boolean | OrderCountOutputTypeCountFulfillmentsArgs
+    orderLineItems?: boolean | OrderCountOutputTypeCountOrderLineItemsArgs
   }
 
   // Custom InputTypes
@@ -3205,6 +3447,13 @@ export namespace Prisma {
    */
   export type OrderCountOutputTypeCountFulfillmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FulfillmentWhereInput
+  }
+
+  /**
+   * OrderCountOutputType without action
+   */
+  export type OrderCountOutputTypeCountOrderLineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderLineItemWhereInput
   }
 
 
@@ -5751,7 +6000,8 @@ export namespace Prisma {
     featured: boolean | null
     source: string | null
     cjProductId: string | null
-    trackInventory: boolean | null
+    nutrition: string | null
+    isBundle: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5772,7 +6022,8 @@ export namespace Prisma {
     featured: boolean | null
     source: string | null
     cjProductId: string | null
-    trackInventory: boolean | null
+    nutrition: string | null
+    isBundle: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5796,7 +6047,8 @@ export namespace Prisma {
     metadata: number
     source: number
     cjProductId: number
-    trackInventory: number
+    nutrition: number
+    isBundle: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -5827,7 +6079,8 @@ export namespace Prisma {
     featured?: true
     source?: true
     cjProductId?: true
-    trackInventory?: true
+    nutrition?: true
+    isBundle?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5848,7 +6101,8 @@ export namespace Prisma {
     featured?: true
     source?: true
     cjProductId?: true
-    trackInventory?: true
+    nutrition?: true
+    isBundle?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -5872,7 +6126,8 @@ export namespace Prisma {
     metadata?: true
     source?: true
     cjProductId?: true
-    trackInventory?: true
+    nutrition?: true
+    isBundle?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5983,7 +6238,8 @@ export namespace Prisma {
     metadata: JsonValue | null
     source: string
     cjProductId: string | null
-    trackInventory: boolean
+    nutrition: string | null
+    isBundle: boolean
     createdAt: Date
     updatedAt: Date
     _count: ProductCountAggregateOutputType | null
@@ -6026,12 +6282,15 @@ export namespace Prisma {
     metadata?: boolean
     source?: boolean
     cjProductId?: boolean
-    trackInventory?: boolean
+    nutrition?: boolean
+    isBundle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     prices?: boolean | Product$pricesArgs<ExtArgs>
     variants?: boolean | Product$variantsArgs<ExtArgs>
-    nutrition?: boolean | Product$nutritionArgs<ExtArgs>
+    nutrition_old?: boolean | Product$nutrition_oldArgs<ExtArgs>
+    bundleItems?: boolean | Product$bundleItemsArgs<ExtArgs>
+    bundledIn?: boolean | Product$bundledInArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
@@ -6054,7 +6313,8 @@ export namespace Prisma {
     metadata?: boolean
     source?: boolean
     cjProductId?: boolean
-    trackInventory?: boolean
+    nutrition?: boolean
+    isBundle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["product"]>
@@ -6078,7 +6338,8 @@ export namespace Prisma {
     metadata?: boolean
     source?: boolean
     cjProductId?: boolean
-    trackInventory?: boolean
+    nutrition?: boolean
+    isBundle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["product"]>
@@ -6102,16 +6363,19 @@ export namespace Prisma {
     metadata?: boolean
     source?: boolean
     cjProductId?: boolean
-    trackInventory?: boolean
+    nutrition?: boolean
+    isBundle?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "subtitle" | "tagline" | "images" | "active" | "slug" | "category" | "type" | "gender" | "collection" | "collectionOrder" | "featured" | "tags" | "metadata" | "source" | "cjProductId" | "trackInventory" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "subtitle" | "tagline" | "images" | "active" | "slug" | "category" | "type" | "gender" | "collection" | "collectionOrder" | "featured" | "tags" | "metadata" | "source" | "cjProductId" | "nutrition" | "isBundle" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     prices?: boolean | Product$pricesArgs<ExtArgs>
     variants?: boolean | Product$variantsArgs<ExtArgs>
-    nutrition?: boolean | Product$nutritionArgs<ExtArgs>
+    nutrition_old?: boolean | Product$nutrition_oldArgs<ExtArgs>
+    bundleItems?: boolean | Product$bundleItemsArgs<ExtArgs>
+    bundledIn?: boolean | Product$bundledInArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProductIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6122,7 +6386,9 @@ export namespace Prisma {
     objects: {
       prices: Prisma.$PricePayload<ExtArgs>[]
       variants: Prisma.$ProductVariantPayload<ExtArgs>[]
-      nutrition: Prisma.$ProductNutritionPayload<ExtArgs> | null
+      nutrition_old: Prisma.$ProductNutritionPayload<ExtArgs> | null
+      bundleItems: Prisma.$BundleItemPayload<ExtArgs>[]
+      bundledIn: Prisma.$BundleItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6143,7 +6409,8 @@ export namespace Prisma {
       metadata: Prisma.JsonValue | null
       source: string
       cjProductId: string | null
-      trackInventory: boolean
+      nutrition: string | null
+      isBundle: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["product"]>
@@ -6542,7 +6809,9 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     prices<T extends Product$pricesArgs<ExtArgs> = {}>(args?: Subset<T, Product$pricesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PricePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     variants<T extends Product$variantsArgs<ExtArgs> = {}>(args?: Subset<T, Product$variantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    nutrition<T extends Product$nutritionArgs<ExtArgs> = {}>(args?: Subset<T, Product$nutritionArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    nutrition_old<T extends Product$nutrition_oldArgs<ExtArgs> = {}>(args?: Subset<T, Product$nutrition_oldArgs<ExtArgs>>): Prisma__ProductNutritionClient<$Result.GetResult<Prisma.$ProductNutritionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    bundleItems<T extends Product$bundleItemsArgs<ExtArgs> = {}>(args?: Subset<T, Product$bundleItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    bundledIn<T extends Product$bundledInArgs<ExtArgs> = {}>(args?: Subset<T, Product$bundledInArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6590,7 +6859,8 @@ export namespace Prisma {
     readonly metadata: FieldRef<"Product", 'Json'>
     readonly source: FieldRef<"Product", 'String'>
     readonly cjProductId: FieldRef<"Product", 'String'>
-    readonly trackInventory: FieldRef<"Product", 'Boolean'>
+    readonly nutrition: FieldRef<"Product", 'String'>
+    readonly isBundle: FieldRef<"Product", 'Boolean'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
   }
@@ -7029,9 +7299,9 @@ export namespace Prisma {
   }
 
   /**
-   * Product.nutrition
+   * Product.nutrition_old
    */
-  export type Product$nutritionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Product$nutrition_oldArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the ProductNutrition
      */
@@ -7045,6 +7315,54 @@ export namespace Prisma {
      */
     include?: ProductNutritionInclude<ExtArgs> | null
     where?: ProductNutritionWhereInput
+  }
+
+  /**
+   * Product.bundleItems
+   */
+  export type Product$bundleItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    where?: BundleItemWhereInput
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    cursor?: BundleItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
+  }
+
+  /**
+   * Product.bundledIn
+   */
+  export type Product$bundledInArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    where?: BundleItemWhereInput
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    cursor?: BundleItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
   }
 
   /**
@@ -7079,11 +7397,17 @@ export namespace Prisma {
   }
 
   export type ProductVariantAvgAggregateOutputType = {
+    position: number | null
+    price: number | null
+    compareAtPrice: number | null
     cost: number | null
     stock: number | null
   }
 
   export type ProductVariantSumAggregateOutputType = {
+    position: number | null
+    price: number | null
+    compareAtPrice: number | null
     cost: number | null
     stock: number | null
   }
@@ -7091,13 +7415,18 @@ export namespace Prisma {
   export type ProductVariantMinAggregateOutputType = {
     id: string | null
     productId: string | null
-    stripePriceId: string | null
-    sku: string | null
-    cjVariantId: string | null
-    cjSku: string | null
+    title: string | null
+    position: number | null
+    price: number | null
+    compareAtPrice: number | null
     cost: number | null
     stock: number | null
+    trackInventory: boolean | null
+    sku: string | null
     image: string | null
+    stripePriceId: string | null
+    cjVariantId: string | null
+    cjSku: string | null
     active: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7106,13 +7435,18 @@ export namespace Prisma {
   export type ProductVariantMaxAggregateOutputType = {
     id: string | null
     productId: string | null
-    stripePriceId: string | null
-    sku: string | null
-    cjVariantId: string | null
-    cjSku: string | null
+    title: string | null
+    position: number | null
+    price: number | null
+    compareAtPrice: number | null
     cost: number | null
     stock: number | null
+    trackInventory: boolean | null
+    sku: string | null
     image: string | null
+    stripePriceId: string | null
+    cjVariantId: string | null
+    cjSku: string | null
     active: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7121,14 +7455,19 @@ export namespace Prisma {
   export type ProductVariantCountAggregateOutputType = {
     id: number
     productId: number
-    stripePriceId: number
-    sku: number
-    options: number
-    cjVariantId: number
-    cjSku: number
+    title: number
+    position: number
+    price: number
+    compareAtPrice: number
     cost: number
     stock: number
+    trackInventory: number
+    options: number
+    sku: number
     image: number
+    stripePriceId: number
+    cjVariantId: number
+    cjSku: number
     active: number
     createdAt: number
     updatedAt: number
@@ -7137,11 +7476,17 @@ export namespace Prisma {
 
 
   export type ProductVariantAvgAggregateInputType = {
+    position?: true
+    price?: true
+    compareAtPrice?: true
     cost?: true
     stock?: true
   }
 
   export type ProductVariantSumAggregateInputType = {
+    position?: true
+    price?: true
+    compareAtPrice?: true
     cost?: true
     stock?: true
   }
@@ -7149,13 +7494,18 @@ export namespace Prisma {
   export type ProductVariantMinAggregateInputType = {
     id?: true
     productId?: true
-    stripePriceId?: true
-    sku?: true
-    cjVariantId?: true
-    cjSku?: true
+    title?: true
+    position?: true
+    price?: true
+    compareAtPrice?: true
     cost?: true
     stock?: true
+    trackInventory?: true
+    sku?: true
     image?: true
+    stripePriceId?: true
+    cjVariantId?: true
+    cjSku?: true
     active?: true
     createdAt?: true
     updatedAt?: true
@@ -7164,13 +7514,18 @@ export namespace Prisma {
   export type ProductVariantMaxAggregateInputType = {
     id?: true
     productId?: true
-    stripePriceId?: true
-    sku?: true
-    cjVariantId?: true
-    cjSku?: true
+    title?: true
+    position?: true
+    price?: true
+    compareAtPrice?: true
     cost?: true
     stock?: true
+    trackInventory?: true
+    sku?: true
     image?: true
+    stripePriceId?: true
+    cjVariantId?: true
+    cjSku?: true
     active?: true
     createdAt?: true
     updatedAt?: true
@@ -7179,14 +7534,19 @@ export namespace Prisma {
   export type ProductVariantCountAggregateInputType = {
     id?: true
     productId?: true
-    stripePriceId?: true
-    sku?: true
-    options?: true
-    cjVariantId?: true
-    cjSku?: true
+    title?: true
+    position?: true
+    price?: true
+    compareAtPrice?: true
     cost?: true
     stock?: true
+    trackInventory?: true
+    options?: true
+    sku?: true
     image?: true
+    stripePriceId?: true
+    cjVariantId?: true
+    cjSku?: true
     active?: true
     createdAt?: true
     updatedAt?: true
@@ -7282,14 +7642,19 @@ export namespace Prisma {
   export type ProductVariantGroupByOutputType = {
     id: string
     productId: string
-    stripePriceId: string | null
-    sku: string | null
-    options: JsonValue
-    cjVariantId: string | null
-    cjSku: string | null
+    title: string
+    position: number
+    price: number
+    compareAtPrice: number | null
     cost: number | null
     stock: number
+    trackInventory: boolean
+    options: JsonValue
+    sku: string | null
     image: string | null
+    stripePriceId: string | null
+    cjVariantId: string | null
+    cjSku: string | null
     active: boolean
     createdAt: Date
     updatedAt: Date
@@ -7317,31 +7682,44 @@ export namespace Prisma {
   export type ProductVariantSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     productId?: boolean
-    stripePriceId?: boolean
-    sku?: boolean
-    options?: boolean
-    cjVariantId?: boolean
-    cjSku?: boolean
+    title?: boolean
+    position?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
+    trackInventory?: boolean
+    options?: boolean
+    sku?: boolean
     image?: boolean
+    stripePriceId?: boolean
+    cjVariantId?: boolean
+    cjSku?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     product?: boolean | ProductDefaultArgs<ExtArgs>
+    bundleItems?: boolean | ProductVariant$bundleItemsArgs<ExtArgs>
+    lineItems?: boolean | ProductVariant$lineItemsArgs<ExtArgs>
+    _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["productVariant"]>
 
   export type ProductVariantSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     productId?: boolean
-    stripePriceId?: boolean
-    sku?: boolean
-    options?: boolean
-    cjVariantId?: boolean
-    cjSku?: boolean
+    title?: boolean
+    position?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
+    trackInventory?: boolean
+    options?: boolean
+    sku?: boolean
     image?: boolean
+    stripePriceId?: boolean
+    cjVariantId?: boolean
+    cjSku?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7351,14 +7729,19 @@ export namespace Prisma {
   export type ProductVariantSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     productId?: boolean
-    stripePriceId?: boolean
-    sku?: boolean
-    options?: boolean
-    cjVariantId?: boolean
-    cjSku?: boolean
+    title?: boolean
+    position?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
+    trackInventory?: boolean
+    options?: boolean
+    sku?: boolean
     image?: boolean
+    stripePriceId?: boolean
+    cjVariantId?: boolean
+    cjSku?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -7368,22 +7751,30 @@ export namespace Prisma {
   export type ProductVariantSelectScalar = {
     id?: boolean
     productId?: boolean
-    stripePriceId?: boolean
-    sku?: boolean
-    options?: boolean
-    cjVariantId?: boolean
-    cjSku?: boolean
+    title?: boolean
+    position?: boolean
+    price?: boolean
+    compareAtPrice?: boolean
     cost?: boolean
     stock?: boolean
+    trackInventory?: boolean
+    options?: boolean
+    sku?: boolean
     image?: boolean
+    stripePriceId?: boolean
+    cjVariantId?: boolean
+    cjSku?: boolean
     active?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "stripePriceId" | "sku" | "options" | "cjVariantId" | "cjSku" | "cost" | "stock" | "image" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
+  export type ProductVariantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "title" | "position" | "price" | "compareAtPrice" | "cost" | "stock" | "trackInventory" | "options" | "sku" | "image" | "stripePriceId" | "cjVariantId" | "cjSku" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["productVariant"]>
   export type ProductVariantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     product?: boolean | ProductDefaultArgs<ExtArgs>
+    bundleItems?: boolean | ProductVariant$bundleItemsArgs<ExtArgs>
+    lineItems?: boolean | ProductVariant$lineItemsArgs<ExtArgs>
+    _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProductVariantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     product?: boolean | ProductDefaultArgs<ExtArgs>
@@ -7396,18 +7787,25 @@ export namespace Prisma {
     name: "ProductVariant"
     objects: {
       product: Prisma.$ProductPayload<ExtArgs>
+      bundleItems: Prisma.$BundleItemPayload<ExtArgs>[]
+      lineItems: Prisma.$OrderLineItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       productId: string
-      stripePriceId: string | null
-      sku: string | null
-      options: Prisma.JsonValue
-      cjVariantId: string | null
-      cjSku: string | null
+      title: string
+      position: number
+      price: number
+      compareAtPrice: number | null
       cost: number | null
       stock: number
+      trackInventory: boolean
+      options: Prisma.JsonValue
+      sku: string | null
       image: string | null
+      stripePriceId: string | null
+      cjVariantId: string | null
+      cjSku: string | null
       active: boolean
       createdAt: Date
       updatedAt: Date
@@ -7806,6 +8204,8 @@ export namespace Prisma {
   export interface Prisma__ProductVariantClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    bundleItems<T extends ProductVariant$bundleItemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$bundleItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    lineItems<T extends ProductVariant$lineItemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$lineItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7837,14 +8237,19 @@ export namespace Prisma {
   interface ProductVariantFieldRefs {
     readonly id: FieldRef<"ProductVariant", 'String'>
     readonly productId: FieldRef<"ProductVariant", 'String'>
-    readonly stripePriceId: FieldRef<"ProductVariant", 'String'>
-    readonly sku: FieldRef<"ProductVariant", 'String'>
-    readonly options: FieldRef<"ProductVariant", 'Json'>
-    readonly cjVariantId: FieldRef<"ProductVariant", 'String'>
-    readonly cjSku: FieldRef<"ProductVariant", 'String'>
+    readonly title: FieldRef<"ProductVariant", 'String'>
+    readonly position: FieldRef<"ProductVariant", 'Int'>
+    readonly price: FieldRef<"ProductVariant", 'Int'>
+    readonly compareAtPrice: FieldRef<"ProductVariant", 'Int'>
     readonly cost: FieldRef<"ProductVariant", 'Int'>
     readonly stock: FieldRef<"ProductVariant", 'Int'>
+    readonly trackInventory: FieldRef<"ProductVariant", 'Boolean'>
+    readonly options: FieldRef<"ProductVariant", 'Json'>
+    readonly sku: FieldRef<"ProductVariant", 'String'>
     readonly image: FieldRef<"ProductVariant", 'String'>
+    readonly stripePriceId: FieldRef<"ProductVariant", 'String'>
+    readonly cjVariantId: FieldRef<"ProductVariant", 'String'>
+    readonly cjSku: FieldRef<"ProductVariant", 'String'>
     readonly active: FieldRef<"ProductVariant", 'Boolean'>
     readonly createdAt: FieldRef<"ProductVariant", 'DateTime'>
     readonly updatedAt: FieldRef<"ProductVariant", 'DateTime'>
@@ -8241,6 +8646,54 @@ export namespace Prisma {
      * Limit how many ProductVariants to delete.
      */
     limit?: number
+  }
+
+  /**
+   * ProductVariant.bundleItems
+   */
+  export type ProductVariant$bundleItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    where?: BundleItemWhereInput
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    cursor?: BundleItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductVariant.lineItems
+   */
+  export type ProductVariant$lineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    where?: OrderLineItemWhereInput
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    cursor?: OrderLineItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderLineItemScalarFieldEnum | OrderLineItemScalarFieldEnum[]
   }
 
   /**
@@ -10448,6 +10901,2381 @@ export namespace Prisma {
 
 
   /**
+   * Model BundleItem
+   */
+
+  export type AggregateBundleItem = {
+    _count: BundleItemCountAggregateOutputType | null
+    _avg: BundleItemAvgAggregateOutputType | null
+    _sum: BundleItemSumAggregateOutputType | null
+    _min: BundleItemMinAggregateOutputType | null
+    _max: BundleItemMaxAggregateOutputType | null
+  }
+
+  export type BundleItemAvgAggregateOutputType = {
+    quantity: number | null
+    position: number | null
+  }
+
+  export type BundleItemSumAggregateOutputType = {
+    quantity: number | null
+    position: number | null
+  }
+
+  export type BundleItemMinAggregateOutputType = {
+    id: string | null
+    bundleProductId: string | null
+    componentProductId: string | null
+    componentVariantId: string | null
+    quantity: number | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BundleItemMaxAggregateOutputType = {
+    id: string | null
+    bundleProductId: string | null
+    componentProductId: string | null
+    componentVariantId: string | null
+    quantity: number | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BundleItemCountAggregateOutputType = {
+    id: number
+    bundleProductId: number
+    componentProductId: number
+    componentVariantId: number
+    quantity: number
+    position: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BundleItemAvgAggregateInputType = {
+    quantity?: true
+    position?: true
+  }
+
+  export type BundleItemSumAggregateInputType = {
+    quantity?: true
+    position?: true
+  }
+
+  export type BundleItemMinAggregateInputType = {
+    id?: true
+    bundleProductId?: true
+    componentProductId?: true
+    componentVariantId?: true
+    quantity?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BundleItemMaxAggregateInputType = {
+    id?: true
+    bundleProductId?: true
+    componentProductId?: true
+    componentVariantId?: true
+    quantity?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BundleItemCountAggregateInputType = {
+    id?: true
+    bundleProductId?: true
+    componentProductId?: true
+    componentVariantId?: true
+    quantity?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BundleItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BundleItem to aggregate.
+     */
+    where?: BundleItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BundleItems to fetch.
+     */
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BundleItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BundleItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BundleItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BundleItems
+    **/
+    _count?: true | BundleItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BundleItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BundleItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BundleItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BundleItemMaxAggregateInputType
+  }
+
+  export type GetBundleItemAggregateType<T extends BundleItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateBundleItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBundleItem[P]>
+      : GetScalarType<T[P], AggregateBundleItem[P]>
+  }
+
+
+
+
+  export type BundleItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BundleItemWhereInput
+    orderBy?: BundleItemOrderByWithAggregationInput | BundleItemOrderByWithAggregationInput[]
+    by: BundleItemScalarFieldEnum[] | BundleItemScalarFieldEnum
+    having?: BundleItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BundleItemCountAggregateInputType | true
+    _avg?: BundleItemAvgAggregateInputType
+    _sum?: BundleItemSumAggregateInputType
+    _min?: BundleItemMinAggregateInputType
+    _max?: BundleItemMaxAggregateInputType
+  }
+
+  export type BundleItemGroupByOutputType = {
+    id: string
+    bundleProductId: string
+    componentProductId: string
+    componentVariantId: string | null
+    quantity: number
+    position: number
+    createdAt: Date
+    updatedAt: Date
+    _count: BundleItemCountAggregateOutputType | null
+    _avg: BundleItemAvgAggregateOutputType | null
+    _sum: BundleItemSumAggregateOutputType | null
+    _min: BundleItemMinAggregateOutputType | null
+    _max: BundleItemMaxAggregateOutputType | null
+  }
+
+  type GetBundleItemGroupByPayload<T extends BundleItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BundleItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BundleItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BundleItemGroupByOutputType[P]>
+            : GetScalarType<T[P], BundleItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BundleItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bundleProductId?: boolean
+    componentProductId?: boolean
+    componentVariantId?: boolean
+    quantity?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }, ExtArgs["result"]["bundleItem"]>
+
+  export type BundleItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bundleProductId?: boolean
+    componentProductId?: boolean
+    componentVariantId?: boolean
+    quantity?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }, ExtArgs["result"]["bundleItem"]>
+
+  export type BundleItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    bundleProductId?: boolean
+    componentProductId?: boolean
+    componentVariantId?: boolean
+    quantity?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }, ExtArgs["result"]["bundleItem"]>
+
+  export type BundleItemSelectScalar = {
+    id?: boolean
+    bundleProductId?: boolean
+    componentProductId?: boolean
+    componentVariantId?: boolean
+    quantity?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BundleItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "bundleProductId" | "componentProductId" | "componentVariantId" | "quantity" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["bundleItem"]>
+  export type BundleItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }
+  export type BundleItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }
+  export type BundleItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    bundleProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentProduct?: boolean | ProductDefaultArgs<ExtArgs>
+    componentVariant?: boolean | BundleItem$componentVariantArgs<ExtArgs>
+  }
+
+  export type $BundleItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BundleItem"
+    objects: {
+      bundleProduct: Prisma.$ProductPayload<ExtArgs>
+      componentProduct: Prisma.$ProductPayload<ExtArgs>
+      componentVariant: Prisma.$ProductVariantPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      bundleProductId: string
+      componentProductId: string
+      componentVariantId: string | null
+      quantity: number
+      position: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["bundleItem"]>
+    composites: {}
+  }
+
+  type BundleItemGetPayload<S extends boolean | null | undefined | BundleItemDefaultArgs> = $Result.GetResult<Prisma.$BundleItemPayload, S>
+
+  type BundleItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BundleItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BundleItemCountAggregateInputType | true
+    }
+
+  export interface BundleItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BundleItem'], meta: { name: 'BundleItem' } }
+    /**
+     * Find zero or one BundleItem that matches the filter.
+     * @param {BundleItemFindUniqueArgs} args - Arguments to find a BundleItem
+     * @example
+     * // Get one BundleItem
+     * const bundleItem = await prisma.bundleItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BundleItemFindUniqueArgs>(args: SelectSubset<T, BundleItemFindUniqueArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BundleItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BundleItemFindUniqueOrThrowArgs} args - Arguments to find a BundleItem
+     * @example
+     * // Get one BundleItem
+     * const bundleItem = await prisma.bundleItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BundleItemFindUniqueOrThrowArgs>(args: SelectSubset<T, BundleItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BundleItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemFindFirstArgs} args - Arguments to find a BundleItem
+     * @example
+     * // Get one BundleItem
+     * const bundleItem = await prisma.bundleItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BundleItemFindFirstArgs>(args?: SelectSubset<T, BundleItemFindFirstArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BundleItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemFindFirstOrThrowArgs} args - Arguments to find a BundleItem
+     * @example
+     * // Get one BundleItem
+     * const bundleItem = await prisma.bundleItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BundleItemFindFirstOrThrowArgs>(args?: SelectSubset<T, BundleItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BundleItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BundleItems
+     * const bundleItems = await prisma.bundleItem.findMany()
+     * 
+     * // Get first 10 BundleItems
+     * const bundleItems = await prisma.bundleItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const bundleItemWithIdOnly = await prisma.bundleItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BundleItemFindManyArgs>(args?: SelectSubset<T, BundleItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BundleItem.
+     * @param {BundleItemCreateArgs} args - Arguments to create a BundleItem.
+     * @example
+     * // Create one BundleItem
+     * const BundleItem = await prisma.bundleItem.create({
+     *   data: {
+     *     // ... data to create a BundleItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends BundleItemCreateArgs>(args: SelectSubset<T, BundleItemCreateArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BundleItems.
+     * @param {BundleItemCreateManyArgs} args - Arguments to create many BundleItems.
+     * @example
+     * // Create many BundleItems
+     * const bundleItem = await prisma.bundleItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BundleItemCreateManyArgs>(args?: SelectSubset<T, BundleItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BundleItems and returns the data saved in the database.
+     * @param {BundleItemCreateManyAndReturnArgs} args - Arguments to create many BundleItems.
+     * @example
+     * // Create many BundleItems
+     * const bundleItem = await prisma.bundleItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BundleItems and only return the `id`
+     * const bundleItemWithIdOnly = await prisma.bundleItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BundleItemCreateManyAndReturnArgs>(args?: SelectSubset<T, BundleItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BundleItem.
+     * @param {BundleItemDeleteArgs} args - Arguments to delete one BundleItem.
+     * @example
+     * // Delete one BundleItem
+     * const BundleItem = await prisma.bundleItem.delete({
+     *   where: {
+     *     // ... filter to delete one BundleItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BundleItemDeleteArgs>(args: SelectSubset<T, BundleItemDeleteArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BundleItem.
+     * @param {BundleItemUpdateArgs} args - Arguments to update one BundleItem.
+     * @example
+     * // Update one BundleItem
+     * const bundleItem = await prisma.bundleItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BundleItemUpdateArgs>(args: SelectSubset<T, BundleItemUpdateArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BundleItems.
+     * @param {BundleItemDeleteManyArgs} args - Arguments to filter BundleItems to delete.
+     * @example
+     * // Delete a few BundleItems
+     * const { count } = await prisma.bundleItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BundleItemDeleteManyArgs>(args?: SelectSubset<T, BundleItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BundleItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BundleItems
+     * const bundleItem = await prisma.bundleItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BundleItemUpdateManyArgs>(args: SelectSubset<T, BundleItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BundleItems and returns the data updated in the database.
+     * @param {BundleItemUpdateManyAndReturnArgs} args - Arguments to update many BundleItems.
+     * @example
+     * // Update many BundleItems
+     * const bundleItem = await prisma.bundleItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BundleItems and only return the `id`
+     * const bundleItemWithIdOnly = await prisma.bundleItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BundleItemUpdateManyAndReturnArgs>(args: SelectSubset<T, BundleItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BundleItem.
+     * @param {BundleItemUpsertArgs} args - Arguments to update or create a BundleItem.
+     * @example
+     * // Update or create a BundleItem
+     * const bundleItem = await prisma.bundleItem.upsert({
+     *   create: {
+     *     // ... data to create a BundleItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BundleItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BundleItemUpsertArgs>(args: SelectSubset<T, BundleItemUpsertArgs<ExtArgs>>): Prisma__BundleItemClient<$Result.GetResult<Prisma.$BundleItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BundleItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemCountArgs} args - Arguments to filter BundleItems to count.
+     * @example
+     * // Count the number of BundleItems
+     * const count = await prisma.bundleItem.count({
+     *   where: {
+     *     // ... the filter for the BundleItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends BundleItemCountArgs>(
+      args?: Subset<T, BundleItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BundleItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BundleItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BundleItemAggregateArgs>(args: Subset<T, BundleItemAggregateArgs>): Prisma.PrismaPromise<GetBundleItemAggregateType<T>>
+
+    /**
+     * Group by BundleItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BundleItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BundleItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BundleItemGroupByArgs['orderBy'] }
+        : { orderBy?: BundleItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BundleItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBundleItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BundleItem model
+   */
+  readonly fields: BundleItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BundleItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BundleItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    bundleProduct<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    componentProduct<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    componentVariant<T extends BundleItem$componentVariantArgs<ExtArgs> = {}>(args?: Subset<T, BundleItem$componentVariantArgs<ExtArgs>>): Prisma__ProductVariantClient<$Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BundleItem model
+   */
+  interface BundleItemFieldRefs {
+    readonly id: FieldRef<"BundleItem", 'String'>
+    readonly bundleProductId: FieldRef<"BundleItem", 'String'>
+    readonly componentProductId: FieldRef<"BundleItem", 'String'>
+    readonly componentVariantId: FieldRef<"BundleItem", 'String'>
+    readonly quantity: FieldRef<"BundleItem", 'Int'>
+    readonly position: FieldRef<"BundleItem", 'Int'>
+    readonly createdAt: FieldRef<"BundleItem", 'DateTime'>
+    readonly updatedAt: FieldRef<"BundleItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BundleItem findUnique
+   */
+  export type BundleItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter, which BundleItem to fetch.
+     */
+    where: BundleItemWhereUniqueInput
+  }
+
+  /**
+   * BundleItem findUniqueOrThrow
+   */
+  export type BundleItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter, which BundleItem to fetch.
+     */
+    where: BundleItemWhereUniqueInput
+  }
+
+  /**
+   * BundleItem findFirst
+   */
+  export type BundleItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter, which BundleItem to fetch.
+     */
+    where?: BundleItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BundleItems to fetch.
+     */
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BundleItems.
+     */
+    cursor?: BundleItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BundleItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BundleItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BundleItems.
+     */
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
+  }
+
+  /**
+   * BundleItem findFirstOrThrow
+   */
+  export type BundleItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter, which BundleItem to fetch.
+     */
+    where?: BundleItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BundleItems to fetch.
+     */
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BundleItems.
+     */
+    cursor?: BundleItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BundleItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BundleItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BundleItems.
+     */
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
+  }
+
+  /**
+   * BundleItem findMany
+   */
+  export type BundleItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter, which BundleItems to fetch.
+     */
+    where?: BundleItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BundleItems to fetch.
+     */
+    orderBy?: BundleItemOrderByWithRelationInput | BundleItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BundleItems.
+     */
+    cursor?: BundleItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BundleItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BundleItems.
+     */
+    skip?: number
+    distinct?: BundleItemScalarFieldEnum | BundleItemScalarFieldEnum[]
+  }
+
+  /**
+   * BundleItem create
+   */
+  export type BundleItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BundleItem.
+     */
+    data: XOR<BundleItemCreateInput, BundleItemUncheckedCreateInput>
+  }
+
+  /**
+   * BundleItem createMany
+   */
+  export type BundleItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BundleItems.
+     */
+    data: BundleItemCreateManyInput | BundleItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BundleItem createManyAndReturn
+   */
+  export type BundleItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many BundleItems.
+     */
+    data: BundleItemCreateManyInput | BundleItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BundleItem update
+   */
+  export type BundleItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BundleItem.
+     */
+    data: XOR<BundleItemUpdateInput, BundleItemUncheckedUpdateInput>
+    /**
+     * Choose, which BundleItem to update.
+     */
+    where: BundleItemWhereUniqueInput
+  }
+
+  /**
+   * BundleItem updateMany
+   */
+  export type BundleItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BundleItems.
+     */
+    data: XOR<BundleItemUpdateManyMutationInput, BundleItemUncheckedUpdateManyInput>
+    /**
+     * Filter which BundleItems to update
+     */
+    where?: BundleItemWhereInput
+    /**
+     * Limit how many BundleItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BundleItem updateManyAndReturn
+   */
+  export type BundleItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * The data used to update BundleItems.
+     */
+    data: XOR<BundleItemUpdateManyMutationInput, BundleItemUncheckedUpdateManyInput>
+    /**
+     * Filter which BundleItems to update
+     */
+    where?: BundleItemWhereInput
+    /**
+     * Limit how many BundleItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BundleItem upsert
+   */
+  export type BundleItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BundleItem to update in case it exists.
+     */
+    where: BundleItemWhereUniqueInput
+    /**
+     * In case the BundleItem found by the `where` argument doesn't exist, create a new BundleItem with this data.
+     */
+    create: XOR<BundleItemCreateInput, BundleItemUncheckedCreateInput>
+    /**
+     * In case the BundleItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BundleItemUpdateInput, BundleItemUncheckedUpdateInput>
+  }
+
+  /**
+   * BundleItem delete
+   */
+  export type BundleItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+    /**
+     * Filter which BundleItem to delete.
+     */
+    where: BundleItemWhereUniqueInput
+  }
+
+  /**
+   * BundleItem deleteMany
+   */
+  export type BundleItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BundleItems to delete
+     */
+    where?: BundleItemWhereInput
+    /**
+     * Limit how many BundleItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BundleItem.componentVariant
+   */
+  export type BundleItem$componentVariantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductVariant
+     */
+    select?: ProductVariantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductVariant
+     */
+    omit?: ProductVariantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductVariantInclude<ExtArgs> | null
+    where?: ProductVariantWhereInput
+  }
+
+  /**
+   * BundleItem without action
+   */
+  export type BundleItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BundleItem
+     */
+    select?: BundleItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BundleItem
+     */
+    omit?: BundleItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BundleItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model OrderLineItem
+   */
+
+  export type AggregateOrderLineItem = {
+    _count: OrderLineItemCountAggregateOutputType | null
+    _avg: OrderLineItemAvgAggregateOutputType | null
+    _sum: OrderLineItemSumAggregateOutputType | null
+    _min: OrderLineItemMinAggregateOutputType | null
+    _max: OrderLineItemMaxAggregateOutputType | null
+  }
+
+  export type OrderLineItemAvgAggregateOutputType = {
+    unitPrice: number | null
+    quantity: number | null
+    totalPrice: number | null
+  }
+
+  export type OrderLineItemSumAggregateOutputType = {
+    unitPrice: number | null
+    quantity: number | null
+    totalPrice: number | null
+  }
+
+  export type OrderLineItemMinAggregateOutputType = {
+    id: string | null
+    orderId: string | null
+    variantId: string | null
+    productName: string | null
+    variantTitle: string | null
+    sku: string | null
+    image: string | null
+    unitPrice: number | null
+    quantity: number | null
+    totalPrice: number | null
+    createdAt: Date | null
+  }
+
+  export type OrderLineItemMaxAggregateOutputType = {
+    id: string | null
+    orderId: string | null
+    variantId: string | null
+    productName: string | null
+    variantTitle: string | null
+    sku: string | null
+    image: string | null
+    unitPrice: number | null
+    quantity: number | null
+    totalPrice: number | null
+    createdAt: Date | null
+  }
+
+  export type OrderLineItemCountAggregateOutputType = {
+    id: number
+    orderId: number
+    variantId: number
+    productName: number
+    variantTitle: number
+    sku: number
+    image: number
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type OrderLineItemAvgAggregateInputType = {
+    unitPrice?: true
+    quantity?: true
+    totalPrice?: true
+  }
+
+  export type OrderLineItemSumAggregateInputType = {
+    unitPrice?: true
+    quantity?: true
+    totalPrice?: true
+  }
+
+  export type OrderLineItemMinAggregateInputType = {
+    id?: true
+    orderId?: true
+    variantId?: true
+    productName?: true
+    variantTitle?: true
+    sku?: true
+    image?: true
+    unitPrice?: true
+    quantity?: true
+    totalPrice?: true
+    createdAt?: true
+  }
+
+  export type OrderLineItemMaxAggregateInputType = {
+    id?: true
+    orderId?: true
+    variantId?: true
+    productName?: true
+    variantTitle?: true
+    sku?: true
+    image?: true
+    unitPrice?: true
+    quantity?: true
+    totalPrice?: true
+    createdAt?: true
+  }
+
+  export type OrderLineItemCountAggregateInputType = {
+    id?: true
+    orderId?: true
+    variantId?: true
+    productName?: true
+    variantTitle?: true
+    sku?: true
+    image?: true
+    unitPrice?: true
+    quantity?: true
+    totalPrice?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type OrderLineItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OrderLineItem to aggregate.
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderLineItems to fetch.
+     */
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OrderLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OrderLineItems
+    **/
+    _count?: true | OrderLineItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OrderLineItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OrderLineItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OrderLineItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OrderLineItemMaxAggregateInputType
+  }
+
+  export type GetOrderLineItemAggregateType<T extends OrderLineItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateOrderLineItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOrderLineItem[P]>
+      : GetScalarType<T[P], AggregateOrderLineItem[P]>
+  }
+
+
+
+
+  export type OrderLineItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderLineItemWhereInput
+    orderBy?: OrderLineItemOrderByWithAggregationInput | OrderLineItemOrderByWithAggregationInput[]
+    by: OrderLineItemScalarFieldEnum[] | OrderLineItemScalarFieldEnum
+    having?: OrderLineItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OrderLineItemCountAggregateInputType | true
+    _avg?: OrderLineItemAvgAggregateInputType
+    _sum?: OrderLineItemSumAggregateInputType
+    _min?: OrderLineItemMinAggregateInputType
+    _max?: OrderLineItemMaxAggregateInputType
+  }
+
+  export type OrderLineItemGroupByOutputType = {
+    id: string
+    orderId: string
+    variantId: string | null
+    productName: string
+    variantTitle: string
+    sku: string | null
+    image: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt: Date
+    _count: OrderLineItemCountAggregateOutputType | null
+    _avg: OrderLineItemAvgAggregateOutputType | null
+    _sum: OrderLineItemSumAggregateOutputType | null
+    _min: OrderLineItemMinAggregateOutputType | null
+    _max: OrderLineItemMaxAggregateOutputType | null
+  }
+
+  type GetOrderLineItemGroupByPayload<T extends OrderLineItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OrderLineItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OrderLineItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OrderLineItemGroupByOutputType[P]>
+            : GetScalarType<T[P], OrderLineItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OrderLineItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderId?: boolean
+    variantId?: boolean
+    productName?: boolean
+    variantTitle?: boolean
+    sku?: boolean
+    image?: boolean
+    unitPrice?: boolean
+    quantity?: boolean
+    totalPrice?: boolean
+    createdAt?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }, ExtArgs["result"]["orderLineItem"]>
+
+  export type OrderLineItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderId?: boolean
+    variantId?: boolean
+    productName?: boolean
+    variantTitle?: boolean
+    sku?: boolean
+    image?: boolean
+    unitPrice?: boolean
+    quantity?: boolean
+    totalPrice?: boolean
+    createdAt?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }, ExtArgs["result"]["orderLineItem"]>
+
+  export type OrderLineItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderId?: boolean
+    variantId?: boolean
+    productName?: boolean
+    variantTitle?: boolean
+    sku?: boolean
+    image?: boolean
+    unitPrice?: boolean
+    quantity?: boolean
+    totalPrice?: boolean
+    createdAt?: boolean
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }, ExtArgs["result"]["orderLineItem"]>
+
+  export type OrderLineItemSelectScalar = {
+    id?: boolean
+    orderId?: boolean
+    variantId?: boolean
+    productName?: boolean
+    variantTitle?: boolean
+    sku?: boolean
+    image?: boolean
+    unitPrice?: boolean
+    quantity?: boolean
+    totalPrice?: boolean
+    createdAt?: boolean
+  }
+
+  export type OrderLineItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderId" | "variantId" | "productName" | "variantTitle" | "sku" | "image" | "unitPrice" | "quantity" | "totalPrice" | "createdAt", ExtArgs["result"]["orderLineItem"]>
+  export type OrderLineItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }
+  export type OrderLineItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }
+  export type OrderLineItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    order?: boolean | OrderDefaultArgs<ExtArgs>
+    variant?: boolean | OrderLineItem$variantArgs<ExtArgs>
+  }
+
+  export type $OrderLineItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OrderLineItem"
+    objects: {
+      order: Prisma.$OrderPayload<ExtArgs>
+      variant: Prisma.$ProductVariantPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      orderId: string
+      variantId: string | null
+      productName: string
+      variantTitle: string
+      sku: string | null
+      image: string | null
+      unitPrice: number
+      quantity: number
+      totalPrice: number
+      createdAt: Date
+    }, ExtArgs["result"]["orderLineItem"]>
+    composites: {}
+  }
+
+  type OrderLineItemGetPayload<S extends boolean | null | undefined | OrderLineItemDefaultArgs> = $Result.GetResult<Prisma.$OrderLineItemPayload, S>
+
+  type OrderLineItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OrderLineItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OrderLineItemCountAggregateInputType | true
+    }
+
+  export interface OrderLineItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OrderLineItem'], meta: { name: 'OrderLineItem' } }
+    /**
+     * Find zero or one OrderLineItem that matches the filter.
+     * @param {OrderLineItemFindUniqueArgs} args - Arguments to find a OrderLineItem
+     * @example
+     * // Get one OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OrderLineItemFindUniqueArgs>(args: SelectSubset<T, OrderLineItemFindUniqueArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OrderLineItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OrderLineItemFindUniqueOrThrowArgs} args - Arguments to find a OrderLineItem
+     * @example
+     * // Get one OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OrderLineItemFindUniqueOrThrowArgs>(args: SelectSubset<T, OrderLineItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OrderLineItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemFindFirstArgs} args - Arguments to find a OrderLineItem
+     * @example
+     * // Get one OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OrderLineItemFindFirstArgs>(args?: SelectSubset<T, OrderLineItemFindFirstArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OrderLineItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemFindFirstOrThrowArgs} args - Arguments to find a OrderLineItem
+     * @example
+     * // Get one OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OrderLineItemFindFirstOrThrowArgs>(args?: SelectSubset<T, OrderLineItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OrderLineItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OrderLineItems
+     * const orderLineItems = await prisma.orderLineItem.findMany()
+     * 
+     * // Get first 10 OrderLineItems
+     * const orderLineItems = await prisma.orderLineItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const orderLineItemWithIdOnly = await prisma.orderLineItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OrderLineItemFindManyArgs>(args?: SelectSubset<T, OrderLineItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OrderLineItem.
+     * @param {OrderLineItemCreateArgs} args - Arguments to create a OrderLineItem.
+     * @example
+     * // Create one OrderLineItem
+     * const OrderLineItem = await prisma.orderLineItem.create({
+     *   data: {
+     *     // ... data to create a OrderLineItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends OrderLineItemCreateArgs>(args: SelectSubset<T, OrderLineItemCreateArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OrderLineItems.
+     * @param {OrderLineItemCreateManyArgs} args - Arguments to create many OrderLineItems.
+     * @example
+     * // Create many OrderLineItems
+     * const orderLineItem = await prisma.orderLineItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OrderLineItemCreateManyArgs>(args?: SelectSubset<T, OrderLineItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many OrderLineItems and returns the data saved in the database.
+     * @param {OrderLineItemCreateManyAndReturnArgs} args - Arguments to create many OrderLineItems.
+     * @example
+     * // Create many OrderLineItems
+     * const orderLineItem = await prisma.orderLineItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many OrderLineItems and only return the `id`
+     * const orderLineItemWithIdOnly = await prisma.orderLineItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OrderLineItemCreateManyAndReturnArgs>(args?: SelectSubset<T, OrderLineItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a OrderLineItem.
+     * @param {OrderLineItemDeleteArgs} args - Arguments to delete one OrderLineItem.
+     * @example
+     * // Delete one OrderLineItem
+     * const OrderLineItem = await prisma.orderLineItem.delete({
+     *   where: {
+     *     // ... filter to delete one OrderLineItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OrderLineItemDeleteArgs>(args: SelectSubset<T, OrderLineItemDeleteArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OrderLineItem.
+     * @param {OrderLineItemUpdateArgs} args - Arguments to update one OrderLineItem.
+     * @example
+     * // Update one OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OrderLineItemUpdateArgs>(args: SelectSubset<T, OrderLineItemUpdateArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OrderLineItems.
+     * @param {OrderLineItemDeleteManyArgs} args - Arguments to filter OrderLineItems to delete.
+     * @example
+     * // Delete a few OrderLineItems
+     * const { count } = await prisma.orderLineItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OrderLineItemDeleteManyArgs>(args?: SelectSubset<T, OrderLineItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OrderLineItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OrderLineItems
+     * const orderLineItem = await prisma.orderLineItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OrderLineItemUpdateManyArgs>(args: SelectSubset<T, OrderLineItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OrderLineItems and returns the data updated in the database.
+     * @param {OrderLineItemUpdateManyAndReturnArgs} args - Arguments to update many OrderLineItems.
+     * @example
+     * // Update many OrderLineItems
+     * const orderLineItem = await prisma.orderLineItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more OrderLineItems and only return the `id`
+     * const orderLineItemWithIdOnly = await prisma.orderLineItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OrderLineItemUpdateManyAndReturnArgs>(args: SelectSubset<T, OrderLineItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one OrderLineItem.
+     * @param {OrderLineItemUpsertArgs} args - Arguments to update or create a OrderLineItem.
+     * @example
+     * // Update or create a OrderLineItem
+     * const orderLineItem = await prisma.orderLineItem.upsert({
+     *   create: {
+     *     // ... data to create a OrderLineItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OrderLineItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OrderLineItemUpsertArgs>(args: SelectSubset<T, OrderLineItemUpsertArgs<ExtArgs>>): Prisma__OrderLineItemClient<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OrderLineItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemCountArgs} args - Arguments to filter OrderLineItems to count.
+     * @example
+     * // Count the number of OrderLineItems
+     * const count = await prisma.orderLineItem.count({
+     *   where: {
+     *     // ... the filter for the OrderLineItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends OrderLineItemCountArgs>(
+      args?: Subset<T, OrderLineItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OrderLineItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OrderLineItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OrderLineItemAggregateArgs>(args: Subset<T, OrderLineItemAggregateArgs>): Prisma.PrismaPromise<GetOrderLineItemAggregateType<T>>
+
+    /**
+     * Group by OrderLineItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OrderLineItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OrderLineItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OrderLineItemGroupByArgs['orderBy'] }
+        : { orderBy?: OrderLineItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OrderLineItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOrderLineItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OrderLineItem model
+   */
+  readonly fields: OrderLineItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OrderLineItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OrderLineItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    order<T extends OrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, OrderDefaultArgs<ExtArgs>>): Prisma__OrderClient<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    variant<T extends OrderLineItem$variantArgs<ExtArgs> = {}>(args?: Subset<T, OrderLineItem$variantArgs<ExtArgs>>): Prisma__ProductVariantClient<$Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OrderLineItem model
+   */
+  interface OrderLineItemFieldRefs {
+    readonly id: FieldRef<"OrderLineItem", 'String'>
+    readonly orderId: FieldRef<"OrderLineItem", 'String'>
+    readonly variantId: FieldRef<"OrderLineItem", 'String'>
+    readonly productName: FieldRef<"OrderLineItem", 'String'>
+    readonly variantTitle: FieldRef<"OrderLineItem", 'String'>
+    readonly sku: FieldRef<"OrderLineItem", 'String'>
+    readonly image: FieldRef<"OrderLineItem", 'String'>
+    readonly unitPrice: FieldRef<"OrderLineItem", 'Int'>
+    readonly quantity: FieldRef<"OrderLineItem", 'Int'>
+    readonly totalPrice: FieldRef<"OrderLineItem", 'Int'>
+    readonly createdAt: FieldRef<"OrderLineItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OrderLineItem findUnique
+   */
+  export type OrderLineItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which OrderLineItem to fetch.
+     */
+    where: OrderLineItemWhereUniqueInput
+  }
+
+  /**
+   * OrderLineItem findUniqueOrThrow
+   */
+  export type OrderLineItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which OrderLineItem to fetch.
+     */
+    where: OrderLineItemWhereUniqueInput
+  }
+
+  /**
+   * OrderLineItem findFirst
+   */
+  export type OrderLineItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which OrderLineItem to fetch.
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderLineItems to fetch.
+     */
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OrderLineItems.
+     */
+    cursor?: OrderLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OrderLineItems.
+     */
+    distinct?: OrderLineItemScalarFieldEnum | OrderLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * OrderLineItem findFirstOrThrow
+   */
+  export type OrderLineItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which OrderLineItem to fetch.
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderLineItems to fetch.
+     */
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OrderLineItems.
+     */
+    cursor?: OrderLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderLineItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OrderLineItems.
+     */
+    distinct?: OrderLineItemScalarFieldEnum | OrderLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * OrderLineItem findMany
+   */
+  export type OrderLineItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter, which OrderLineItems to fetch.
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OrderLineItems to fetch.
+     */
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OrderLineItems.
+     */
+    cursor?: OrderLineItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OrderLineItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OrderLineItems.
+     */
+    skip?: number
+    distinct?: OrderLineItemScalarFieldEnum | OrderLineItemScalarFieldEnum[]
+  }
+
+  /**
+   * OrderLineItem create
+   */
+  export type OrderLineItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a OrderLineItem.
+     */
+    data: XOR<OrderLineItemCreateInput, OrderLineItemUncheckedCreateInput>
+  }
+
+  /**
+   * OrderLineItem createMany
+   */
+  export type OrderLineItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OrderLineItems.
+     */
+    data: OrderLineItemCreateManyInput | OrderLineItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OrderLineItem createManyAndReturn
+   */
+  export type OrderLineItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many OrderLineItems.
+     */
+    data: OrderLineItemCreateManyInput | OrderLineItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OrderLineItem update
+   */
+  export type OrderLineItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a OrderLineItem.
+     */
+    data: XOR<OrderLineItemUpdateInput, OrderLineItemUncheckedUpdateInput>
+    /**
+     * Choose, which OrderLineItem to update.
+     */
+    where: OrderLineItemWhereUniqueInput
+  }
+
+  /**
+   * OrderLineItem updateMany
+   */
+  export type OrderLineItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OrderLineItems.
+     */
+    data: XOR<OrderLineItemUpdateManyMutationInput, OrderLineItemUncheckedUpdateManyInput>
+    /**
+     * Filter which OrderLineItems to update
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * Limit how many OrderLineItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OrderLineItem updateManyAndReturn
+   */
+  export type OrderLineItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * The data used to update OrderLineItems.
+     */
+    data: XOR<OrderLineItemUpdateManyMutationInput, OrderLineItemUncheckedUpdateManyInput>
+    /**
+     * Filter which OrderLineItems to update
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * Limit how many OrderLineItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OrderLineItem upsert
+   */
+  export type OrderLineItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the OrderLineItem to update in case it exists.
+     */
+    where: OrderLineItemWhereUniqueInput
+    /**
+     * In case the OrderLineItem found by the `where` argument doesn't exist, create a new OrderLineItem with this data.
+     */
+    create: XOR<OrderLineItemCreateInput, OrderLineItemUncheckedCreateInput>
+    /**
+     * In case the OrderLineItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OrderLineItemUpdateInput, OrderLineItemUncheckedUpdateInput>
+  }
+
+  /**
+   * OrderLineItem delete
+   */
+  export type OrderLineItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    /**
+     * Filter which OrderLineItem to delete.
+     */
+    where: OrderLineItemWhereUniqueInput
+  }
+
+  /**
+   * OrderLineItem deleteMany
+   */
+  export type OrderLineItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OrderLineItems to delete
+     */
+    where?: OrderLineItemWhereInput
+    /**
+     * Limit how many OrderLineItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OrderLineItem.variant
+   */
+  export type OrderLineItem$variantArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductVariant
+     */
+    select?: ProductVariantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductVariant
+     */
+    omit?: ProductVariantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductVariantInclude<ExtArgs> | null
+    where?: ProductVariantWhereInput
+  }
+
+  /**
+   * OrderLineItem without action
+   */
+  export type OrderLineItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Review
    */
 
@@ -11822,6 +14650,7 @@ export namespace Prisma {
     orderNumber?: boolean
     user?: boolean | Order$userArgs<ExtArgs>
     fulfillments?: boolean | Order$fulfillmentsArgs<ExtArgs>
+    orderLineItems?: boolean | Order$orderLineItemsArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
@@ -11876,6 +14705,7 @@ export namespace Prisma {
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | Order$userArgs<ExtArgs>
     fulfillments?: boolean | Order$fulfillmentsArgs<ExtArgs>
+    orderLineItems?: boolean | Order$orderLineItemsArgs<ExtArgs>
     _count?: boolean | OrderCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11890,6 +14720,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs> | null
       fulfillments: Prisma.$FulfillmentPayload<ExtArgs>[]
+      orderLineItems: Prisma.$OrderLineItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -12300,6 +15131,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends Order$userArgs<ExtArgs> = {}>(args?: Subset<T, Order$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     fulfillments<T extends Order$fulfillmentsArgs<ExtArgs> = {}>(args?: Subset<T, Order$fulfillmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FulfillmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    orderLineItems<T extends Order$orderLineItemsArgs<ExtArgs> = {}>(args?: Subset<T, Order$orderLineItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderLineItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12777,6 +15609,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FulfillmentScalarFieldEnum | FulfillmentScalarFieldEnum[]
+  }
+
+  /**
+   * Order.orderLineItems
+   */
+  export type Order$orderLineItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderLineItem
+     */
+    select?: OrderLineItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderLineItem
+     */
+    omit?: OrderLineItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderLineItemInclude<ExtArgs> | null
+    where?: OrderLineItemWhereInput
+    orderBy?: OrderLineItemOrderByWithRelationInput | OrderLineItemOrderByWithRelationInput[]
+    cursor?: OrderLineItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderLineItemScalarFieldEnum | OrderLineItemScalarFieldEnum[]
   }
 
   /**
@@ -31421,7 +34277,8 @@ export namespace Prisma {
     metadata: 'metadata',
     source: 'source',
     cjProductId: 'cjProductId',
-    trackInventory: 'trackInventory',
+    nutrition: 'nutrition',
+    isBundle: 'isBundle',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -31432,14 +34289,19 @@ export namespace Prisma {
   export const ProductVariantScalarFieldEnum: {
     id: 'id',
     productId: 'productId',
-    stripePriceId: 'stripePriceId',
-    sku: 'sku',
-    options: 'options',
-    cjVariantId: 'cjVariantId',
-    cjSku: 'cjSku',
+    title: 'title',
+    position: 'position',
+    price: 'price',
+    compareAtPrice: 'compareAtPrice',
     cost: 'cost',
     stock: 'stock',
+    trackInventory: 'trackInventory',
+    options: 'options',
+    sku: 'sku',
     image: 'image',
+    stripePriceId: 'stripePriceId',
+    cjVariantId: 'cjVariantId',
+    cjSku: 'cjSku',
     active: 'active',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -31471,6 +34333,37 @@ export namespace Prisma {
   };
 
   export type ProductNutritionScalarFieldEnum = (typeof ProductNutritionScalarFieldEnum)[keyof typeof ProductNutritionScalarFieldEnum]
+
+
+  export const BundleItemScalarFieldEnum: {
+    id: 'id',
+    bundleProductId: 'bundleProductId',
+    componentProductId: 'componentProductId',
+    componentVariantId: 'componentVariantId',
+    quantity: 'quantity',
+    position: 'position',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BundleItemScalarFieldEnum = (typeof BundleItemScalarFieldEnum)[keyof typeof BundleItemScalarFieldEnum]
+
+
+  export const OrderLineItemScalarFieldEnum: {
+    id: 'id',
+    orderId: 'orderId',
+    variantId: 'variantId',
+    productName: 'productName',
+    variantTitle: 'variantTitle',
+    sku: 'sku',
+    image: 'image',
+    unitPrice: 'unitPrice',
+    quantity: 'quantity',
+    totalPrice: 'totalPrice',
+    createdAt: 'createdAt'
+  };
+
+  export type OrderLineItemScalarFieldEnum = (typeof OrderLineItemScalarFieldEnum)[keyof typeof OrderLineItemScalarFieldEnum]
 
 
   export const ReviewScalarFieldEnum: {
@@ -32206,12 +35099,15 @@ export namespace Prisma {
     metadata?: JsonNullableFilter<"Product">
     source?: StringFilter<"Product"> | string
     cjProductId?: StringNullableFilter<"Product"> | string | null
-    trackInventory?: BoolFilter<"Product"> | boolean
+    nutrition?: StringNullableFilter<"Product"> | string | null
+    isBundle?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     prices?: PriceListRelationFilter
     variants?: ProductVariantListRelationFilter
-    nutrition?: XOR<ProductNutritionNullableScalarRelationFilter, ProductNutritionWhereInput> | null
+    nutrition_old?: XOR<ProductNutritionNullableScalarRelationFilter, ProductNutritionWhereInput> | null
+    bundleItems?: BundleItemListRelationFilter
+    bundledIn?: BundleItemListRelationFilter
   }
 
   export type ProductOrderByWithRelationInput = {
@@ -32233,12 +35129,15 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     source?: SortOrder
     cjProductId?: SortOrderInput | SortOrder
-    trackInventory?: SortOrder
+    nutrition?: SortOrderInput | SortOrder
+    isBundle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     prices?: PriceOrderByRelationAggregateInput
     variants?: ProductVariantOrderByRelationAggregateInput
-    nutrition?: ProductNutritionOrderByWithRelationInput
+    nutrition_old?: ProductNutritionOrderByWithRelationInput
+    bundleItems?: BundleItemOrderByRelationAggregateInput
+    bundledIn?: BundleItemOrderByRelationAggregateInput
   }
 
   export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -32263,12 +35162,15 @@ export namespace Prisma {
     metadata?: JsonNullableFilter<"Product">
     source?: StringFilter<"Product"> | string
     cjProductId?: StringNullableFilter<"Product"> | string | null
-    trackInventory?: BoolFilter<"Product"> | boolean
+    nutrition?: StringNullableFilter<"Product"> | string | null
+    isBundle?: BoolFilter<"Product"> | boolean
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
     prices?: PriceListRelationFilter
     variants?: ProductVariantListRelationFilter
-    nutrition?: XOR<ProductNutritionNullableScalarRelationFilter, ProductNutritionWhereInput> | null
+    nutrition_old?: XOR<ProductNutritionNullableScalarRelationFilter, ProductNutritionWhereInput> | null
+    bundleItems?: BundleItemListRelationFilter
+    bundledIn?: BundleItemListRelationFilter
   }, "id" | "slug">
 
   export type ProductOrderByWithAggregationInput = {
@@ -32290,7 +35192,8 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     source?: SortOrder
     cjProductId?: SortOrderInput | SortOrder
-    trackInventory?: SortOrder
+    nutrition?: SortOrderInput | SortOrder
+    isBundle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProductCountOrderByAggregateInput
@@ -32322,7 +35225,8 @@ export namespace Prisma {
     metadata?: JsonNullableWithAggregatesFilter<"Product">
     source?: StringWithAggregatesFilter<"Product"> | string
     cjProductId?: StringNullableWithAggregatesFilter<"Product"> | string | null
-    trackInventory?: BoolWithAggregatesFilter<"Product"> | boolean
+    nutrition?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    isBundle?: BoolWithAggregatesFilter<"Product"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
   }
@@ -32333,35 +35237,49 @@ export namespace Prisma {
     NOT?: ProductVariantWhereInput | ProductVariantWhereInput[]
     id?: StringFilter<"ProductVariant"> | string
     productId?: StringFilter<"ProductVariant"> | string
-    stripePriceId?: StringNullableFilter<"ProductVariant"> | string | null
-    sku?: StringNullableFilter<"ProductVariant"> | string | null
-    options?: JsonFilter<"ProductVariant">
-    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
-    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
+    title?: StringFilter<"ProductVariant"> | string
+    position?: IntFilter<"ProductVariant"> | number
+    price?: IntFilter<"ProductVariant"> | number
+    compareAtPrice?: IntNullableFilter<"ProductVariant"> | number | null
     cost?: IntNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
+    trackInventory?: BoolFilter<"ProductVariant"> | boolean
+    options?: JsonFilter<"ProductVariant">
+    sku?: StringNullableFilter<"ProductVariant"> | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
+    stripePriceId?: StringNullableFilter<"ProductVariant"> | string | null
+    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
+    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    bundleItems?: BundleItemListRelationFilter
+    lineItems?: OrderLineItemListRelationFilter
   }
 
   export type ProductVariantOrderByWithRelationInput = {
     id?: SortOrder
     productId?: SortOrder
-    stripePriceId?: SortOrderInput | SortOrder
-    sku?: SortOrderInput | SortOrder
-    options?: SortOrder
-    cjVariantId?: SortOrderInput | SortOrder
-    cjSku?: SortOrderInput | SortOrder
+    title?: SortOrder
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrderInput | SortOrder
     cost?: SortOrderInput | SortOrder
     stock?: SortOrder
+    trackInventory?: SortOrder
+    options?: SortOrder
+    sku?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    stripePriceId?: SortOrderInput | SortOrder
+    cjVariantId?: SortOrderInput | SortOrder
+    cjSku?: SortOrderInput | SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     product?: ProductOrderByWithRelationInput
+    bundleItems?: BundleItemOrderByRelationAggregateInput
+    lineItems?: OrderLineItemOrderByRelationAggregateInput
   }
 
   export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
@@ -32371,30 +35289,42 @@ export namespace Prisma {
     OR?: ProductVariantWhereInput[]
     NOT?: ProductVariantWhereInput | ProductVariantWhereInput[]
     productId?: StringFilter<"ProductVariant"> | string
-    sku?: StringNullableFilter<"ProductVariant"> | string | null
-    options?: JsonFilter<"ProductVariant">
-    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
-    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
+    title?: StringFilter<"ProductVariant"> | string
+    position?: IntFilter<"ProductVariant"> | number
+    price?: IntFilter<"ProductVariant"> | number
+    compareAtPrice?: IntNullableFilter<"ProductVariant"> | number | null
     cost?: IntNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
+    trackInventory?: BoolFilter<"ProductVariant"> | boolean
+    options?: JsonFilter<"ProductVariant">
+    sku?: StringNullableFilter<"ProductVariant"> | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
+    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
+    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    bundleItems?: BundleItemListRelationFilter
+    lineItems?: OrderLineItemListRelationFilter
   }, "id" | "stripePriceId">
 
   export type ProductVariantOrderByWithAggregationInput = {
     id?: SortOrder
     productId?: SortOrder
-    stripePriceId?: SortOrderInput | SortOrder
-    sku?: SortOrderInput | SortOrder
-    options?: SortOrder
-    cjVariantId?: SortOrderInput | SortOrder
-    cjSku?: SortOrderInput | SortOrder
+    title?: SortOrder
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrderInput | SortOrder
     cost?: SortOrderInput | SortOrder
     stock?: SortOrder
+    trackInventory?: SortOrder
+    options?: SortOrder
+    sku?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    stripePriceId?: SortOrderInput | SortOrder
+    cjVariantId?: SortOrderInput | SortOrder
+    cjSku?: SortOrderInput | SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -32411,14 +35341,19 @@ export namespace Prisma {
     NOT?: ProductVariantScalarWhereWithAggregatesInput | ProductVariantScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"ProductVariant"> | string
     productId?: StringWithAggregatesFilter<"ProductVariant"> | string
-    stripePriceId?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
-    sku?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
-    options?: JsonWithAggregatesFilter<"ProductVariant">
-    cjVariantId?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
-    cjSku?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    title?: StringWithAggregatesFilter<"ProductVariant"> | string
+    position?: IntWithAggregatesFilter<"ProductVariant"> | number
+    price?: IntWithAggregatesFilter<"ProductVariant"> | number
+    compareAtPrice?: IntNullableWithAggregatesFilter<"ProductVariant"> | number | null
     cost?: IntNullableWithAggregatesFilter<"ProductVariant"> | number | null
     stock?: IntWithAggregatesFilter<"ProductVariant"> | number
+    trackInventory?: BoolWithAggregatesFilter<"ProductVariant"> | boolean
+    options?: JsonWithAggregatesFilter<"ProductVariant">
+    sku?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     image?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    stripePriceId?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    cjVariantId?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
+    cjSku?: StringNullableWithAggregatesFilter<"ProductVariant"> | string | null
     active?: BoolWithAggregatesFilter<"ProductVariant"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ProductVariant"> | Date | string
@@ -32551,6 +35486,174 @@ export namespace Prisma {
     nutrition?: StringWithAggregatesFilter<"ProductNutrition"> | string
   }
 
+  export type BundleItemWhereInput = {
+    AND?: BundleItemWhereInput | BundleItemWhereInput[]
+    OR?: BundleItemWhereInput[]
+    NOT?: BundleItemWhereInput | BundleItemWhereInput[]
+    id?: StringFilter<"BundleItem"> | string
+    bundleProductId?: StringFilter<"BundleItem"> | string
+    componentProductId?: StringFilter<"BundleItem"> | string
+    componentVariantId?: StringNullableFilter<"BundleItem"> | string | null
+    quantity?: IntFilter<"BundleItem"> | number
+    position?: IntFilter<"BundleItem"> | number
+    createdAt?: DateTimeFilter<"BundleItem"> | Date | string
+    updatedAt?: DateTimeFilter<"BundleItem"> | Date | string
+    bundleProduct?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    componentProduct?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    componentVariant?: XOR<ProductVariantNullableScalarRelationFilter, ProductVariantWhereInput> | null
+  }
+
+  export type BundleItemOrderByWithRelationInput = {
+    id?: SortOrder
+    bundleProductId?: SortOrder
+    componentProductId?: SortOrder
+    componentVariantId?: SortOrderInput | SortOrder
+    quantity?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    bundleProduct?: ProductOrderByWithRelationInput
+    componentProduct?: ProductOrderByWithRelationInput
+    componentVariant?: ProductVariantOrderByWithRelationInput
+  }
+
+  export type BundleItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BundleItemWhereInput | BundleItemWhereInput[]
+    OR?: BundleItemWhereInput[]
+    NOT?: BundleItemWhereInput | BundleItemWhereInput[]
+    bundleProductId?: StringFilter<"BundleItem"> | string
+    componentProductId?: StringFilter<"BundleItem"> | string
+    componentVariantId?: StringNullableFilter<"BundleItem"> | string | null
+    quantity?: IntFilter<"BundleItem"> | number
+    position?: IntFilter<"BundleItem"> | number
+    createdAt?: DateTimeFilter<"BundleItem"> | Date | string
+    updatedAt?: DateTimeFilter<"BundleItem"> | Date | string
+    bundleProduct?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    componentProduct?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    componentVariant?: XOR<ProductVariantNullableScalarRelationFilter, ProductVariantWhereInput> | null
+  }, "id">
+
+  export type BundleItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    bundleProductId?: SortOrder
+    componentProductId?: SortOrder
+    componentVariantId?: SortOrderInput | SortOrder
+    quantity?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BundleItemCountOrderByAggregateInput
+    _avg?: BundleItemAvgOrderByAggregateInput
+    _max?: BundleItemMaxOrderByAggregateInput
+    _min?: BundleItemMinOrderByAggregateInput
+    _sum?: BundleItemSumOrderByAggregateInput
+  }
+
+  export type BundleItemScalarWhereWithAggregatesInput = {
+    AND?: BundleItemScalarWhereWithAggregatesInput | BundleItemScalarWhereWithAggregatesInput[]
+    OR?: BundleItemScalarWhereWithAggregatesInput[]
+    NOT?: BundleItemScalarWhereWithAggregatesInput | BundleItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BundleItem"> | string
+    bundleProductId?: StringWithAggregatesFilter<"BundleItem"> | string
+    componentProductId?: StringWithAggregatesFilter<"BundleItem"> | string
+    componentVariantId?: StringNullableWithAggregatesFilter<"BundleItem"> | string | null
+    quantity?: IntWithAggregatesFilter<"BundleItem"> | number
+    position?: IntWithAggregatesFilter<"BundleItem"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"BundleItem"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BundleItem"> | Date | string
+  }
+
+  export type OrderLineItemWhereInput = {
+    AND?: OrderLineItemWhereInput | OrderLineItemWhereInput[]
+    OR?: OrderLineItemWhereInput[]
+    NOT?: OrderLineItemWhereInput | OrderLineItemWhereInput[]
+    id?: StringFilter<"OrderLineItem"> | string
+    orderId?: StringFilter<"OrderLineItem"> | string
+    variantId?: StringNullableFilter<"OrderLineItem"> | string | null
+    productName?: StringFilter<"OrderLineItem"> | string
+    variantTitle?: StringFilter<"OrderLineItem"> | string
+    sku?: StringNullableFilter<"OrderLineItem"> | string | null
+    image?: StringNullableFilter<"OrderLineItem"> | string | null
+    unitPrice?: IntFilter<"OrderLineItem"> | number
+    quantity?: IntFilter<"OrderLineItem"> | number
+    totalPrice?: IntFilter<"OrderLineItem"> | number
+    createdAt?: DateTimeFilter<"OrderLineItem"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+    variant?: XOR<ProductVariantNullableScalarRelationFilter, ProductVariantWhereInput> | null
+  }
+
+  export type OrderLineItemOrderByWithRelationInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    variantId?: SortOrderInput | SortOrder
+    productName?: SortOrder
+    variantTitle?: SortOrder
+    sku?: SortOrderInput | SortOrder
+    image?: SortOrderInput | SortOrder
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+    createdAt?: SortOrder
+    order?: OrderOrderByWithRelationInput
+    variant?: ProductVariantOrderByWithRelationInput
+  }
+
+  export type OrderLineItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: OrderLineItemWhereInput | OrderLineItemWhereInput[]
+    OR?: OrderLineItemWhereInput[]
+    NOT?: OrderLineItemWhereInput | OrderLineItemWhereInput[]
+    orderId?: StringFilter<"OrderLineItem"> | string
+    variantId?: StringNullableFilter<"OrderLineItem"> | string | null
+    productName?: StringFilter<"OrderLineItem"> | string
+    variantTitle?: StringFilter<"OrderLineItem"> | string
+    sku?: StringNullableFilter<"OrderLineItem"> | string | null
+    image?: StringNullableFilter<"OrderLineItem"> | string | null
+    unitPrice?: IntFilter<"OrderLineItem"> | number
+    quantity?: IntFilter<"OrderLineItem"> | number
+    totalPrice?: IntFilter<"OrderLineItem"> | number
+    createdAt?: DateTimeFilter<"OrderLineItem"> | Date | string
+    order?: XOR<OrderScalarRelationFilter, OrderWhereInput>
+    variant?: XOR<ProductVariantNullableScalarRelationFilter, ProductVariantWhereInput> | null
+  }, "id">
+
+  export type OrderLineItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    variantId?: SortOrderInput | SortOrder
+    productName?: SortOrder
+    variantTitle?: SortOrder
+    sku?: SortOrderInput | SortOrder
+    image?: SortOrderInput | SortOrder
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+    createdAt?: SortOrder
+    _count?: OrderLineItemCountOrderByAggregateInput
+    _avg?: OrderLineItemAvgOrderByAggregateInput
+    _max?: OrderLineItemMaxOrderByAggregateInput
+    _min?: OrderLineItemMinOrderByAggregateInput
+    _sum?: OrderLineItemSumOrderByAggregateInput
+  }
+
+  export type OrderLineItemScalarWhereWithAggregatesInput = {
+    AND?: OrderLineItemScalarWhereWithAggregatesInput | OrderLineItemScalarWhereWithAggregatesInput[]
+    OR?: OrderLineItemScalarWhereWithAggregatesInput[]
+    NOT?: OrderLineItemScalarWhereWithAggregatesInput | OrderLineItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OrderLineItem"> | string
+    orderId?: StringWithAggregatesFilter<"OrderLineItem"> | string
+    variantId?: StringNullableWithAggregatesFilter<"OrderLineItem"> | string | null
+    productName?: StringWithAggregatesFilter<"OrderLineItem"> | string
+    variantTitle?: StringWithAggregatesFilter<"OrderLineItem"> | string
+    sku?: StringNullableWithAggregatesFilter<"OrderLineItem"> | string | null
+    image?: StringNullableWithAggregatesFilter<"OrderLineItem"> | string | null
+    unitPrice?: IntWithAggregatesFilter<"OrderLineItem"> | number
+    quantity?: IntWithAggregatesFilter<"OrderLineItem"> | number
+    totalPrice?: IntWithAggregatesFilter<"OrderLineItem"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"OrderLineItem"> | Date | string
+  }
+
   export type ReviewWhereInput = {
     AND?: ReviewWhereInput | ReviewWhereInput[]
     OR?: ReviewWhereInput[]
@@ -32642,6 +35745,7 @@ export namespace Prisma {
     orderNumber?: StringFilter<"Order"> | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     fulfillments?: FulfillmentListRelationFilter
+    orderLineItems?: OrderLineItemListRelationFilter
   }
 
   export type OrderOrderByWithRelationInput = {
@@ -32659,6 +35763,7 @@ export namespace Prisma {
     orderNumber?: SortOrder
     user?: UserOrderByWithRelationInput
     fulfillments?: FulfillmentOrderByRelationAggregateInput
+    orderLineItems?: OrderLineItemOrderByRelationAggregateInput
   }
 
   export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -32679,6 +35784,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     fulfillments?: FulfillmentListRelationFilter
+    orderLineItems?: OrderLineItemListRelationFilter
   }, "id" | "orderNumber">
 
   export type OrderOrderByWithAggregationInput = {
@@ -34254,12 +37360,15 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceCreateNestedManyWithoutProductInput
     variants?: ProductVariantCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductUncheckedCreateInput = {
@@ -34281,12 +37390,15 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceUncheckedCreateNestedManyWithoutProductInput
     variants?: ProductVariantUncheckedCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemUncheckedCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductUpdateInput = {
@@ -34308,12 +37420,15 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUpdateManyWithoutProductNestedInput
     variants?: ProductVariantUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUpdateManyWithoutComponentProductNestedInput
   }
 
   export type ProductUncheckedUpdateInput = {
@@ -34335,12 +37450,15 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUncheckedUpdateManyWithoutProductNestedInput
     variants?: ProductVariantUncheckedUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput
   }
 
   export type ProductCreateManyInput = {
@@ -34362,7 +37480,8 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34386,7 +37505,8 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34410,86 +37530,120 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProductVariantCreateInput = {
     id?: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     product: ProductCreateNestedOneWithoutVariantsInput
+    bundleItems?: BundleItemCreateNestedManyWithoutComponentVariantInput
+    lineItems?: OrderLineItemCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateInput = {
     id?: string
     productId: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutComponentVariantInput
+    lineItems?: OrderLineItemUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutComponentVariantNestedInput
+    lineItems?: OrderLineItemUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutComponentVariantNestedInput
+    lineItems?: OrderLineItemUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantCreateManyInput = {
     id?: string
     productId: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34497,14 +37651,19 @@ export namespace Prisma {
 
   export type ProductVariantUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34513,14 +37672,19 @@ export namespace Prisma {
   export type ProductVariantUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34619,7 +37783,7 @@ export namespace Prisma {
   export type ProductNutritionCreateInput = {
     id?: string
     nutrition: string
-    product: ProductCreateNestedOneWithoutNutritionInput
+    product: ProductCreateNestedOneWithoutNutrition_oldInput
   }
 
   export type ProductNutritionUncheckedCreateInput = {
@@ -34631,7 +37795,7 @@ export namespace Prisma {
   export type ProductNutritionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     nutrition?: StringFieldUpdateOperationsInput | string
-    product?: ProductUpdateOneRequiredWithoutNutritionNestedInput
+    product?: ProductUpdateOneRequiredWithoutNutrition_oldNestedInput
   }
 
   export type ProductNutritionUncheckedUpdateInput = {
@@ -34655,6 +37819,176 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     productId?: StringFieldUpdateOperationsInput | string
     nutrition?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type BundleItemCreateInput = {
+    id?: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bundleProduct: ProductCreateNestedOneWithoutBundleItemsInput
+    componentProduct: ProductCreateNestedOneWithoutBundledInInput
+    componentVariant?: ProductVariantCreateNestedOneWithoutBundleItemsInput
+  }
+
+  export type BundleItemUncheckedCreateInput = {
+    id?: string
+    bundleProductId: string
+    componentProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleProduct?: ProductUpdateOneRequiredWithoutBundleItemsNestedInput
+    componentProduct?: ProductUpdateOneRequiredWithoutBundledInNestedInput
+    componentVariant?: ProductVariantUpdateOneWithoutBundleItemsNestedInput
+  }
+
+  export type BundleItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemCreateManyInput = {
+    id?: string
+    bundleProductId: string
+    componentProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemCreateInput = {
+    id?: string
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+    order: OrderCreateNestedOneWithoutOrderLineItemsInput
+    variant?: ProductVariantCreateNestedOneWithoutLineItemsInput
+  }
+
+  export type OrderLineItemUncheckedCreateInput = {
+    id?: string
+    orderId: string
+    variantId?: string | null
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+  }
+
+  export type OrderLineItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutOrderLineItemsNestedInput
+    variant?: ProductVariantUpdateOneWithoutLineItemsNestedInput
+  }
+
+  export type OrderLineItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemCreateManyInput = {
+    id?: string
+    orderId: string
+    variantId?: string | null
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+  }
+
+  export type OrderLineItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ReviewCreateInput = {
@@ -34747,6 +38081,7 @@ export namespace Prisma {
     orderNumber: string
     user?: UserCreateNestedOneWithoutOrdersInput
     fulfillments?: FulfillmentCreateNestedManyWithoutOrderInput
+    orderLineItems?: OrderLineItemCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateInput = {
@@ -34763,6 +38098,7 @@ export namespace Prisma {
     updatedAt: Date | string
     orderNumber: string
     fulfillments?: FulfillmentUncheckedCreateNestedManyWithoutOrderInput
+    orderLineItems?: OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUpdateInput = {
@@ -34779,6 +38115,7 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     user?: UserUpdateOneWithoutOrdersNestedInput
     fulfillments?: FulfillmentUpdateManyWithoutOrderNestedInput
+    orderLineItems?: OrderLineItemUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateInput = {
@@ -34795,6 +38132,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     fulfillments?: FulfillmentUncheckedUpdateManyWithoutOrderNestedInput
+    orderLineItems?: OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderCreateManyInput = {
@@ -36672,11 +40010,21 @@ export namespace Prisma {
     isNot?: ProductNutritionWhereInput | null
   }
 
+  export type BundleItemListRelationFilter = {
+    every?: BundleItemWhereInput
+    some?: BundleItemWhereInput
+    none?: BundleItemWhereInput
+  }
+
   export type PriceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type ProductVariantOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BundleItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -36699,7 +40047,8 @@ export namespace Prisma {
     metadata?: SortOrder
     source?: SortOrder
     cjProductId?: SortOrder
-    trackInventory?: SortOrder
+    nutrition?: SortOrder
+    isBundle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36724,7 +40073,8 @@ export namespace Prisma {
     featured?: SortOrder
     source?: SortOrder
     cjProductId?: SortOrder
-    trackInventory?: SortOrder
+    nutrition?: SortOrder
+    isBundle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36745,7 +40095,8 @@ export namespace Prisma {
     featured?: SortOrder
     source?: SortOrder
     cjProductId?: SortOrder
-    trackInventory?: SortOrder
+    nutrition?: SortOrder
+    isBundle?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36824,23 +40175,41 @@ export namespace Prisma {
     isNot?: ProductWhereInput
   }
 
+  export type OrderLineItemListRelationFilter = {
+    every?: OrderLineItemWhereInput
+    some?: OrderLineItemWhereInput
+    none?: OrderLineItemWhereInput
+  }
+
+  export type OrderLineItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ProductVariantCountOrderByAggregateInput = {
     id?: SortOrder
     productId?: SortOrder
-    stripePriceId?: SortOrder
-    sku?: SortOrder
-    options?: SortOrder
-    cjVariantId?: SortOrder
-    cjSku?: SortOrder
+    title?: SortOrder
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
+    trackInventory?: SortOrder
+    options?: SortOrder
+    sku?: SortOrder
     image?: SortOrder
+    stripePriceId?: SortOrder
+    cjVariantId?: SortOrder
+    cjSku?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductVariantAvgOrderByAggregateInput = {
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
   }
@@ -36848,13 +40217,18 @@ export namespace Prisma {
   export type ProductVariantMaxOrderByAggregateInput = {
     id?: SortOrder
     productId?: SortOrder
-    stripePriceId?: SortOrder
-    sku?: SortOrder
-    cjVariantId?: SortOrder
-    cjSku?: SortOrder
+    title?: SortOrder
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
+    trackInventory?: SortOrder
+    sku?: SortOrder
     image?: SortOrder
+    stripePriceId?: SortOrder
+    cjVariantId?: SortOrder
+    cjSku?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -36863,19 +40237,27 @@ export namespace Prisma {
   export type ProductVariantMinOrderByAggregateInput = {
     id?: SortOrder
     productId?: SortOrder
-    stripePriceId?: SortOrder
-    sku?: SortOrder
-    cjVariantId?: SortOrder
-    cjSku?: SortOrder
+    title?: SortOrder
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
+    trackInventory?: SortOrder
+    sku?: SortOrder
     image?: SortOrder
+    stripePriceId?: SortOrder
+    cjVariantId?: SortOrder
+    cjSku?: SortOrder
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductVariantSumOrderByAggregateInput = {
+    position?: SortOrder
+    price?: SortOrder
+    compareAtPrice?: SortOrder
     cost?: SortOrder
     stock?: SortOrder
   }
@@ -36967,6 +40349,113 @@ export namespace Prisma {
     id?: SortOrder
     productId?: SortOrder
     nutrition?: SortOrder
+  }
+
+  export type ProductVariantNullableScalarRelationFilter = {
+    is?: ProductVariantWhereInput | null
+    isNot?: ProductVariantWhereInput | null
+  }
+
+  export type BundleItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    bundleProductId?: SortOrder
+    componentProductId?: SortOrder
+    componentVariantId?: SortOrder
+    quantity?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BundleItemAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+    position?: SortOrder
+  }
+
+  export type BundleItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    bundleProductId?: SortOrder
+    componentProductId?: SortOrder
+    componentVariantId?: SortOrder
+    quantity?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BundleItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    bundleProductId?: SortOrder
+    componentProductId?: SortOrder
+    componentVariantId?: SortOrder
+    quantity?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BundleItemSumOrderByAggregateInput = {
+    quantity?: SortOrder
+    position?: SortOrder
+  }
+
+  export type OrderScalarRelationFilter = {
+    is?: OrderWhereInput
+    isNot?: OrderWhereInput
+  }
+
+  export type OrderLineItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    variantId?: SortOrder
+    productName?: SortOrder
+    variantTitle?: SortOrder
+    sku?: SortOrder
+    image?: SortOrder
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type OrderLineItemAvgOrderByAggregateInput = {
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+  }
+
+  export type OrderLineItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    variantId?: SortOrder
+    productName?: SortOrder
+    variantTitle?: SortOrder
+    sku?: SortOrder
+    image?: SortOrder
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type OrderLineItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    orderId?: SortOrder
+    variantId?: SortOrder
+    productName?: SortOrder
+    variantTitle?: SortOrder
+    sku?: SortOrder
+    image?: SortOrder
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type OrderLineItemSumOrderByAggregateInput = {
+    unitPrice?: SortOrder
+    quantity?: SortOrder
+    totalPrice?: SortOrder
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -37102,11 +40591,6 @@ export namespace Prisma {
 
   export type OrderSumOrderByAggregateInput = {
     total?: SortOrder
-  }
-
-  export type OrderScalarRelationFilter = {
-    is?: OrderWhereInput
-    isNot?: OrderWhereInput
   }
 
   export type FulfillmentCountOrderByAggregateInput = {
@@ -38302,6 +41786,20 @@ export namespace Prisma {
     connect?: ProductNutritionWhereUniqueInput
   }
 
+  export type BundleItemCreateNestedManyWithoutBundleProductInput = {
+    create?: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput> | BundleItemCreateWithoutBundleProductInput[] | BundleItemUncheckedCreateWithoutBundleProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutBundleProductInput | BundleItemCreateOrConnectWithoutBundleProductInput[]
+    createMany?: BundleItemCreateManyBundleProductInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+  }
+
+  export type BundleItemCreateNestedManyWithoutComponentProductInput = {
+    create?: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput> | BundleItemCreateWithoutComponentProductInput[] | BundleItemUncheckedCreateWithoutComponentProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentProductInput | BundleItemCreateOrConnectWithoutComponentProductInput[]
+    createMany?: BundleItemCreateManyComponentProductInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+  }
+
   export type PriceUncheckedCreateNestedManyWithoutProductInput = {
     create?: XOR<PriceCreateWithoutProductInput, PriceUncheckedCreateWithoutProductInput> | PriceCreateWithoutProductInput[] | PriceUncheckedCreateWithoutProductInput[]
     connectOrCreate?: PriceCreateOrConnectWithoutProductInput | PriceCreateOrConnectWithoutProductInput[]
@@ -38320,6 +41818,20 @@ export namespace Prisma {
     create?: XOR<ProductNutritionCreateWithoutProductInput, ProductNutritionUncheckedCreateWithoutProductInput>
     connectOrCreate?: ProductNutritionCreateOrConnectWithoutProductInput
     connect?: ProductNutritionWhereUniqueInput
+  }
+
+  export type BundleItemUncheckedCreateNestedManyWithoutBundleProductInput = {
+    create?: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput> | BundleItemCreateWithoutBundleProductInput[] | BundleItemUncheckedCreateWithoutBundleProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutBundleProductInput | BundleItemCreateOrConnectWithoutBundleProductInput[]
+    createMany?: BundleItemCreateManyBundleProductInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+  }
+
+  export type BundleItemUncheckedCreateNestedManyWithoutComponentProductInput = {
+    create?: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput> | BundleItemCreateWithoutComponentProductInput[] | BundleItemUncheckedCreateWithoutComponentProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentProductInput | BundleItemCreateOrConnectWithoutComponentProductInput[]
+    createMany?: BundleItemCreateManyComponentProductInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
   }
 
   export type ProductUpdateimagesInput = {
@@ -38378,6 +41890,34 @@ export namespace Prisma {
     update?: XOR<XOR<ProductNutritionUpdateToOneWithWhereWithoutProductInput, ProductNutritionUpdateWithoutProductInput>, ProductNutritionUncheckedUpdateWithoutProductInput>
   }
 
+  export type BundleItemUpdateManyWithoutBundleProductNestedInput = {
+    create?: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput> | BundleItemCreateWithoutBundleProductInput[] | BundleItemUncheckedCreateWithoutBundleProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutBundleProductInput | BundleItemCreateOrConnectWithoutBundleProductInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutBundleProductInput | BundleItemUpsertWithWhereUniqueWithoutBundleProductInput[]
+    createMany?: BundleItemCreateManyBundleProductInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutBundleProductInput | BundleItemUpdateWithWhereUniqueWithoutBundleProductInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutBundleProductInput | BundleItemUpdateManyWithWhereWithoutBundleProductInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
+  export type BundleItemUpdateManyWithoutComponentProductNestedInput = {
+    create?: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput> | BundleItemCreateWithoutComponentProductInput[] | BundleItemUncheckedCreateWithoutComponentProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentProductInput | BundleItemCreateOrConnectWithoutComponentProductInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutComponentProductInput | BundleItemUpsertWithWhereUniqueWithoutComponentProductInput[]
+    createMany?: BundleItemCreateManyComponentProductInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutComponentProductInput | BundleItemUpdateWithWhereUniqueWithoutComponentProductInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutComponentProductInput | BundleItemUpdateManyWithWhereWithoutComponentProductInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
   export type PriceUncheckedUpdateManyWithoutProductNestedInput = {
     create?: XOR<PriceCreateWithoutProductInput, PriceUncheckedCreateWithoutProductInput> | PriceCreateWithoutProductInput[] | PriceUncheckedCreateWithoutProductInput[]
     connectOrCreate?: PriceCreateOrConnectWithoutProductInput | PriceCreateOrConnectWithoutProductInput[]
@@ -38416,10 +41956,66 @@ export namespace Prisma {
     update?: XOR<XOR<ProductNutritionUpdateToOneWithWhereWithoutProductInput, ProductNutritionUpdateWithoutProductInput>, ProductNutritionUncheckedUpdateWithoutProductInput>
   }
 
+  export type BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput = {
+    create?: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput> | BundleItemCreateWithoutBundleProductInput[] | BundleItemUncheckedCreateWithoutBundleProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutBundleProductInput | BundleItemCreateOrConnectWithoutBundleProductInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutBundleProductInput | BundleItemUpsertWithWhereUniqueWithoutBundleProductInput[]
+    createMany?: BundleItemCreateManyBundleProductInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutBundleProductInput | BundleItemUpdateWithWhereUniqueWithoutBundleProductInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutBundleProductInput | BundleItemUpdateManyWithWhereWithoutBundleProductInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
+  export type BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput = {
+    create?: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput> | BundleItemCreateWithoutComponentProductInput[] | BundleItemUncheckedCreateWithoutComponentProductInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentProductInput | BundleItemCreateOrConnectWithoutComponentProductInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutComponentProductInput | BundleItemUpsertWithWhereUniqueWithoutComponentProductInput[]
+    createMany?: BundleItemCreateManyComponentProductInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutComponentProductInput | BundleItemUpdateWithWhereUniqueWithoutComponentProductInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutComponentProductInput | BundleItemUpdateManyWithWhereWithoutComponentProductInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
   export type ProductCreateNestedOneWithoutVariantsInput = {
     create?: XOR<ProductCreateWithoutVariantsInput, ProductUncheckedCreateWithoutVariantsInput>
     connectOrCreate?: ProductCreateOrConnectWithoutVariantsInput
     connect?: ProductWhereUniqueInput
+  }
+
+  export type BundleItemCreateNestedManyWithoutComponentVariantInput = {
+    create?: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput> | BundleItemCreateWithoutComponentVariantInput[] | BundleItemUncheckedCreateWithoutComponentVariantInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentVariantInput | BundleItemCreateOrConnectWithoutComponentVariantInput[]
+    createMany?: BundleItemCreateManyComponentVariantInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+  }
+
+  export type OrderLineItemCreateNestedManyWithoutVariantInput = {
+    create?: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput> | OrderLineItemCreateWithoutVariantInput[] | OrderLineItemUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutVariantInput | OrderLineItemCreateOrConnectWithoutVariantInput[]
+    createMany?: OrderLineItemCreateManyVariantInputEnvelope
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+  }
+
+  export type BundleItemUncheckedCreateNestedManyWithoutComponentVariantInput = {
+    create?: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput> | BundleItemCreateWithoutComponentVariantInput[] | BundleItemUncheckedCreateWithoutComponentVariantInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentVariantInput | BundleItemCreateOrConnectWithoutComponentVariantInput[]
+    createMany?: BundleItemCreateManyComponentVariantInputEnvelope
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+  }
+
+  export type OrderLineItemUncheckedCreateNestedManyWithoutVariantInput = {
+    create?: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput> | OrderLineItemCreateWithoutVariantInput[] | OrderLineItemUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutVariantInput | OrderLineItemCreateOrConnectWithoutVariantInput[]
+    createMany?: OrderLineItemCreateManyVariantInputEnvelope
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
   }
 
   export type ProductUpdateOneRequiredWithoutVariantsNestedInput = {
@@ -38428,6 +42024,62 @@ export namespace Prisma {
     upsert?: ProductUpsertWithoutVariantsInput
     connect?: ProductWhereUniqueInput
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutVariantsInput, ProductUpdateWithoutVariantsInput>, ProductUncheckedUpdateWithoutVariantsInput>
+  }
+
+  export type BundleItemUpdateManyWithoutComponentVariantNestedInput = {
+    create?: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput> | BundleItemCreateWithoutComponentVariantInput[] | BundleItemUncheckedCreateWithoutComponentVariantInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentVariantInput | BundleItemCreateOrConnectWithoutComponentVariantInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutComponentVariantInput | BundleItemUpsertWithWhereUniqueWithoutComponentVariantInput[]
+    createMany?: BundleItemCreateManyComponentVariantInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutComponentVariantInput | BundleItemUpdateWithWhereUniqueWithoutComponentVariantInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutComponentVariantInput | BundleItemUpdateManyWithWhereWithoutComponentVariantInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
+  export type OrderLineItemUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput> | OrderLineItemCreateWithoutVariantInput[] | OrderLineItemUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutVariantInput | OrderLineItemCreateOrConnectWithoutVariantInput[]
+    upsert?: OrderLineItemUpsertWithWhereUniqueWithoutVariantInput | OrderLineItemUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: OrderLineItemCreateManyVariantInputEnvelope
+    set?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    disconnect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    delete?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    update?: OrderLineItemUpdateWithWhereUniqueWithoutVariantInput | OrderLineItemUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: OrderLineItemUpdateManyWithWhereWithoutVariantInput | OrderLineItemUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
+  }
+
+  export type BundleItemUncheckedUpdateManyWithoutComponentVariantNestedInput = {
+    create?: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput> | BundleItemCreateWithoutComponentVariantInput[] | BundleItemUncheckedCreateWithoutComponentVariantInput[]
+    connectOrCreate?: BundleItemCreateOrConnectWithoutComponentVariantInput | BundleItemCreateOrConnectWithoutComponentVariantInput[]
+    upsert?: BundleItemUpsertWithWhereUniqueWithoutComponentVariantInput | BundleItemUpsertWithWhereUniqueWithoutComponentVariantInput[]
+    createMany?: BundleItemCreateManyComponentVariantInputEnvelope
+    set?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    disconnect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    delete?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    connect?: BundleItemWhereUniqueInput | BundleItemWhereUniqueInput[]
+    update?: BundleItemUpdateWithWhereUniqueWithoutComponentVariantInput | BundleItemUpdateWithWhereUniqueWithoutComponentVariantInput[]
+    updateMany?: BundleItemUpdateManyWithWhereWithoutComponentVariantInput | BundleItemUpdateManyWithWhereWithoutComponentVariantInput[]
+    deleteMany?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+  }
+
+  export type OrderLineItemUncheckedUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput> | OrderLineItemCreateWithoutVariantInput[] | OrderLineItemUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutVariantInput | OrderLineItemCreateOrConnectWithoutVariantInput[]
+    upsert?: OrderLineItemUpsertWithWhereUniqueWithoutVariantInput | OrderLineItemUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: OrderLineItemCreateManyVariantInputEnvelope
+    set?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    disconnect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    delete?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    update?: OrderLineItemUpdateWithWhereUniqueWithoutVariantInput | OrderLineItemUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: OrderLineItemUpdateManyWithWhereWithoutVariantInput | OrderLineItemUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
   }
 
   export type ProductCreateNestedOneWithoutPricesInput = {
@@ -38444,18 +42096,92 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutPricesInput, ProductUpdateWithoutPricesInput>, ProductUncheckedUpdateWithoutPricesInput>
   }
 
-  export type ProductCreateNestedOneWithoutNutritionInput = {
-    create?: XOR<ProductCreateWithoutNutritionInput, ProductUncheckedCreateWithoutNutritionInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutNutritionInput
+  export type ProductCreateNestedOneWithoutNutrition_oldInput = {
+    create?: XOR<ProductCreateWithoutNutrition_oldInput, ProductUncheckedCreateWithoutNutrition_oldInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutNutrition_oldInput
     connect?: ProductWhereUniqueInput
   }
 
-  export type ProductUpdateOneRequiredWithoutNutritionNestedInput = {
-    create?: XOR<ProductCreateWithoutNutritionInput, ProductUncheckedCreateWithoutNutritionInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutNutritionInput
-    upsert?: ProductUpsertWithoutNutritionInput
+  export type ProductUpdateOneRequiredWithoutNutrition_oldNestedInput = {
+    create?: XOR<ProductCreateWithoutNutrition_oldInput, ProductUncheckedCreateWithoutNutrition_oldInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutNutrition_oldInput
+    upsert?: ProductUpsertWithoutNutrition_oldInput
     connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutNutritionInput, ProductUpdateWithoutNutritionInput>, ProductUncheckedUpdateWithoutNutritionInput>
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutNutrition_oldInput, ProductUpdateWithoutNutrition_oldInput>, ProductUncheckedUpdateWithoutNutrition_oldInput>
+  }
+
+  export type ProductCreateNestedOneWithoutBundleItemsInput = {
+    create?: XOR<ProductCreateWithoutBundleItemsInput, ProductUncheckedCreateWithoutBundleItemsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutBundleItemsInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type ProductCreateNestedOneWithoutBundledInInput = {
+    create?: XOR<ProductCreateWithoutBundledInInput, ProductUncheckedCreateWithoutBundledInInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutBundledInInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type ProductVariantCreateNestedOneWithoutBundleItemsInput = {
+    create?: XOR<ProductVariantCreateWithoutBundleItemsInput, ProductVariantUncheckedCreateWithoutBundleItemsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutBundleItemsInput
+    connect?: ProductVariantWhereUniqueInput
+  }
+
+  export type ProductUpdateOneRequiredWithoutBundleItemsNestedInput = {
+    create?: XOR<ProductCreateWithoutBundleItemsInput, ProductUncheckedCreateWithoutBundleItemsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutBundleItemsInput
+    upsert?: ProductUpsertWithoutBundleItemsInput
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutBundleItemsInput, ProductUpdateWithoutBundleItemsInput>, ProductUncheckedUpdateWithoutBundleItemsInput>
+  }
+
+  export type ProductUpdateOneRequiredWithoutBundledInNestedInput = {
+    create?: XOR<ProductCreateWithoutBundledInInput, ProductUncheckedCreateWithoutBundledInInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutBundledInInput
+    upsert?: ProductUpsertWithoutBundledInInput
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutBundledInInput, ProductUpdateWithoutBundledInInput>, ProductUncheckedUpdateWithoutBundledInInput>
+  }
+
+  export type ProductVariantUpdateOneWithoutBundleItemsNestedInput = {
+    create?: XOR<ProductVariantCreateWithoutBundleItemsInput, ProductVariantUncheckedCreateWithoutBundleItemsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutBundleItemsInput
+    upsert?: ProductVariantUpsertWithoutBundleItemsInput
+    disconnect?: ProductVariantWhereInput | boolean
+    delete?: ProductVariantWhereInput | boolean
+    connect?: ProductVariantWhereUniqueInput
+    update?: XOR<XOR<ProductVariantUpdateToOneWithWhereWithoutBundleItemsInput, ProductVariantUpdateWithoutBundleItemsInput>, ProductVariantUncheckedUpdateWithoutBundleItemsInput>
+  }
+
+  export type OrderCreateNestedOneWithoutOrderLineItemsInput = {
+    create?: XOR<OrderCreateWithoutOrderLineItemsInput, OrderUncheckedCreateWithoutOrderLineItemsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutOrderLineItemsInput
+    connect?: OrderWhereUniqueInput
+  }
+
+  export type ProductVariantCreateNestedOneWithoutLineItemsInput = {
+    create?: XOR<ProductVariantCreateWithoutLineItemsInput, ProductVariantUncheckedCreateWithoutLineItemsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutLineItemsInput
+    connect?: ProductVariantWhereUniqueInput
+  }
+
+  export type OrderUpdateOneRequiredWithoutOrderLineItemsNestedInput = {
+    create?: XOR<OrderCreateWithoutOrderLineItemsInput, OrderUncheckedCreateWithoutOrderLineItemsInput>
+    connectOrCreate?: OrderCreateOrConnectWithoutOrderLineItemsInput
+    upsert?: OrderUpsertWithoutOrderLineItemsInput
+    connect?: OrderWhereUniqueInput
+    update?: XOR<XOR<OrderUpdateToOneWithWhereWithoutOrderLineItemsInput, OrderUpdateWithoutOrderLineItemsInput>, OrderUncheckedUpdateWithoutOrderLineItemsInput>
+  }
+
+  export type ProductVariantUpdateOneWithoutLineItemsNestedInput = {
+    create?: XOR<ProductVariantCreateWithoutLineItemsInput, ProductVariantUncheckedCreateWithoutLineItemsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutLineItemsInput
+    upsert?: ProductVariantUpsertWithoutLineItemsInput
+    disconnect?: ProductVariantWhereInput | boolean
+    delete?: ProductVariantWhereInput | boolean
+    connect?: ProductVariantWhereUniqueInput
+    update?: XOR<XOR<ProductVariantUpdateToOneWithWhereWithoutLineItemsInput, ProductVariantUpdateWithoutLineItemsInput>, ProductVariantUncheckedUpdateWithoutLineItemsInput>
   }
 
   export type UserCreateNestedOneWithoutReviewsInput = {
@@ -38493,11 +42219,25 @@ export namespace Prisma {
     connect?: FulfillmentWhereUniqueInput | FulfillmentWhereUniqueInput[]
   }
 
+  export type OrderLineItemCreateNestedManyWithoutOrderInput = {
+    create?: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput> | OrderLineItemCreateWithoutOrderInput[] | OrderLineItemUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutOrderInput | OrderLineItemCreateOrConnectWithoutOrderInput[]
+    createMany?: OrderLineItemCreateManyOrderInputEnvelope
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+  }
+
   export type FulfillmentUncheckedCreateNestedManyWithoutOrderInput = {
     create?: XOR<FulfillmentCreateWithoutOrderInput, FulfillmentUncheckedCreateWithoutOrderInput> | FulfillmentCreateWithoutOrderInput[] | FulfillmentUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: FulfillmentCreateOrConnectWithoutOrderInput | FulfillmentCreateOrConnectWithoutOrderInput[]
     createMany?: FulfillmentCreateManyOrderInputEnvelope
     connect?: FulfillmentWhereUniqueInput | FulfillmentWhereUniqueInput[]
+  }
+
+  export type OrderLineItemUncheckedCreateNestedManyWithoutOrderInput = {
+    create?: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput> | OrderLineItemCreateWithoutOrderInput[] | OrderLineItemUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutOrderInput | OrderLineItemCreateOrConnectWithoutOrderInput[]
+    createMany?: OrderLineItemCreateManyOrderInputEnvelope
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
   }
 
   export type UserUpdateOneWithoutOrdersNestedInput = {
@@ -38524,6 +42264,20 @@ export namespace Prisma {
     deleteMany?: FulfillmentScalarWhereInput | FulfillmentScalarWhereInput[]
   }
 
+  export type OrderLineItemUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput> | OrderLineItemCreateWithoutOrderInput[] | OrderLineItemUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutOrderInput | OrderLineItemCreateOrConnectWithoutOrderInput[]
+    upsert?: OrderLineItemUpsertWithWhereUniqueWithoutOrderInput | OrderLineItemUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: OrderLineItemCreateManyOrderInputEnvelope
+    set?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    disconnect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    delete?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    update?: OrderLineItemUpdateWithWhereUniqueWithoutOrderInput | OrderLineItemUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: OrderLineItemUpdateManyWithWhereWithoutOrderInput | OrderLineItemUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
+  }
+
   export type FulfillmentUncheckedUpdateManyWithoutOrderNestedInput = {
     create?: XOR<FulfillmentCreateWithoutOrderInput, FulfillmentUncheckedCreateWithoutOrderInput> | FulfillmentCreateWithoutOrderInput[] | FulfillmentUncheckedCreateWithoutOrderInput[]
     connectOrCreate?: FulfillmentCreateOrConnectWithoutOrderInput | FulfillmentCreateOrConnectWithoutOrderInput[]
@@ -38536,6 +42290,20 @@ export namespace Prisma {
     update?: FulfillmentUpdateWithWhereUniqueWithoutOrderInput | FulfillmentUpdateWithWhereUniqueWithoutOrderInput[]
     updateMany?: FulfillmentUpdateManyWithWhereWithoutOrderInput | FulfillmentUpdateManyWithWhereWithoutOrderInput[]
     deleteMany?: FulfillmentScalarWhereInput | FulfillmentScalarWhereInput[]
+  }
+
+  export type OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput = {
+    create?: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput> | OrderLineItemCreateWithoutOrderInput[] | OrderLineItemUncheckedCreateWithoutOrderInput[]
+    connectOrCreate?: OrderLineItemCreateOrConnectWithoutOrderInput | OrderLineItemCreateOrConnectWithoutOrderInput[]
+    upsert?: OrderLineItemUpsertWithWhereUniqueWithoutOrderInput | OrderLineItemUpsertWithWhereUniqueWithoutOrderInput[]
+    createMany?: OrderLineItemCreateManyOrderInputEnvelope
+    set?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    disconnect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    delete?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    connect?: OrderLineItemWhereUniqueInput | OrderLineItemWhereUniqueInput[]
+    update?: OrderLineItemUpdateWithWhereUniqueWithoutOrderInput | OrderLineItemUpdateWithWhereUniqueWithoutOrderInput[]
+    updateMany?: OrderLineItemUpdateManyWithWhereWithoutOrderInput | OrderLineItemUpdateManyWithWhereWithoutOrderInput[]
+    deleteMany?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
   }
 
   export type OrderCreateNestedOneWithoutFulfillmentsInput = {
@@ -40242,32 +44010,46 @@ export namespace Prisma {
 
   export type ProductVariantCreateWithoutProductInput = {
     id?: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    bundleItems?: BundleItemCreateNestedManyWithoutComponentVariantInput
+    lineItems?: OrderLineItemCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutProductInput = {
     id?: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutComponentVariantInput
+    lineItems?: OrderLineItemUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutProductInput = {
@@ -40293,6 +44075,66 @@ export namespace Prisma {
   export type ProductNutritionCreateOrConnectWithoutProductInput = {
     where: ProductNutritionWhereUniqueInput
     create: XOR<ProductNutritionCreateWithoutProductInput, ProductNutritionUncheckedCreateWithoutProductInput>
+  }
+
+  export type BundleItemCreateWithoutBundleProductInput = {
+    id?: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    componentProduct: ProductCreateNestedOneWithoutBundledInInput
+    componentVariant?: ProductVariantCreateNestedOneWithoutBundleItemsInput
+  }
+
+  export type BundleItemUncheckedCreateWithoutBundleProductInput = {
+    id?: string
+    componentProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemCreateOrConnectWithoutBundleProductInput = {
+    where: BundleItemWhereUniqueInput
+    create: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput>
+  }
+
+  export type BundleItemCreateManyBundleProductInputEnvelope = {
+    data: BundleItemCreateManyBundleProductInput | BundleItemCreateManyBundleProductInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BundleItemCreateWithoutComponentProductInput = {
+    id?: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bundleProduct: ProductCreateNestedOneWithoutBundleItemsInput
+    componentVariant?: ProductVariantCreateNestedOneWithoutBundleItemsInput
+  }
+
+  export type BundleItemUncheckedCreateWithoutComponentProductInput = {
+    id?: string
+    bundleProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemCreateOrConnectWithoutComponentProductInput = {
+    where: BundleItemWhereUniqueInput
+    create: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput>
+  }
+
+  export type BundleItemCreateManyComponentProductInputEnvelope = {
+    data: BundleItemCreateManyComponentProductInput | BundleItemCreateManyComponentProductInput[]
+    skipDuplicates?: boolean
   }
 
   export type PriceUpsertWithWhereUniqueWithoutProductInput = {
@@ -40349,14 +44191,19 @@ export namespace Prisma {
     NOT?: ProductVariantScalarWhereInput | ProductVariantScalarWhereInput[]
     id?: StringFilter<"ProductVariant"> | string
     productId?: StringFilter<"ProductVariant"> | string
-    stripePriceId?: StringNullableFilter<"ProductVariant"> | string | null
-    sku?: StringNullableFilter<"ProductVariant"> | string | null
-    options?: JsonFilter<"ProductVariant">
-    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
-    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
+    title?: StringFilter<"ProductVariant"> | string
+    position?: IntFilter<"ProductVariant"> | number
+    price?: IntFilter<"ProductVariant"> | number
+    compareAtPrice?: IntNullableFilter<"ProductVariant"> | number | null
     cost?: IntNullableFilter<"ProductVariant"> | number | null
     stock?: IntFilter<"ProductVariant"> | number
+    trackInventory?: BoolFilter<"ProductVariant"> | boolean
+    options?: JsonFilter<"ProductVariant">
+    sku?: StringNullableFilter<"ProductVariant"> | string | null
     image?: StringNullableFilter<"ProductVariant"> | string | null
+    stripePriceId?: StringNullableFilter<"ProductVariant"> | string | null
+    cjVariantId?: StringNullableFilter<"ProductVariant"> | string | null
+    cjSku?: StringNullableFilter<"ProductVariant"> | string | null
     active?: BoolFilter<"ProductVariant"> | boolean
     createdAt?: DateTimeFilter<"ProductVariant"> | Date | string
     updatedAt?: DateTimeFilter<"ProductVariant"> | Date | string
@@ -40383,6 +44230,52 @@ export namespace Prisma {
     nutrition?: StringFieldUpdateOperationsInput | string
   }
 
+  export type BundleItemUpsertWithWhereUniqueWithoutBundleProductInput = {
+    where: BundleItemWhereUniqueInput
+    update: XOR<BundleItemUpdateWithoutBundleProductInput, BundleItemUncheckedUpdateWithoutBundleProductInput>
+    create: XOR<BundleItemCreateWithoutBundleProductInput, BundleItemUncheckedCreateWithoutBundleProductInput>
+  }
+
+  export type BundleItemUpdateWithWhereUniqueWithoutBundleProductInput = {
+    where: BundleItemWhereUniqueInput
+    data: XOR<BundleItemUpdateWithoutBundleProductInput, BundleItemUncheckedUpdateWithoutBundleProductInput>
+  }
+
+  export type BundleItemUpdateManyWithWhereWithoutBundleProductInput = {
+    where: BundleItemScalarWhereInput
+    data: XOR<BundleItemUpdateManyMutationInput, BundleItemUncheckedUpdateManyWithoutBundleProductInput>
+  }
+
+  export type BundleItemScalarWhereInput = {
+    AND?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+    OR?: BundleItemScalarWhereInput[]
+    NOT?: BundleItemScalarWhereInput | BundleItemScalarWhereInput[]
+    id?: StringFilter<"BundleItem"> | string
+    bundleProductId?: StringFilter<"BundleItem"> | string
+    componentProductId?: StringFilter<"BundleItem"> | string
+    componentVariantId?: StringNullableFilter<"BundleItem"> | string | null
+    quantity?: IntFilter<"BundleItem"> | number
+    position?: IntFilter<"BundleItem"> | number
+    createdAt?: DateTimeFilter<"BundleItem"> | Date | string
+    updatedAt?: DateTimeFilter<"BundleItem"> | Date | string
+  }
+
+  export type BundleItemUpsertWithWhereUniqueWithoutComponentProductInput = {
+    where: BundleItemWhereUniqueInput
+    update: XOR<BundleItemUpdateWithoutComponentProductInput, BundleItemUncheckedUpdateWithoutComponentProductInput>
+    create: XOR<BundleItemCreateWithoutComponentProductInput, BundleItemUncheckedCreateWithoutComponentProductInput>
+  }
+
+  export type BundleItemUpdateWithWhereUniqueWithoutComponentProductInput = {
+    where: BundleItemWhereUniqueInput
+    data: XOR<BundleItemUpdateWithoutComponentProductInput, BundleItemUncheckedUpdateWithoutComponentProductInput>
+  }
+
+  export type BundleItemUpdateManyWithWhereWithoutComponentProductInput = {
+    where: BundleItemScalarWhereInput
+    data: XOR<BundleItemUpdateManyMutationInput, BundleItemUncheckedUpdateManyWithoutComponentProductInput>
+  }
+
   export type ProductCreateWithoutVariantsInput = {
     id: string
     name: string
@@ -40402,11 +44295,14 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductUncheckedCreateWithoutVariantsInput = {
@@ -40428,16 +44324,85 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceUncheckedCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemUncheckedCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductCreateOrConnectWithoutVariantsInput = {
     where: ProductWhereUniqueInput
     create: XOR<ProductCreateWithoutVariantsInput, ProductUncheckedCreateWithoutVariantsInput>
+  }
+
+  export type BundleItemCreateWithoutComponentVariantInput = {
+    id?: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bundleProduct: ProductCreateNestedOneWithoutBundleItemsInput
+    componentProduct: ProductCreateNestedOneWithoutBundledInInput
+  }
+
+  export type BundleItemUncheckedCreateWithoutComponentVariantInput = {
+    id?: string
+    bundleProductId: string
+    componentProductId: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemCreateOrConnectWithoutComponentVariantInput = {
+    where: BundleItemWhereUniqueInput
+    create: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput>
+  }
+
+  export type BundleItemCreateManyComponentVariantInputEnvelope = {
+    data: BundleItemCreateManyComponentVariantInput | BundleItemCreateManyComponentVariantInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderLineItemCreateWithoutVariantInput = {
+    id?: string
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+    order: OrderCreateNestedOneWithoutOrderLineItemsInput
+  }
+
+  export type OrderLineItemUncheckedCreateWithoutVariantInput = {
+    id?: string
+    orderId: string
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+  }
+
+  export type OrderLineItemCreateOrConnectWithoutVariantInput = {
+    where: OrderLineItemWhereUniqueInput
+    create: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput>
+  }
+
+  export type OrderLineItemCreateManyVariantInputEnvelope = {
+    data: OrderLineItemCreateManyVariantInput | OrderLineItemCreateManyVariantInput[]
+    skipDuplicates?: boolean
   }
 
   export type ProductUpsertWithoutVariantsInput = {
@@ -40470,11 +44435,14 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUpdateManyWithoutComponentProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutVariantsInput = {
@@ -40496,11 +44464,63 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUncheckedUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput
+  }
+
+  export type BundleItemUpsertWithWhereUniqueWithoutComponentVariantInput = {
+    where: BundleItemWhereUniqueInput
+    update: XOR<BundleItemUpdateWithoutComponentVariantInput, BundleItemUncheckedUpdateWithoutComponentVariantInput>
+    create: XOR<BundleItemCreateWithoutComponentVariantInput, BundleItemUncheckedCreateWithoutComponentVariantInput>
+  }
+
+  export type BundleItemUpdateWithWhereUniqueWithoutComponentVariantInput = {
+    where: BundleItemWhereUniqueInput
+    data: XOR<BundleItemUpdateWithoutComponentVariantInput, BundleItemUncheckedUpdateWithoutComponentVariantInput>
+  }
+
+  export type BundleItemUpdateManyWithWhereWithoutComponentVariantInput = {
+    where: BundleItemScalarWhereInput
+    data: XOR<BundleItemUpdateManyMutationInput, BundleItemUncheckedUpdateManyWithoutComponentVariantInput>
+  }
+
+  export type OrderLineItemUpsertWithWhereUniqueWithoutVariantInput = {
+    where: OrderLineItemWhereUniqueInput
+    update: XOR<OrderLineItemUpdateWithoutVariantInput, OrderLineItemUncheckedUpdateWithoutVariantInput>
+    create: XOR<OrderLineItemCreateWithoutVariantInput, OrderLineItemUncheckedCreateWithoutVariantInput>
+  }
+
+  export type OrderLineItemUpdateWithWhereUniqueWithoutVariantInput = {
+    where: OrderLineItemWhereUniqueInput
+    data: XOR<OrderLineItemUpdateWithoutVariantInput, OrderLineItemUncheckedUpdateWithoutVariantInput>
+  }
+
+  export type OrderLineItemUpdateManyWithWhereWithoutVariantInput = {
+    where: OrderLineItemScalarWhereInput
+    data: XOR<OrderLineItemUpdateManyMutationInput, OrderLineItemUncheckedUpdateManyWithoutVariantInput>
+  }
+
+  export type OrderLineItemScalarWhereInput = {
+    AND?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
+    OR?: OrderLineItemScalarWhereInput[]
+    NOT?: OrderLineItemScalarWhereInput | OrderLineItemScalarWhereInput[]
+    id?: StringFilter<"OrderLineItem"> | string
+    orderId?: StringFilter<"OrderLineItem"> | string
+    variantId?: StringNullableFilter<"OrderLineItem"> | string | null
+    productName?: StringFilter<"OrderLineItem"> | string
+    variantTitle?: StringFilter<"OrderLineItem"> | string
+    sku?: StringNullableFilter<"OrderLineItem"> | string | null
+    image?: StringNullableFilter<"OrderLineItem"> | string | null
+    unitPrice?: IntFilter<"OrderLineItem"> | number
+    quantity?: IntFilter<"OrderLineItem"> | number
+    totalPrice?: IntFilter<"OrderLineItem"> | number
+    createdAt?: DateTimeFilter<"OrderLineItem"> | Date | string
   }
 
   export type ProductCreateWithoutPricesInput = {
@@ -40522,11 +44542,14 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     variants?: ProductVariantCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductUncheckedCreateWithoutPricesInput = {
@@ -40548,11 +44571,14 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     variants?: ProductVariantUncheckedCreateNestedManyWithoutProductInput
-    nutrition?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    nutrition_old?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemUncheckedCreateNestedManyWithoutComponentProductInput
   }
 
   export type ProductCreateOrConnectWithoutPricesInput = {
@@ -40590,11 +44616,14 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     variants?: ProductVariantUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUpdateManyWithoutComponentProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutPricesInput = {
@@ -40616,14 +44645,17 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     variants?: ProductVariantUncheckedUpdateManyWithoutProductNestedInput
-    nutrition?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput
   }
 
-  export type ProductCreateWithoutNutritionInput = {
+  export type ProductCreateWithoutNutrition_oldInput = {
     id: string
     name: string
     description?: string | null
@@ -40642,14 +44674,17 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceCreateNestedManyWithoutProductInput
     variants?: ProductVariantCreateNestedManyWithoutProductInput
+    bundleItems?: BundleItemCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemCreateNestedManyWithoutComponentProductInput
   }
 
-  export type ProductUncheckedCreateWithoutNutritionInput = {
+  export type ProductUncheckedCreateWithoutNutrition_oldInput = {
     id: string
     name: string
     description?: string | null
@@ -40668,30 +44703,33 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: string
     cjProductId?: string | null
-    trackInventory?: boolean
+    nutrition?: string | null
+    isBundle?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     prices?: PriceUncheckedCreateNestedManyWithoutProductInput
     variants?: ProductVariantUncheckedCreateNestedManyWithoutProductInput
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutBundleProductInput
+    bundledIn?: BundleItemUncheckedCreateNestedManyWithoutComponentProductInput
   }
 
-  export type ProductCreateOrConnectWithoutNutritionInput = {
+  export type ProductCreateOrConnectWithoutNutrition_oldInput = {
     where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutNutritionInput, ProductUncheckedCreateWithoutNutritionInput>
+    create: XOR<ProductCreateWithoutNutrition_oldInput, ProductUncheckedCreateWithoutNutrition_oldInput>
   }
 
-  export type ProductUpsertWithoutNutritionInput = {
-    update: XOR<ProductUpdateWithoutNutritionInput, ProductUncheckedUpdateWithoutNutritionInput>
-    create: XOR<ProductCreateWithoutNutritionInput, ProductUncheckedCreateWithoutNutritionInput>
+  export type ProductUpsertWithoutNutrition_oldInput = {
+    update: XOR<ProductUpdateWithoutNutrition_oldInput, ProductUncheckedUpdateWithoutNutrition_oldInput>
+    create: XOR<ProductCreateWithoutNutrition_oldInput, ProductUncheckedCreateWithoutNutrition_oldInput>
     where?: ProductWhereInput
   }
 
-  export type ProductUpdateToOneWithWhereWithoutNutritionInput = {
+  export type ProductUpdateToOneWithWhereWithoutNutrition_oldInput = {
     where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutNutritionInput, ProductUncheckedUpdateWithoutNutritionInput>
+    data: XOR<ProductUpdateWithoutNutrition_oldInput, ProductUncheckedUpdateWithoutNutrition_oldInput>
   }
 
-  export type ProductUpdateWithoutNutritionInput = {
+  export type ProductUpdateWithoutNutrition_oldInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40710,14 +44748,17 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUpdateManyWithoutProductNestedInput
     variants?: ProductVariantUpdateManyWithoutProductNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUpdateManyWithoutComponentProductNestedInput
   }
 
-  export type ProductUncheckedUpdateWithoutNutritionInput = {
+  export type ProductUncheckedUpdateWithoutNutrition_oldInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40736,11 +44777,566 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
     source?: StringFieldUpdateOperationsInput | string
     cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
-    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prices?: PriceUncheckedUpdateManyWithoutProductNestedInput
     variants?: ProductVariantUncheckedUpdateManyWithoutProductNestedInput
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput
+    bundledIn?: BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput
+  }
+
+  export type ProductCreateWithoutBundleItemsInput = {
+    id: string
+    name: string
+    description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
+    images?: ProductCreateimagesInput | string[]
+    active?: boolean
+    slug?: string | null
+    category?: string | null
+    type?: string | null
+    gender?: string | null
+    collection?: string | null
+    collectionOrder?: number | null
+    featured?: boolean
+    tags?: ProductCreatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: string
+    cjProductId?: string | null
+    nutrition?: string | null
+    isBundle?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    prices?: PriceCreateNestedManyWithoutProductInput
+    variants?: ProductVariantCreateNestedManyWithoutProductInput
+    nutrition_old?: ProductNutritionCreateNestedOneWithoutProductInput
+    bundledIn?: BundleItemCreateNestedManyWithoutComponentProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutBundleItemsInput = {
+    id: string
+    name: string
+    description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
+    images?: ProductCreateimagesInput | string[]
+    active?: boolean
+    slug?: string | null
+    category?: string | null
+    type?: string | null
+    gender?: string | null
+    collection?: string | null
+    collectionOrder?: number | null
+    featured?: boolean
+    tags?: ProductCreatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: string
+    cjProductId?: string | null
+    nutrition?: string | null
+    isBundle?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    prices?: PriceUncheckedCreateNestedManyWithoutProductInput
+    variants?: ProductVariantUncheckedCreateNestedManyWithoutProductInput
+    nutrition_old?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    bundledIn?: BundleItemUncheckedCreateNestedManyWithoutComponentProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutBundleItemsInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutBundleItemsInput, ProductUncheckedCreateWithoutBundleItemsInput>
+  }
+
+  export type ProductCreateWithoutBundledInInput = {
+    id: string
+    name: string
+    description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
+    images?: ProductCreateimagesInput | string[]
+    active?: boolean
+    slug?: string | null
+    category?: string | null
+    type?: string | null
+    gender?: string | null
+    collection?: string | null
+    collectionOrder?: number | null
+    featured?: boolean
+    tags?: ProductCreatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: string
+    cjProductId?: string | null
+    nutrition?: string | null
+    isBundle?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    prices?: PriceCreateNestedManyWithoutProductInput
+    variants?: ProductVariantCreateNestedManyWithoutProductInput
+    nutrition_old?: ProductNutritionCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemCreateNestedManyWithoutBundleProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutBundledInInput = {
+    id: string
+    name: string
+    description?: string | null
+    subtitle?: string | null
+    tagline?: string | null
+    images?: ProductCreateimagesInput | string[]
+    active?: boolean
+    slug?: string | null
+    category?: string | null
+    type?: string | null
+    gender?: string | null
+    collection?: string | null
+    collectionOrder?: number | null
+    featured?: boolean
+    tags?: ProductCreatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: string
+    cjProductId?: string | null
+    nutrition?: string | null
+    isBundle?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    prices?: PriceUncheckedCreateNestedManyWithoutProductInput
+    variants?: ProductVariantUncheckedCreateNestedManyWithoutProductInput
+    nutrition_old?: ProductNutritionUncheckedCreateNestedOneWithoutProductInput
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutBundleProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutBundledInInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutBundledInInput, ProductUncheckedCreateWithoutBundledInInput>
+  }
+
+  export type ProductVariantCreateWithoutBundleItemsInput = {
+    id?: string
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
+    image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    product: ProductCreateNestedOneWithoutVariantsInput
+    lineItems?: OrderLineItemCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantUncheckedCreateWithoutBundleItemsInput = {
+    id?: string
+    productId: string
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
+    image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lineItems?: OrderLineItemUncheckedCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantCreateOrConnectWithoutBundleItemsInput = {
+    where: ProductVariantWhereUniqueInput
+    create: XOR<ProductVariantCreateWithoutBundleItemsInput, ProductVariantUncheckedCreateWithoutBundleItemsInput>
+  }
+
+  export type ProductUpsertWithoutBundleItemsInput = {
+    update: XOR<ProductUpdateWithoutBundleItemsInput, ProductUncheckedUpdateWithoutBundleItemsInput>
+    create: XOR<ProductCreateWithoutBundleItemsInput, ProductUncheckedCreateWithoutBundleItemsInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutBundleItemsInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutBundleItemsInput, ProductUncheckedUpdateWithoutBundleItemsInput>
+  }
+
+  export type ProductUpdateWithoutBundleItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ProductUpdateimagesInput | string[]
+    active?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    collection?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    tags?: ProductUpdatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    prices?: PriceUpdateManyWithoutProductNestedInput
+    variants?: ProductVariantUpdateManyWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUpdateOneWithoutProductNestedInput
+    bundledIn?: BundleItemUpdateManyWithoutComponentProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutBundleItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ProductUpdateimagesInput | string[]
+    active?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    collection?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    tags?: ProductUpdatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    prices?: PriceUncheckedUpdateManyWithoutProductNestedInput
+    variants?: ProductVariantUncheckedUpdateManyWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    bundledIn?: BundleItemUncheckedUpdateManyWithoutComponentProductNestedInput
+  }
+
+  export type ProductUpsertWithoutBundledInInput = {
+    update: XOR<ProductUpdateWithoutBundledInInput, ProductUncheckedUpdateWithoutBundledInInput>
+    create: XOR<ProductCreateWithoutBundledInInput, ProductUncheckedCreateWithoutBundledInInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutBundledInInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutBundledInInput, ProductUncheckedUpdateWithoutBundledInInput>
+  }
+
+  export type ProductUpdateWithoutBundledInInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ProductUpdateimagesInput | string[]
+    active?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    collection?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    tags?: ProductUpdatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    prices?: PriceUpdateManyWithoutProductNestedInput
+    variants?: ProductVariantUpdateManyWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutBundleProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutBundledInInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    subtitle?: NullableStringFieldUpdateOperationsInput | string | null
+    tagline?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: ProductUpdateimagesInput | string[]
+    active?: BoolFieldUpdateOperationsInput | boolean
+    slug?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    collection?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    featured?: BoolFieldUpdateOperationsInput | boolean
+    tags?: ProductUpdatetagsInput | string[]
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    cjProductId?: NullableStringFieldUpdateOperationsInput | string | null
+    nutrition?: NullableStringFieldUpdateOperationsInput | string | null
+    isBundle?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    prices?: PriceUncheckedUpdateManyWithoutProductNestedInput
+    variants?: ProductVariantUncheckedUpdateManyWithoutProductNestedInput
+    nutrition_old?: ProductNutritionUncheckedUpdateOneWithoutProductNestedInput
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutBundleProductNestedInput
+  }
+
+  export type ProductVariantUpsertWithoutBundleItemsInput = {
+    update: XOR<ProductVariantUpdateWithoutBundleItemsInput, ProductVariantUncheckedUpdateWithoutBundleItemsInput>
+    create: XOR<ProductVariantCreateWithoutBundleItemsInput, ProductVariantUncheckedCreateWithoutBundleItemsInput>
+    where?: ProductVariantWhereInput
+  }
+
+  export type ProductVariantUpdateToOneWithWhereWithoutBundleItemsInput = {
+    where?: ProductVariantWhereInput
+    data: XOR<ProductVariantUpdateWithoutBundleItemsInput, ProductVariantUncheckedUpdateWithoutBundleItemsInput>
+  }
+
+  export type ProductVariantUpdateWithoutBundleItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: NullableIntFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
+    lineItems?: OrderLineItemUpdateManyWithoutVariantNestedInput
+  }
+
+  export type ProductVariantUncheckedUpdateWithoutBundleItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: NullableIntFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lineItems?: OrderLineItemUncheckedUpdateManyWithoutVariantNestedInput
+  }
+
+  export type OrderCreateWithoutOrderLineItemsInput = {
+    id: string
+    customerEmail?: string | null
+    customerName?: string | null
+    total: number
+    lineItems: JsonNullValueInput | InputJsonValue
+    shippingAddress?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    status: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    orderNumber: string
+    user?: UserCreateNestedOneWithoutOrdersInput
+    fulfillments?: FulfillmentCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderUncheckedCreateWithoutOrderLineItemsInput = {
+    id: string
+    userId?: string | null
+    customerEmail?: string | null
+    customerName?: string | null
+    total: number
+    lineItems: JsonNullValueInput | InputJsonValue
+    shippingAddress?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    status: string
+    createdAt: Date | string
+    updatedAt: Date | string
+    orderNumber: string
+    fulfillments?: FulfillmentUncheckedCreateNestedManyWithoutOrderInput
+  }
+
+  export type OrderCreateOrConnectWithoutOrderLineItemsInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutOrderLineItemsInput, OrderUncheckedCreateWithoutOrderLineItemsInput>
+  }
+
+  export type ProductVariantCreateWithoutLineItemsInput = {
+    id?: string
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
+    image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    product: ProductCreateNestedOneWithoutVariantsInput
+    bundleItems?: BundleItemCreateNestedManyWithoutComponentVariantInput
+  }
+
+  export type ProductVariantUncheckedCreateWithoutLineItemsInput = {
+    id?: string
+    productId: string
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
+    cost?: number | null
+    stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
+    image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bundleItems?: BundleItemUncheckedCreateNestedManyWithoutComponentVariantInput
+  }
+
+  export type ProductVariantCreateOrConnectWithoutLineItemsInput = {
+    where: ProductVariantWhereUniqueInput
+    create: XOR<ProductVariantCreateWithoutLineItemsInput, ProductVariantUncheckedCreateWithoutLineItemsInput>
+  }
+
+  export type OrderUpsertWithoutOrderLineItemsInput = {
+    update: XOR<OrderUpdateWithoutOrderLineItemsInput, OrderUncheckedUpdateWithoutOrderLineItemsInput>
+    create: XOR<OrderCreateWithoutOrderLineItemsInput, OrderUncheckedCreateWithoutOrderLineItemsInput>
+    where?: OrderWhereInput
+  }
+
+  export type OrderUpdateToOneWithWhereWithoutOrderLineItemsInput = {
+    where?: OrderWhereInput
+    data: XOR<OrderUpdateWithoutOrderLineItemsInput, OrderUncheckedUpdateWithoutOrderLineItemsInput>
+  }
+
+  export type OrderUpdateWithoutOrderLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customerEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    customerName?: NullableStringFieldUpdateOperationsInput | string | null
+    total?: FloatFieldUpdateOperationsInput | number
+    lineItems?: JsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    user?: UserUpdateOneWithoutOrdersNestedInput
+    fulfillments?: FulfillmentUpdateManyWithoutOrderNestedInput
+  }
+
+  export type OrderUncheckedUpdateWithoutOrderLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    customerEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    customerName?: NullableStringFieldUpdateOperationsInput | string | null
+    total?: FloatFieldUpdateOperationsInput | number
+    lineItems?: JsonNullValueInput | InputJsonValue
+    shippingAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    fulfillments?: FulfillmentUncheckedUpdateManyWithoutOrderNestedInput
+  }
+
+  export type ProductVariantUpsertWithoutLineItemsInput = {
+    update: XOR<ProductVariantUpdateWithoutLineItemsInput, ProductVariantUncheckedUpdateWithoutLineItemsInput>
+    create: XOR<ProductVariantCreateWithoutLineItemsInput, ProductVariantUncheckedCreateWithoutLineItemsInput>
+    where?: ProductVariantWhereInput
+  }
+
+  export type ProductVariantUpdateToOneWithWhereWithoutLineItemsInput = {
+    where?: ProductVariantWhereInput
+    data: XOR<ProductVariantUpdateWithoutLineItemsInput, ProductVariantUncheckedUpdateWithoutLineItemsInput>
+  }
+
+  export type ProductVariantUpdateWithoutLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: NullableIntFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
+    bundleItems?: BundleItemUpdateManyWithoutComponentVariantNestedInput
+  }
+
+  export type ProductVariantUncheckedUpdateWithoutLineItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: NullableIntFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutComponentVariantNestedInput
   }
 
   export type UserCreateWithoutReviewsInput = {
@@ -40940,6 +45536,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type OrderLineItemCreateWithoutOrderInput = {
+    id?: string
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+    variant?: ProductVariantCreateNestedOneWithoutLineItemsInput
+  }
+
+  export type OrderLineItemUncheckedCreateWithoutOrderInput = {
+    id?: string
+    variantId?: string | null
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+  }
+
+  export type OrderLineItemCreateOrConnectWithoutOrderInput = {
+    where: OrderLineItemWhereUniqueInput
+    create: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput>
+  }
+
+  export type OrderLineItemCreateManyOrderInputEnvelope = {
+    data: OrderLineItemCreateManyOrderInput | OrderLineItemCreateManyOrderInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutOrdersInput = {
     update: XOR<UserUpdateWithoutOrdersInput, UserUncheckedUpdateWithoutOrdersInput>
     create: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
@@ -41031,6 +45663,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Fulfillment"> | Date | string
   }
 
+  export type OrderLineItemUpsertWithWhereUniqueWithoutOrderInput = {
+    where: OrderLineItemWhereUniqueInput
+    update: XOR<OrderLineItemUpdateWithoutOrderInput, OrderLineItemUncheckedUpdateWithoutOrderInput>
+    create: XOR<OrderLineItemCreateWithoutOrderInput, OrderLineItemUncheckedCreateWithoutOrderInput>
+  }
+
+  export type OrderLineItemUpdateWithWhereUniqueWithoutOrderInput = {
+    where: OrderLineItemWhereUniqueInput
+    data: XOR<OrderLineItemUpdateWithoutOrderInput, OrderLineItemUncheckedUpdateWithoutOrderInput>
+  }
+
+  export type OrderLineItemUpdateManyWithWhereWithoutOrderInput = {
+    where: OrderLineItemScalarWhereInput
+    data: XOR<OrderLineItemUpdateManyMutationInput, OrderLineItemUncheckedUpdateManyWithoutOrderInput>
+  }
+
   export type OrderCreateWithoutFulfillmentsInput = {
     id: string
     customerEmail?: string | null
@@ -41044,6 +45692,7 @@ export namespace Prisma {
     updatedAt: Date | string
     orderNumber: string
     user?: UserCreateNestedOneWithoutOrdersInput
+    orderLineItems?: OrderLineItemCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutFulfillmentsInput = {
@@ -41059,6 +45708,7 @@ export namespace Prisma {
     createdAt: Date | string
     updatedAt: Date | string
     orderNumber: string
+    orderLineItems?: OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutFulfillmentsInput = {
@@ -41090,6 +45740,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     user?: UserUpdateOneWithoutOrdersNestedInput
+    orderLineItems?: OrderLineItemUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutFulfillmentsInput = {
@@ -41105,6 +45756,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    orderLineItems?: OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type UserCreateWithoutWishlistInput = {
@@ -41300,6 +45952,7 @@ export namespace Prisma {
     updatedAt: Date | string
     orderNumber: string
     fulfillments?: FulfillmentCreateNestedManyWithoutOrderInput
+    orderLineItems?: OrderLineItemCreateNestedManyWithoutOrderInput
   }
 
   export type OrderUncheckedCreateWithoutUserInput = {
@@ -41315,6 +45968,7 @@ export namespace Prisma {
     updatedAt: Date | string
     orderNumber: string
     fulfillments?: FulfillmentUncheckedCreateNestedManyWithoutOrderInput
+    orderLineItems?: OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
   }
 
   export type OrderCreateOrConnectWithoutUserInput = {
@@ -43887,15 +48541,40 @@ export namespace Prisma {
 
   export type ProductVariantCreateManyProductInput = {
     id?: string
-    stripePriceId?: string | null
-    sku?: string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: string | null
-    cjSku?: string | null
+    title?: string
+    position?: number
+    price?: number
+    compareAtPrice?: number | null
     cost?: number | null
     stock?: number
+    trackInventory?: boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: string | null
     image?: string | null
+    stripePriceId?: string | null
+    cjVariantId?: string | null
+    cjSku?: string | null
     active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemCreateManyBundleProductInput = {
+    id?: string
+    componentProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BundleItemCreateManyComponentProductInput = {
+    id?: string
+    bundleProductId: string
+    componentVariantId?: string | null
+    quantity?: number
+    position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -43938,47 +48617,218 @@ export namespace Prisma {
 
   export type ProductVariantUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleItems?: BundleItemUpdateManyWithoutComponentVariantNestedInput
+    lineItems?: OrderLineItemUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutProductInput = {
     id?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
     cost?: NullableIntFieldUpdateOperationsInput | number | null
     stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleItems?: BundleItemUncheckedUpdateManyWithoutComponentVariantNestedInput
+    lineItems?: OrderLineItemUncheckedUpdateManyWithoutVariantNestedInput
+  }
+
+  export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    price?: IntFieldUpdateOperationsInput | number
+    compareAtPrice?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: NullableIntFieldUpdateOperationsInput | number | null
+    stock?: IntFieldUpdateOperationsInput | number
+    trackInventory?: BoolFieldUpdateOperationsInput | boolean
+    options?: JsonNullValueInput | InputJsonValue
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
+  export type BundleItemUpdateWithoutBundleProductInput = {
     id?: StringFieldUpdateOperationsInput | string
-    stripePriceId?: NullableStringFieldUpdateOperationsInput | string | null
-    sku?: NullableStringFieldUpdateOperationsInput | string | null
-    options?: JsonNullValueInput | InputJsonValue
-    cjVariantId?: NullableStringFieldUpdateOperationsInput | string | null
-    cjSku?: NullableStringFieldUpdateOperationsInput | string | null
-    cost?: NullableIntFieldUpdateOperationsInput | number | null
-    stock?: IntFieldUpdateOperationsInput | number
-    image?: NullableStringFieldUpdateOperationsInput | string | null
-    active?: BoolFieldUpdateOperationsInput | boolean
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    componentProduct?: ProductUpdateOneRequiredWithoutBundledInNestedInput
+    componentVariant?: ProductVariantUpdateOneWithoutBundleItemsNestedInput
+  }
+
+  export type BundleItemUncheckedUpdateWithoutBundleProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemUncheckedUpdateManyWithoutBundleProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemUpdateWithoutComponentProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleProduct?: ProductUpdateOneRequiredWithoutBundleItemsNestedInput
+    componentVariant?: ProductVariantUpdateOneWithoutBundleItemsNestedInput
+  }
+
+  export type BundleItemUncheckedUpdateWithoutComponentProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemUncheckedUpdateManyWithoutComponentProductInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentVariantId?: NullableStringFieldUpdateOperationsInput | string | null
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemCreateManyComponentVariantInput = {
+    id?: string
+    bundleProductId: string
+    componentProductId: string
+    quantity?: number
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OrderLineItemCreateManyVariantInput = {
+    id?: string
+    orderId: string
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
+  }
+
+  export type BundleItemUpdateWithoutComponentVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bundleProduct?: ProductUpdateOneRequiredWithoutBundleItemsNestedInput
+    componentProduct?: ProductUpdateOneRequiredWithoutBundledInNestedInput
+  }
+
+  export type BundleItemUncheckedUpdateWithoutComponentVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BundleItemUncheckedUpdateManyWithoutComponentVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    bundleProductId?: StringFieldUpdateOperationsInput | string
+    componentProductId?: StringFieldUpdateOperationsInput | string
+    quantity?: IntFieldUpdateOperationsInput | number
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemUpdateWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    order?: OrderUpdateOneRequiredWithoutOrderLineItemsNestedInput
+  }
+
+  export type OrderLineItemUncheckedUpdateWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemUncheckedUpdateManyWithoutVariantInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderId?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FulfillmentCreateManyOrderInput = {
@@ -43993,6 +48843,19 @@ export namespace Prisma {
     raw?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type OrderLineItemCreateManyOrderInput = {
+    id?: string
+    variantId?: string | null
+    productName: string
+    variantTitle?: string
+    sku?: string | null
+    image?: string | null
+    unitPrice: number
+    quantity: number
+    totalPrice: number
+    createdAt?: Date | string
   }
 
   export type FulfillmentUpdateWithoutOrderInput = {
@@ -44035,6 +48898,45 @@ export namespace Prisma {
     raw?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemUpdateWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: ProductVariantUpdateOneWithoutLineItemsNestedInput
+  }
+
+  export type OrderLineItemUncheckedUpdateWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderLineItemUncheckedUpdateManyWithoutOrderInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    variantId?: NullableStringFieldUpdateOperationsInput | string | null
+    productName?: StringFieldUpdateOperationsInput | string
+    variantTitle?: StringFieldUpdateOperationsInput | string
+    sku?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    unitPrice?: IntFieldUpdateOperationsInput | number
+    quantity?: IntFieldUpdateOperationsInput | number
+    totalPrice?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionCreateManyUserInput = {
@@ -44199,6 +49101,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     fulfillments?: FulfillmentUpdateManyWithoutOrderNestedInput
+    orderLineItems?: OrderLineItemUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateWithoutUserInput = {
@@ -44214,6 +49117,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     fulfillments?: FulfillmentUncheckedUpdateManyWithoutOrderNestedInput
+    orderLineItems?: OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
   }
 
   export type OrderUncheckedUpdateManyWithoutUserInput = {

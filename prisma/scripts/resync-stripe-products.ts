@@ -3,6 +3,10 @@
  * Fetches ALL active products + prices from Stripe (live) and upserts them into the DB.
  * Safe to run multiple times — uses upsert so nothing is duplicated.
  *
+ * Delegates to the shared, variant-aware sync helpers in lib/product/product-sync:
+ * each Stripe price updates the legacy Price row AND mirrors onto
+ * ProductVariant.price (the source of truth for checkout).
+ *
  * Usage:
  *   bun prisma/scripts/resync-stripe-products.ts
  *
@@ -10,10 +14,13 @@
  */
 
 import Stripe from "stripe";
-import { PrismaClient } from "../../lib/generated/prisma";
+import { prisma } from "../../lib/prisma";
+import {
+    syncProductToDatabase,
+    syncPriceToDatabase,
+} from "../../lib/product/product-sync";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
-const prisma = new PrismaClient();
 
 async function main() {
     console.log("\n🔄 Starting Stripe → DB resync...\n");
@@ -32,25 +39,12 @@ async function main() {
 
     for (const product of products) {
         try {
-            await prisma.product.upsert({
-                where: { id: product.id },
-                update: {
-                    name: product.name,
-                    description: product.description || null,
-                    images: product.images || [],
-                    active: product.active,
-                    metadata: product.metadata as object,
-                    updatedAt: new Date(),
-                },
-                create: {
-                    id: product.id,
-                    name: product.name,
-                    description: product.description || null,
-                    images: product.images || [],
-                    active: product.active,
-                    metadata: product.metadata as object,
-                },
-            });
+            const productResult = await syncProductToDatabase(product);
+            if (!productResult.success) {
+                throw productResult.error instanceof Error
+                    ? productResult.error
+                    : new Error("syncProductToDatabase failed");
+            }
             productCount++;
 
             // ── 3. Fetch all prices for this product ─────────────────────────────
@@ -65,37 +59,17 @@ async function main() {
                     ? product.default_price
                     : product.default_price?.id ?? null;
 
-            // Reset all defaults for this product first
-            if (defaultPriceId) {
-                await prisma.price.updateMany({
-                    where: { productId: product.id, isDefault: true },
-                    data: { isDefault: false },
-                });
-            }
-
-            // Upsert each price
+            // Upsert each price (variant-aware).
             for (const price of prices) {
-                const isDefault = price.id === defaultPriceId;
-                await prisma.price.upsert({
-                    where: { id: price.id },
-                    update: {
-                        unitAmount: price.unit_amount || 0,
-                        currency: price.currency,
-                        active: price.active,
-                        isDefault,
-                        image: price.metadata?.image || null,
-                        updatedAt: new Date(),
-                    },
-                    create: {
-                        id: price.id,
-                        productId: product.id,
-                        unitAmount: price.unit_amount || 0,
-                        currency: price.currency,
-                        active: price.active,
-                        isDefault,
-                        image: price.metadata?.image || null,
-                    },
-                });
+                const result = await syncPriceToDatabase(
+                    price,
+                    price.id === defaultPriceId
+                );
+                if (!result.success) {
+                    throw result.error instanceof Error
+                        ? result.error
+                        : new Error("syncPriceToDatabase failed");
+                }
                 priceCount++;
             }
 

@@ -61,14 +61,26 @@ model Product {
   metadata Json?
 
   // Catalog source: "MANUAL" (admin-created via Stripe) or "CJ" (CJ Dropshipping)
-  source         String  @default("MANUAL")
-  cjProductId    String? // CJ product id (pid) when source = "CJ"
-  trackInventory Boolean @default(false)
+  source      String  @default("MANUAL")
+  cjProductId String? // CJ product id (pid) when source = "CJ"
+
+  // ── NEW ─────────────────────────────────────────────────────────
+  // Nutrition / ingredient info stored directly here (replaces ProductNutrition table).
+  // Populated by backfill migration from ProductNutrition.
+  nutrition String? @db.Text
+
+  // When true this product is a composite kit made up of other products via BundleItem.
+  isBundle Boolean @default(false)
+  // ────────────────────────────────────────────────────────────────
 
   // Relations
-  prices    Price[]
-  variants  ProductVariant[]
-  nutrition ProductNutrition?
+  prices        Price[]
+  variants      ProductVariant[]
+  nutrition_old ProductNutrition? @relation("nutrition_old") // kept temporarily during migration; remove after backfill
+
+  // Bundle relations
+  bundleItems BundleItem[] @relation("BundleParent")    // items this bundle contains
+  bundledIn   BundleItem[] @relation("BundleComponent") // bundles that reference this product
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -82,42 +94,76 @@ model Product {
   @@index([cjProductId])
   @@index([collection])
   @@index([featured])
+  @@index([isBundle])
   @@map("products")
 }
 
-// Real product variants (size/color/option combos) + inventory.
-// Replaces the previous "slug-grouping + multiple prices" variant hack.
+
+// A purchasable variant of a product (size, color, pack-size, etc.)
+// Every product has at least one variant. "Simple" products have a single
+// variant with title "Default". Price & inventory live here — NOT on Product.
 model ProductVariant {
   id        String  @id @default(cuid())
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  // Links to the Stripe Price (and our Price row) used for this variant at checkout.
-  // Not an enforced FK so import/backfill ordering stays flexible (cf. ProductNutrition).
-  stripePriceId String? @unique
+  // Human-readable label shown in selectors (e.g. "Default", "3-Pack", "Black / XL")
+  title String @default("Default")
 
-  sku     String?
-  options Json    @default("{}") // structured options, e.g. { "color": "Black", "size": "XL" }
+  // Display ordering within the product
+  position Int @default(0)
+
+  // ── Commercial fields ────────────────────────────────────────────
+  // Canonical selling price in cents. Required — every variant must have a price.
+  price Int @default(0)
+
+  // Optional strikethrough / "was" price in cents (for discount display)
+  compareAtPrice Int?
+
+  // Supplier cost in cents (for margin calculations)
+  cost Int?
+  // ────────────────────────────────────────────────────────────────
+
+  // ── Inventory ────────────────────────────────────────────────────
+  stock          Int     @default(0)
+  trackInventory Boolean @default(false) // moved from Product
+  // ────────────────────────────────────────────────────────────────
+
+  // ── Options (structured JSON) ─────────────────────────────────────
+  // e.g. { "Size": "XL", "Color": "Black" } or { "Pack": "3 Bottles" }
+  options Json @default("{}")
+  // ────────────────────────────────────────────────────────────────
+
+  sku   String? // unique human-readable stock-keeping unit
+  image String? // variant-specific image (falls back to product.images[0])
+
+  // ── External provider linkages ────────────────────────────────────
+  // Links to the Stripe Price object used at checkout.
+  stripePriceId String? @unique
 
   // CJ Dropshipping linkage (null for MANUAL products)
   cjVariantId String?
   cjSku       String?
-  cost        Int? // supplier cost in cents
+  // ────────────────────────────────────────────────────────────────
 
-  stock  Int     @default(0) // available inventory
-  image  String?
   active Boolean @default(true)
+
+  // Relations
+  bundleItems BundleItem[]    // if this specific variant is referenced in a bundle
+  lineItems   OrderLineItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([productId])
-  @@index([cjVariantId])
   @@index([productId, active])
+  @@index([cjVariantId])
+  @@index([stripePriceId])
   @@map("product_variants")
 }
 
 model Price {
+
   id        String  @id // Stripe price ID (price_xxx)
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -141,13 +187,74 @@ model Price {
   @@map("prices")
 }
 
+
+// MIGRATION NOTE: This table is kept alive during the migration period.
+// Data will be backfilled into Product.nutrition then this table will be dropped.
 model ProductNutrition {
   id        String  @id @default(uuid())
   productId String  @unique
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  // Note: No FK constraint - productId references Stripe product ID
-  // which may or may not exist in our products table
+  product   Product @relation("nutrition_old", fields: [productId], references: [id], onDelete: Cascade)
   nutrition String
+}
+
+
+// ── Cross-product bundle component linker ──────────────────────────────────
+// Links a bundle Product to its component Products (and optionally a specific variant).
+// e.g. "Daily Vitality Stack" bundle → 1x Prostate Support (Default) + 1x Vitamin D3 (Default)
+model BundleItem {
+  id String @id @default(cuid())
+
+  // The parent bundle product
+  bundleProductId String
+  bundleProduct   Product @relation("BundleParent", fields: [bundleProductId], references: [id], onDelete: Cascade)
+
+  // The component product included in the bundle
+  componentProductId String
+  componentProduct   Product @relation("BundleComponent", fields: [componentProductId], references: [id], onDelete: Cascade)
+
+  // Optional: pin to a specific variant of the component (e.g. the "Default" or "1-Bottle" variant)
+  componentVariantId String?
+  componentVariant   ProductVariant? @relation(fields: [componentVariantId], references: [id], onDelete: SetNull)
+
+  quantity Int @default(1) // how many of this component are in the bundle
+
+  position Int @default(0) // display order within the bundle
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bundleProductId])
+  @@index([componentProductId])
+  @@map("bundle_items")
+}
+
+// ── Typed order line items ────────────────────────────────────────────────
+// Replaces the untyped JSON `lineItems` blob on Order.
+// Snapshot of variant details at purchase time so receipts never mutate.
+model OrderLineItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Soft link to the variant — kept for analytics & fulfillment lookups.
+  // SetNull so historical line items survive product/variant archival.
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  // Snapshot fields (never mutate even if product/variant is edited)
+  productName  String
+  variantTitle String  @default("Default")
+  sku          String?
+  image        String?
+  unitPrice    Int // cents at time of purchase
+  quantity     Int
+  totalPrice   Int // unitPrice × quantity (cents)
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([variantId])
+  @@map("order_line_items")
 }
 
 model Review {
@@ -171,7 +278,7 @@ model Order {
   customerEmail   String?  // For guest checkout - customer email
   customerName    String?  // For guest checkout - customer name
   total           Float
-  lineItems       Json
+  lineItems       Json     // legacy JSON blob — kept for backward compat; new orders also write OrderLineItem rows
   shippingAddress String?
   metadata        Json?
   status          String
@@ -179,9 +286,11 @@ model Order {
   updatedAt       DateTime
   orderNumber     String   @unique
 
-  fulfillments Fulfillment[]
+  fulfillments    Fulfillment[]
+  orderLineItems  OrderLineItem[] // typed line items (new — written alongside legacy JSON)
 
   @@index([customerEmail]) // Index for quick guest order lookups
+  @@index([status])
   @@map("order")
 }
 

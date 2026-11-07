@@ -1,5 +1,9 @@
 /**
  * Script: backfill-variants.ts
+ *
+ * ⚠️ ONE-TIME TOOL — targets the pre-variant schema migration. Historical
+ *    backfill only; not part of the steady-state Stripe ↔ DB sync.
+ *
  * Creates one ProductVariant per existing active Price so the new variant model
  * is populated from the current "slug-grouping + multiple prices" data.
  *
