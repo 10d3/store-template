@@ -158,6 +158,46 @@ function buildOrderItems(lineItems: any[]): { name: string; quantity: number; pr
   }));
 }
 
+interface OrderLineItemRow {
+  orderId: string;
+  variantId: string | null;
+  productName: string;
+  variantTitle: string;
+  sku: string | null;
+  image: string | null;
+  unitPrice: number;
+  quantity: number;
+  totalPrice: number;
+}
+
+/**
+ * Persists OrderLineItem rows for an order. Variant FKs are sanitized against
+ * the DB so a stale/unknown variant id can never break the webhook (variantId
+ * is nullable). Idempotent: existing rows for the order are replaced.
+ */
+async function persistOrderLineItems(orderId: string, rows: OrderLineItemRow[]) {
+  if (rows.length === 0) return;
+
+  const variantIds = Array.from(
+    new Set(rows.map((r) => r.variantId).filter((id): id is string => !!id))
+  );
+  const existing = variantIds.length
+    ? await prisma.productVariant.findMany({
+        where: { id: { in: variantIds } },
+        select: { id: true },
+      })
+    : [];
+  const validIds = new Set(existing.map((v) => v.id));
+
+  const data = rows.map((r) => ({
+    ...r,
+    variantId: r.variantId && validIds.has(r.variantId) ? r.variantId : null,
+  }));
+
+  await prisma.orderLineItem.deleteMany({ where: { orderId } });
+  await prisma.orderLineItem.createMany({ data });
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Checkout Session
 // ─────────────────────────────────────────────────────────────────
@@ -208,6 +248,43 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       },
     });
 
+    // ── Persist real OrderLineItem rows ─────────────────────────
+    // Read variant identity back from the expanded Stripe product metadata
+    // (written by checkout-session.ts). FKs are sanitized in the helper.
+    const stripeLineItems = await stripeClient.checkout.sessions.listLineItems(
+      data.id,
+      { limit: 100, expand: ["data.price.product"] }
+    );
+
+    const orderLineItemRows: OrderLineItemRow[] = stripeLineItems.data.map((li) => {
+      const product = li.price?.product;
+      const meta =
+        (product && typeof product === "object"
+          ? (product as Stripe.Product).metadata
+          : undefined) ?? {};
+      const quantity = li.quantity ?? 1;
+      const unitPrice =
+        li.price?.unit_amount ??
+        Math.round((li.amount_subtotal ?? 0) / (li.quantity || 1));
+      return {
+        orderId: order.id,
+        variantId: typeof meta.variantId === "string" ? meta.variantId : null,
+        productName:
+          li.description ??
+          (typeof meta.name === "string" ? meta.name : undefined) ??
+          "Product",
+        variantTitle:
+          (typeof meta.variantTitle === "string" && meta.variantTitle) || "Default",
+        sku: null,
+        image: (typeof meta.image === "string" && meta.image) || null,
+        unitPrice,
+        quantity,
+        totalPrice: unitPrice * quantity,
+      };
+    });
+
+    await persistOrderLineItems(order.id, orderLineItemRows);
+
     // ── Affiliate tracking (AFTER the order exists) ─────────────
     // orderValue is the stored Order total (Stripe amount_total), with the
     // session amount as fallback. One commission per order on that trusted
@@ -238,7 +315,20 @@ async function handleCheckoutCompletedSession(data: Stripe.Checkout.Session) {
       }
     }
 
-    const orderItems = buildOrderItems(lineItemsRaw);
+    // Fall back to the fetched Stripe line items when the legacy metadata
+    // mirror is missing, so order emails still render.
+    const orderItems = buildOrderItems(
+      lineItemsRaw.length > 0
+        ? lineItemsRaw
+        : stripeLineItems.data.map((li) => ({
+            name: li.description ?? "Product",
+            quantity: li.quantity ?? 1,
+            price_data: {
+              unit_amount: li.price?.unit_amount ?? 0,
+              product_data: { images: [] as string[] },
+            },
+          }))
+    );
     const orderTotal = data.amount_total ? data.amount_total / 100 : 0;
     const orderId = order.orderNumber.toString();
 
@@ -347,6 +437,27 @@ async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent)
         updatedAt: new Date(),
       },
     });
+
+    // ── Persist real OrderLineItem rows ─────────────────────────
+    // Built from the metadata mirror written by checkout-session.ts
+    // ({ productId, variantId, variantTitle, name, image, unit_amount, quantity }).
+    const piLineItemRows: OrderLineItemRow[] = lineItemsRaw.map((entry) => {
+      const quantity = entry.quantity ?? 1;
+      const unitPrice = entry.unit_amount ?? 0;
+      return {
+        orderId: order.id,
+        variantId: typeof entry.variantId === "string" ? entry.variantId : null,
+        productName: entry.name ?? "Product",
+        variantTitle: entry.variantTitle ?? "Default",
+        sku: null,
+        image: entry.image || null,
+        unitPrice,
+        quantity,
+        totalPrice: unitPrice * quantity,
+      };
+    });
+
+    await persistOrderLineItems(order.id, piLineItemRows);
 
     const orderItems = buildOrderItems(lineItemsRaw);
     const orderTotal = paymentIntent.amount / 100;

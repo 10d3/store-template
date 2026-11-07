@@ -4,8 +4,8 @@ import { prisma } from "./prisma";
 import { admin, haveIBeenPwned, magicLink } from "better-auth/plugins";
 import { stripe } from "@better-auth/stripe";
 import { stripeClient } from "./stripe";
-import handleSubscription from "./subcription";
-import { sendEmail } from "./action/send-email";
+import handleSubscription from "./subscription";
+import { sendEmail } from "./actions/send-email";
 import { MagicLinkEmail } from "@/components/mails/magic-link-email";
 import { ReactElement } from "react";
 

@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
-import { sendEmail } from "@/lib/action/send-email";
+import { sendEmail } from "@/lib/actions/send-email";
 import { AffiliateApprovalEmail } from "@/components/mails/affiliate-approval-email";
 import { AffiliateRejectionEmail } from "@/components/mails/affiliate-rejection-email";
 import { AffiliateStatus } from "@/lib/generated/prisma";
