@@ -1,9 +1,12 @@
 import Stripe from "stripe";
 
-export const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
+let client: Stripe | null = null;
 
-export function getStripeClient() {
-  return stripeClient
+export function getStripe(): Stripe {
+  if (!client) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+    client = new Stripe(key, { apiVersion: "2025-08-27.basil" });
+  }
+  return client;
 }
