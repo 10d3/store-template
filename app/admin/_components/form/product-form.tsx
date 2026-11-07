@@ -12,6 +12,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -28,29 +36,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   type ProductFormData,
   productSchema,
 } from "@/lib/product/product.schema";
-import { Plus, Edit, ChevronDown, Package, Trash2, Copy } from "lucide-react";
-import type { StripeProductVariant, StripeProduct } from "@/types/product";
+import {
+  Plus,
+  Edit,
+  Package,
+  Trash2,
+  Copy,
+  ArrowUp,
+  ArrowDown,
+  Settings2,
+} from "lucide-react";
+import type { VariantData, ProductWithVariants } from "@/lib/catalog";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { archiveVariant, reorderVariants } from "@/lib/catalog";
+import { toast } from "sonner";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
 import { uploadThemes } from "@/lib/theme/upload-theme";
 import RelatedProductsSelector from "@/components/shared/related-products-selector";
 import MarkdownField from "./markdown-field";
+import ManageVariantsDialog from "../manage-variants-dialog";
+import {
+  BundleComponentPicker,
+  type BundleComponentValue,
+} from "../bundle-component-picker";
 
 interface ProductFormProps {
   onSubmit: (data: ProductFormData) => void;
-  initialData?: StripeProduct;
+  initialData?: ProductWithVariants;
   isLoading?: boolean;
-  products?: StripeProduct[]; // All products for related products selector
+  products?: ProductWithVariants[]; // All products for related products selector
   embed?: boolean;
 }
 
@@ -63,21 +81,253 @@ type FormVariant = {
   description?: string;
   images?: string[];
   metadata?: Record<string, any>;
+  compareAtPrice?: number;
+  stock?: number;
+  sku?: string;
+  active?: boolean;
+  position?: number;
 };
 
-// Helper function to create form variant from StripeProductVariant
-function createFormVariantFromStripe(
-  stripeVariant: StripeProductVariant
+const EMPTY_METADATA = {
+  slug: "",
+  category: "",
+  gender: "",
+  pack_size: "",
+  seo_title: "",
+  seo_description: "",
+  tags: "",
+  digital: "false",
+  nutrition: "",
+};
+
+const isPersistedVariantId = (id?: string): id is string =>
+  Boolean(id) && !id!.startsWith("variant-");
+
+// Helper function to create form variant from a persisted ProductVariant row
+function createFormVariantFromProductVariant(
+  variant: VariantData,
+  index: number
 ): FormVariant {
+  const optionLabel = variant.options?.label || variant.options?.title || "";
   return {
-    id: stripeVariant.id,
-    name: stripeVariant.name,
-    price: stripeVariant.price,
-    currency: stripeVariant.currency,
-    description: stripeVariant.description,
-    images: stripeVariant.image || [],
-    metadata: stripeVariant.metadata,
+    id: variant.id,
+    name: optionLabel || variant.title || `Variant ${index + 1}`,
+    price: variant.price ?? 0,
+    currency: "usd",
+    images: variant.image ? [variant.image] : [],
+    metadata: variant.options || {},
+    stock: variant.stock,
+    sku: variant.sku ?? undefined,
+    active: variant.active,
+    position: index,
   };
+}
+
+// Kept out of the RHF metadata values: marketing_why_choose /
+// marketing_how_to_use are not in PRODUCT_METADATA_FIELDS, so zod would reject
+// them. They are serialized to JSON and merged into metadata after validation.
+
+type MarketingImagePosition = "left" | "right";
+
+interface MarketingBlockState {
+  title: string;
+  content: string;
+  bullets: string[];
+  imageSrc: string;
+  imagePosition: MarketingImagePosition | "";
+}
+
+interface MarketingBlockFieldsProps {
+  legend: string;
+  value: MarketingBlockState;
+  onChange: (next: MarketingBlockState) => void;
+}
+
+function createEmptyMarketingBlock(): MarketingBlockState {
+  return { title: "", content: "", bullets: [], imageSrc: "", imagePosition: "" };
+}
+
+function parseMarketingBlock(raw: unknown): MarketingBlockState {
+  const empty = createEmptyMarketingBlock();
+  if (raw === null || raw === undefined) return empty;
+
+  let parsed: unknown = raw;
+  if (typeof raw === "string") {
+    if (!raw.trim()) return empty;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return empty;
+    }
+  }
+
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    return empty;
+  }
+
+  const obj = parsed as Record<string, unknown>;
+  const imagePosition = obj.imagePosition;
+  return {
+    title: typeof obj.title === "string" ? obj.title : "",
+    content: typeof obj.content === "string" ? obj.content : "",
+    bullets: Array.isArray(obj.bullets)
+      ? obj.bullets.filter((b): b is string => typeof b === "string")
+      : [],
+    imageSrc: typeof obj.imageSrc === "string" ? obj.imageSrc : "",
+    imagePosition:
+      imagePosition === "left" || imagePosition === "right"
+        ? imagePosition
+        : "",
+  };
+}
+
+function serializeMarketingBlock(block: MarketingBlockState): string | null {
+  const payload: {
+    title?: string;
+    content?: string;
+    bullets?: string[];
+    imageSrc?: string;
+    imagePosition?: MarketingImagePosition;
+  } = {};
+
+  const title = block.title.trim();
+  const content = block.content.trim();
+  const imageSrc = block.imageSrc.trim();
+  const bullets = block.bullets
+    .map((bullet) => bullet.trim())
+    .filter((bullet) => bullet.length > 0);
+
+  if (title) payload.title = title;
+  if (content) payload.content = content;
+  if (bullets.length > 0) payload.bullets = bullets;
+  if (imageSrc) payload.imageSrc = imageSrc;
+  if (block.imagePosition === "left" || block.imagePosition === "right") {
+    payload.imagePosition = block.imagePosition;
+  }
+
+  return Object.keys(payload).length > 0 ? JSON.stringify(payload) : null;
+}
+
+function MarketingBlockFields({
+  legend,
+  value,
+  onChange,
+}: MarketingBlockFieldsProps) {
+  const update = (patch: Partial<MarketingBlockState>) =>
+    onChange({ ...value, ...patch });
+
+  const addBullet = () => update({ bullets: [...value.bullets, ""] });
+
+  const updateBullet = (index: number, text: string) =>
+    update({
+      bullets: value.bullets.map((bullet, i) => (i === index ? text : bullet)),
+    });
+
+  const removeBullet = (index: number) =>
+    update({ bullets: value.bullets.filter((_, i) => i !== index) });
+
+  return (
+    <div className="space-y-4 rounded-lg border-2 border-gray-200 p-4">
+      <h4 className="text-base font-semibold">{legend}</h4>
+
+      <div className="grid gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Title</label>
+          <Input
+            placeholder={`${legend} title`}
+            className="border-2 focus:border-blue-500 transition-colors"
+            value={value.title}
+            onChange={(e) => update({ title: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Content</label>
+          <Textarea
+            placeholder={`${legend} description`}
+            className="border-2 focus:border-blue-500 transition-colors resize-none"
+            value={value.content}
+            onChange={(e) => update({ content: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Bullets</label>
+          <div className="space-y-2">
+            {value.bullets.map((bullet, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  placeholder={`Bullet ${index + 1}`}
+                  className="border-2 focus:border-blue-500 transition-colors"
+                  value={bullet}
+                  onChange={(e) => updateBullet(index, e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  title="Remove bullet"
+                  onClick={() => removeBullet(index)}
+                  className="h-8 w-8 flex-shrink-0 text-gray-500 hover:text-red-600"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addBullet}
+              className="flex items-center gap-2 border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 bg-transparent"
+            >
+              <Plus className="h-4 w-4" />
+              Add bullet
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Image URL</label>
+            <Input
+              placeholder="/placeholder.jpg"
+              className="border-2 focus:border-blue-500 transition-colors"
+              value={value.imageSrc}
+              onChange={(e) => update({ imageSrc: e.target.value })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional image shown beside this block
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Image Position</label>
+            <Select
+              value={value.imagePosition || "default"}
+              onValueChange={(next) =>
+                update({
+                  imagePosition:
+                    next === "left" || next === "right" ? next : "",
+                })
+              }
+            >
+              <SelectTrigger className="border-2 focus:border-blue-500 transition-colors">
+                <SelectValue placeholder="Default" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="left">Left</SelectItem>
+                <SelectItem value="right">Right</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Optional placement of the image
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProductForm({
@@ -87,9 +337,16 @@ export default function ProductForm({
   products = [],
   embed = false,
 }: ProductFormProps) {
-  const [showVariant, setShowVariant] = useState(false);
-  const [expandedVariants, setExpandedVariants] = useState<Set<string>>(
-    new Set()
+  const [isBundle, setIsBundle] = useState(initialData?.isBundle ?? false);
+  const [manageOpen, setManageOpen] = useState(false);
+  const [bundleComponents, setBundleComponents] = useState<
+    BundleComponentValue[]
+  >([]);
+  const [whyChoose, setWhyChoose] = useState<MarketingBlockState>(
+    createEmptyMarketingBlock
+  );
+  const [howToUse, setHowToUse] = useState<MarketingBlockState>(
+    createEmptyMarketingBlock
   );
 
   const form = useForm<ProductFormData>({
@@ -101,60 +358,41 @@ export default function ProductForm({
       price: 1000,
       currency: "usd",
       images: [],
-      metadata: transformMetadataFromStripe({
-        slug: "",
-        category: "",
-        gender: "",
-        pack_size: "",
-        seo_title: "",
-        seo_description: "",
-        tags: "",
-        digital: "false",
-        nutrition: ""
-      }, "product"),
+      metadata: transformMetadataFromStripe(EMPTY_METADATA, "product"),
       variants: [],
+      isBundle: false,
     },
   });
 
   // Reset form when initialData changes
   useEffect(() => {
     if (initialData) {
+      const persistedVariants: FormVariant[] = initialData.variants
+        ? initialData.variants.map(createFormVariantFromProductVariant)
+        : [];
+
+      const metadata = transformMetadataFromStripe(
+        initialData.metadata || EMPTY_METADATA,
+        "product"
+      );
+      setWhyChoose(parseMarketingBlock(metadata.marketing_why_choose));
+      setHowToUse(parseMarketingBlock(metadata.marketing_how_to_use));
+      delete metadata.marketing_why_choose;
+      delete metadata.marketing_how_to_use;
+
       const formData: ProductFormData = {
         id: initialData.id,
         name: initialData.name,
         description: initialData.description || "",
-        price:
-          initialData.default_price &&
-            typeof initialData.default_price === "object" &&
-            initialData.default_price.unit_amount !== null
-            ? initialData.default_price.unit_amount
-            : 1000,
-        currency:
-          initialData.default_price &&
-            typeof initialData.default_price === "object" &&
-            initialData.default_price.currency
-            ? initialData.default_price.currency
-            : "usd",
+        price: initialData.defaultVariant?.price ?? 1000,
+        currency: "usd",
         images: initialData.images || [],
-        metadata: transformMetadataFromStripe(initialData.metadata || {
-          slug: "",
-          category: "",
-          gender: "",
-          pack_size: "",
-          seo_title: "",
-          seo_description: "",
-          tags: "",
-          digital: "false",
-          nutrition: ""
-        }, "product"),
-        variants: initialData.variants
-          ? initialData.variants.map(createFormVariantFromStripe)
-          : [],
+        metadata,
+        variants: persistedVariants,
+        isBundle: initialData.isBundle,
       };
       form.reset(formData);
-      if (formData.variants && formData.variants.length > 0) {
-        setShowVariant(true);
-      }
+      setIsBundle(initialData.isBundle);
     } else {
       form.reset({
         id: "",
@@ -163,24 +401,29 @@ export default function ProductForm({
         price: 1000,
         currency: "usd",
         images: [],
-        metadata: transformMetadataFromStripe({
-          slug: "",
-          category: "",
-          gender: "",
-          pack_size: "",
-          seo_title: "",
-          seo_description: "",
-          tags: "",
-          digital: "false",
-          nutrition: ""
-        }, "product"),
+        metadata: transformMetadataFromStripe(EMPTY_METADATA, "product"),
         variants: [],
+        isBundle: false,
       });
+      setWhyChoose(createEmptyMarketingBlock());
+      setHowToUse(createEmptyMarketingBlock());
+      setIsBundle(false);
     }
   }, [initialData, form]);
 
   const isEditing = !!initialData;
   const variants = form.watch("variants") || [];
+
+  // Keep the product-level price aligned with the first (default) variant so
+  // the create/update flow's default-variant branch stays consistent.
+  useEffect(() => {
+    if (variants.length > 0) {
+      const firstPrice = variants[0].price;
+      if (form.getValues("price") !== firstPrice) {
+        form.setValue("price", firstPrice);
+      }
+    }
+  }, [variants, form]);
 
   const addVariant = () => {
     const newVariant: FormVariant = {
@@ -191,12 +434,12 @@ export default function ProductForm({
       price: 0,
       currency: "usd",
       metadata: {},
+      stock: 0,
+      active: true,
+      position: variants.length,
     };
     const currentVariants = form.getValues("variants") || [];
     form.setValue("variants", [...currentVariants, newVariant]);
-    setShowVariant(true);
-    // Auto-expand the new variant
-    setExpandedVariants((prev) => new Set([...prev, newVariant.id!]));
   };
 
   const duplicateVariant = (variantToDuplicate: FormVariant) => {
@@ -206,8 +449,10 @@ export default function ProductForm({
       name: `${variantToDuplicate.name} (Copy)`,
     };
     const currentVariants = form.getValues("variants") || [];
-    form.setValue("variants", [...currentVariants, newVariant]);
-    setExpandedVariants((prev) => new Set([...prev, newVariant.id!]));
+    form.setValue("variants", [
+      ...currentVariants,
+      { ...newVariant, position: currentVariants.length },
+    ]);
   };
 
   const updateVariant = (
@@ -228,35 +473,74 @@ export default function ProductForm({
     form.setValue("variants", updatedVariants);
   };
 
-  const removeVariant = (id: string) => {
+  const removeVariant = async (id: string) => {
     const currentVariants = form.getValues("variants") || [];
-    const updatedVariants = currentVariants.filter((v) => v.id !== id);
+    const target = currentVariants.find((v) => v.id === id);
+    const updatedVariants = currentVariants
+      .filter((v) => v.id !== id)
+      .map((v, index) => ({ ...v, position: index }));
     form.setValue("variants", updatedVariants);
-    setExpandedVariants((prev) => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
-    if (updatedVariants.length === 0) {
-      setShowVariant(false);
+
+    if (isEditing && target && isPersistedVariantId(target.id)) {
+      const result = await archiveVariant(target.id);
+      if (result.success) {
+        toast.success("Variant archived");
+      } else {
+        toast.error(result.error || "Failed to archive variant");
+      }
     }
   };
 
-  const toggleVariantExpansion = (id: string) => {
-    setExpandedVariants((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
+  const moveVariant = async (index: number, direction: -1 | 1) => {
+    const currentVariants = form.getValues("variants") || [];
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= currentVariants.length) return;
+
+    const next = [...currentVariants];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
+    const reindexed = next.map((v, i) => ({ ...v, position: i }));
+    form.setValue("variants", reindexed);
+
+    if (isEditing) {
+      const orderedIds = reindexed.map((v) => v.id);
+      if (orderedIds.every(isPersistedVariantId)) {
+        const result = await reorderVariants(orderedIds);
+        if (!result.success) {
+          toast.error(result.error || "Failed to reorder variants");
+        }
       }
-      return newSet;
-    });
+    }
+  };
+
+  const handleBundleToggle = (checked: boolean) => {
+    setIsBundle(checked);
+    form.setValue("isBundle", checked);
+  };
+
+  const handleSubmit = (data: ProductFormData) => {
+    const metadata: Record<string, any> = { ...(data.metadata ?? {}) };
+    const whyChooseJson = serializeMarketingBlock(whyChoose);
+    const howToUseJson = serializeMarketingBlock(howToUse);
+
+    if (whyChooseJson) {
+      metadata.marketing_why_choose = whyChooseJson;
+    } else {
+      delete metadata.marketing_why_choose;
+    }
+
+    if (howToUseJson) {
+      metadata.marketing_how_to_use = howToUseJson;
+    } else {
+      delete metadata.marketing_how_to_use;
+    }
+
+    onSubmit({ ...data, metadata });
   };
 
   const content = (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         {/* Basic Information */}
         <div className="space-y-6">
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -473,338 +757,255 @@ export default function ProductForm({
                 )}
               />
             </div>
+
+            <div className="flex flex-row items-center justify-between rounded-lg border-2 border-gray-200 p-4">
+              <div className="space-y-0.5">
+                <label className="text-base font-medium">Bundle / Pack</label>
+                <p className="text-sm text-muted-foreground">
+                  This product groups other products as a bundle
+                </p>
+              </div>
+              <Switch checked={isBundle} onCheckedChange={handleBundleToggle} />
+            </div>
           </div>
         </div>
 
         <Separator />
 
-        {/* Product Variants Section */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
+        {isBundle ? (
+          <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Product Variants
-              {variants.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {variants.length}{" "}
-                  {variants.length === 1 ? "variant" : "variants"}
-                </Badge>
-              )}
+              Bundle Components
             </h3>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={addVariant}
-              className="flex items-center gap-2 border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 bg-transparent"
-            >
-              <Plus className="h-4 w-4" />
-              Add Variant
-            </Button>
+            <BundleComponentPicker
+              products={products}
+              bundleProductId={isEditing ? initialData?.id : undefined}
+              value={isEditing ? undefined : bundleComponents}
+              onChange={isEditing ? undefined : setBundleComponents}
+              description={
+                isEditing
+                  ? "Add products and quantities that make up this bundle."
+                  : "Add the products that make up this bundle. Components are saved once the product exists."
+              }
+            />
           </div>
-
-          <AnimatePresence>
-            {showVariant && variants.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="space-y-4"
-              >
-                {variants.map((variant, index) => (
-                  <motion.div
-                    key={variant.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.2, delay: index * 0.1 }}
+        ) : (
+          /* Product Variants Section */
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Package className="h-5 w-5" />
+                Product Variants
+                {variants.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {variants.length}{" "}
+                    {variants.length === 1 ? "variant" : "variants"}
+                  </Badge>
+                )}
+              </h3>
+              <div className="flex items-center gap-2">
+                {isEditing && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setManageOpen(true)}
+                    className="flex items-center gap-2"
                   >
-                    <Card className="border-2 border-gray-200 hover:border-gray-300 transition-colors">
-                      <Collapsible
-                        open={expandedVariants.has(variant.id!)}
-                        onOpenChange={() =>
-                          toggleVariantExpansion(variant.id!)
-                        }
-                      >
-                        <CollapsibleTrigger asChild>
-                          <CardHeader className="cursor-pointer transition-colors pb-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <ChevronDown
-                                  className={`h-4 w-4 transition-transform duration-200 ${expandedVariants.has(variant.id!)
-                                    ? "rotate-180"
-                                    : ""
-                                    }`}
-                                />
-                                <CardTitle className="text-base">
-                                  {variant.name || `Variant ${index + 1}`}
-                                </CardTitle>
-                                {variant.price > 0 && (
-                                  <Badge variant="outline">
-                                    ${(variant.price / 100).toFixed(2)}
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    duplicateVariant(variant);
-                                  }}
-                                  className="h-8 w-8 text-gray-500 hover:text-blue-600"
-                                >
-                                  <Copy className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeVariant(variant.id!);
-                                  }}
-                                  className="h-8 w-8 text-gray-500 hover:text-red-600"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardHeader>
-                        </CollapsibleTrigger>
-
-                        <CollapsibleContent>
-                          <CardContent className="pt-0 space-y-4">
-                            <div className="grid gap-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <label className="text-sm font-medium mb-2 block">
-                                    Variant Name
-                                  </label>
-                                  <Input
-                                    placeholder="e.g., Small, Medium, Large"
-                                    value={variant.name}
-                                    onChange={(e) =>
-                                      updateVariant(
-                                        variant.id!,
-                                        "name",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="border-2 focus:border-blue-500 transition-colors"
-                                  />
-                                </div>
-
-                                <div>
-                                  <label className="text-sm font-medium mb-2 block">
-                                    Price (cents)
-                                  </label>
-                                  <Input
-                                    type="number"
-                                    placeholder="1000"
-                                    value={variant.price || ""}
-                                    onChange={(e) =>
-                                      updateVariant(
-                                        variant.id!,
-                                        "price",
-                                        Number.parseInt(e.target.value) ||
-                                        0
-                                      )
-                                    }
-                                    className="border-2 focus:border-blue-500 transition-colors"
-                                  />
-                                </div>
-                              </div>
-
-                              <div>
-                                <label className="text-sm font-medium mb-2 block">
-                                  Description
-                                </label>
-                                <Textarea
-                                  placeholder="Variant description (optional)"
-                                  value={variant.description || ""}
-                                  onChange={(e) =>
-                                    updateVariant(
-                                      variant.id!,
-                                      "description",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="border-2 focus:border-blue-500 transition-colors resize-none"
-                                  rows={3}
-                                />
-                              </div>
-
-                              <div className="flex items-center justify-between p-4 rounded-lg">
-                                <div>
-                                  <label className="text-sm font-medium">
-                                    Active
-                                  </label>
-                                  <p className="text-xs">
-                                    Whether this variant is available for
-                                    purchase
-                                  </p>
-                                </div>
-                                <Switch
-                                  className=""
-                                  checked={
-                                    (variant as any).active || false
-                                  }
-                                  onCheckedChange={(checked) =>
-                                    updateVariant(
-                                      variant.id!,
-                                      "active",
-                                      checked
-                                    )
-                                  }
-                                />
-                              </div>
-                              <div className="space-y-3">
-                                <UploadButton
-                                  appearance={
-                                    uploadThemes.colorful.uploadButton
-                                  }
-                                  endpoint="imageUploader"
-                                  onClientUploadComplete={(res) => {
-                                    if (res?.[0]?.ufsUrl) {
-                                      res.map((item) => {
-                                        updateVariant(
-                                          variant.id!,
-                                          "images",
-                                          [
-                                            ...(variant.images || []),
-                                            item.ufsUrl,
-                                          ]
-                                        );
-                                      });
-                                    }
-                                  }}
-                                  onUploadError={(error: Error) => {
-                                    console.error("Upload error:", error);
-                                  }}
-                                />
-                                {variant.images &&
-                                  variant.images.length > 0 && (
-                                    <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                      <div className="flex-shrink-0 flex flex-row gap-2 flex-wrap">
-                                        {variant.images.map(
-                                          (item, index) => (
-                                            <div
-                                              key={index}
-                                              className="relative group"
-                                            >
-                                              <Image
-                                                width={1000}
-                                                height={1000}
-                                                src={
-                                                  item ||
-                                                  "/placeholder.svg"
-                                                }
-                                                alt={`Uploaded image ${index + 1}`}
-                                                className="w-16 h-16 object-cover rounded-md border"
-                                              />
-                                              <button
-                                                type="button"
-                                                onClick={() => {
-                                                  const newImages =
-                                                    variant.images
-                                                      ? [
-                                                        ...variant.images,
-                                                      ]
-                                                      : [];
-                                                  newImages.splice(
-                                                    index,
-                                                    1
-                                                  );
-                                                  updateVariant(
-                                                    variant.id!,
-                                                    "images",
-                                                    newImages
-                                                  );
-                                                }}
-                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                              >
-                                                <svg
-                                                  className="w-4 h-4"
-                                                  fill="none"
-                                                  stroke="currentColor"
-                                                  viewBox="0 0 24 24"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M6 18L18 6M6 6l12 12"
-                                                  />
-                                                </svg>
-                                              </button>
-                                            </div>
-                                          )
-                                        )}
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                          <span className="text-sm font-medium text-green-800">
-                                            {variant.images.length}{" "}
-                                            {variant.images.length === 1
-                                              ? "image"
-                                              : "images"}{" "}
-                                            uploaded successfully
-                                          </span>
-                                        </div>
-                                      </div>
-                                      {/* <Button
-                                              type="button"
-                                              onClick={() => field.onChange([])}
-                                              className="flex-shrink-0 p-1 text-green-600 hover:text-green-800 transition-colors"
-                                            >
-                                              <svg
-                                                className="w-4 h-4"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                              >
-                                                <path
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth={2}
-                                                  d="M6 18L18 6M6 6l12 12"
-                                                />
-                                              </svg>
-                                            </Button> */}
-                                    </div>
-                                  )}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {!showVariant && (
-            <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
-              <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No variants added yet</p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addVariant}
-                className="border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 bg-transparent"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Variant
-              </Button>
+                    <Settings2 className="h-4 w-4" />
+                    Manage Variants
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addVariant}
+                  className="flex items-center gap-2 border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 bg-transparent"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Variant
+                </Button>
+              </div>
             </div>
-          )}
-        </div>
+
+            {variants.length > 0 ? (
+              <div className="rounded-md border-2 border-gray-200 overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-20">Position</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead className="w-28">Price (¢)</TableHead>
+                      <TableHead className="w-28">Compare at (¢)</TableHead>
+                      <TableHead className="w-24">Stock</TableHead>
+                      <TableHead className="w-32">SKU</TableHead>
+                      <TableHead className="w-20">Active</TableHead>
+                      <TableHead className="w-24 text-right">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {variants.map((variant, index) => (
+                      <TableRow key={variant.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground w-4">
+                              {index + 1}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              disabled={index === 0}
+                              onClick={() => moveVariant(index, -1)}
+                            >
+                              <ArrowUp className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              disabled={index === variants.length - 1}
+                              onClick={() => moveVariant(index, 1)}
+                            >
+                              <ArrowDown className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            placeholder="e.g. Small"
+                            value={variant.name}
+                            onChange={(e) =>
+                              updateVariant(
+                                variant.id!,
+                                "name",
+                                e.target.value
+                              )
+                            }
+                            className="h-9 border-2 focus:border-blue-500 transition-colors"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            placeholder="1000"
+                            value={variant.price || ""}
+                            onChange={(e) =>
+                              updateVariant(
+                                variant.id!,
+                                "price",
+                                Number.parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="h-9 border-2 focus:border-blue-500 transition-colors"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={variant.compareAtPrice ?? ""}
+                            onChange={(e) =>
+                              updateVariant(
+                                variant.id!,
+                                "compareAtPrice",
+                                e.target.value === ""
+                                  ? 0
+                                  : Number.parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="h-9 border-2 focus:border-blue-500 transition-colors"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            placeholder="0"
+                            value={variant.stock ?? ""}
+                            onChange={(e) =>
+                              updateVariant(
+                                variant.id!,
+                                "stock",
+                                e.target.value === ""
+                                  ? 0
+                                  : Number.parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="h-9 border-2 focus:border-blue-500 transition-colors"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            placeholder="SKU"
+                            value={variant.sku ?? ""}
+                            onChange={(e) =>
+                              updateVariant(
+                                variant.id!,
+                                "sku",
+                                e.target.value
+                              )
+                            }
+                            className="h-9 border-2 focus:border-blue-500 transition-colors"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={variant.active ?? true}
+                            onCheckedChange={(checked) =>
+                              updateVariant(variant.id!, "active", checked)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              title="Duplicate"
+                              onClick={() => duplicateVariant(variant)}
+                              className="h-8 w-8 text-gray-500 hover:text-blue-600"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              title="Remove variant"
+                              onClick={() => removeVariant(variant.id!)}
+                              className="h-8 w-8 text-gray-500 hover:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 mb-4">No variants added yet</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addVariant}
+                  className="border-2 border-dashed border-blue-300 text-blue-600 hover:bg-blue-50 bg-transparent"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Variant
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         <Separator />
 
@@ -1044,6 +1245,27 @@ export default function ProductForm({
           </CardContent>
         </Card>
 
+        <Separator />
+
+        {/* Marketing Blocks */}
+        <Card className="border-2 border-gray-100">
+          <CardHeader>
+            <CardTitle className="text-lg">Marketing Blocks</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <MarketingBlockFields
+              legend="Why Choose"
+              value={whyChoose}
+              onChange={setWhyChoose}
+            />
+            <MarketingBlockFields
+              legend="How to Use"
+              value={howToUse}
+              onChange={setHowToUse}
+            />
+          </CardContent>
+        </Card>
+
         <Button
           type="submit"
           className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
@@ -1060,6 +1282,16 @@ export default function ProductForm({
             "Create Product"
           )}
         </Button>
+
+        {isEditing && initialData && (
+          <ManageVariantsDialog
+            productId={initialData.id}
+            productName={initialData.name}
+                    trackInventory={initialData.defaultVariant?.trackInventory ?? false}
+            open={manageOpen}
+            onOpenChange={setManageOpen}
+          />
+        )}
       </form>
     </Form>
   );

@@ -26,13 +26,13 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Percent, Gift, Zap, Edit } from "lucide-react";
 import { couponSchema, CouponFormData } from "@/lib/product/product.schema";
-import { StripeCoupon } from "@/types/product";
+import { type Coupon } from "@/lib/coupons";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
 
 interface EnhancedCouponFormProps {
   onSubmit: (data: CouponFormData) => void;
   onPresetSubmit: (preset: "4for3" | "15off3") => void;
-  initialData?: StripeCoupon;
+  initialData?: Coupon;
   isLoading?: boolean;
 }
 

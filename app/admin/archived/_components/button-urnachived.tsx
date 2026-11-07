@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { unarchiveProduct } from "@/lib/product/crud"
+import { unarchiveProduct } from "@/lib/admin/catalog-admin"
 
 interface ButtonUnarchivedProps {
     productId: string

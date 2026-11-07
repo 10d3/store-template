@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { publishBlog } from "@/lib/action";
+import { publishBlog } from "@/lib/actions";
 
 export default function PublishButton({ id }: { id: string }) {
   const handleAction = async () => {

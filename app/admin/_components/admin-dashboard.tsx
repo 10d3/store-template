@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { listProducts, listCoupons } from "@/lib/product/crud"
+import { listProducts } from "@/lib/admin/catalog-admin"
+import { listCoupons } from "@/lib/coupons"
 import { Package, ShoppingCart, Percent, TrendingUp, DollarSign } from "lucide-react"
 import Link from "next/link"
 
@@ -22,14 +23,14 @@ export default function AdminDashboard() {
     // Calculate statistics
     const totalProducts = products.length
     const activeProducts = products.filter(p => p.active).length
-    const totalPacks = products.filter(p => p.metadata?.type === 'pack').length
+    const totalPacks = products.filter(p => p.isBundle).length
     const totalCoupons = coupons.length
     const activeCoupons = coupons.filter(c => c.valid).length
 
     // Calculate total revenue potential (sum of all product prices)
     const totalRevenuePotential = products.reduce((sum, product) => {
-        if (product.default_price && typeof product.default_price === 'object' && 'unit_amount' in product.default_price) {
-            return sum + (product.default_price.unit_amount || 0)
+        if (product.defaultVariant) {
+            return sum + (product.defaultVariant.price || 0)
         }
         return sum
     }, 0) / 100 // Convert from cents to dollars

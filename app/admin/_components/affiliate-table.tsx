@@ -33,7 +33,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { AffiliateStatus } from "@/lib/generated/prisma";
-import { updateAffiliateStatus } from "@/lib/action/admin-affiliation";
+import { updateAffiliateStatus } from "@/lib/actions/admin-affiliation";
 
 interface Subscription {
     id: string;

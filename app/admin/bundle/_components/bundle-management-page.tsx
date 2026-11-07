@@ -10,12 +10,11 @@ import {
     updatePack,
     archiveProduct,
     listProducts,
-    listCoupons,
-} from "@/lib/product/crud";
+} from "@/lib/admin/catalog-admin";
 import { toast } from "sonner";
 import { EnhancedPackForm } from "../../_components/form/pack-form";
 import { MultiPackForm } from "../../_components/form/multi-pack-form";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import { PackFormData } from "@/lib/product/product.schema";
 import { BundleOnlyList } from "../../_components/bundle-only-list";
 import {
@@ -27,7 +26,7 @@ import {
 
 export default function BundleManagementPage() {
     const queryClient = useQueryClient();
-    const [editingPack, setEditingPack] = useState<StripeProduct | null>(null);
+    const [editingPack, setEditingPack] = useState<ProductWithVariants | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [formType, setFormType] = useState<"generic" | "multi">("generic");
 
@@ -36,9 +35,6 @@ export default function BundleManagementPage() {
         queryKey: ["products"],
         queryFn: listProducts,
     });
-
-    // Filter to show only packs
-    // const packs = products.filter((p) => p.metadata?.type === "bundle");
 
     // Mutations
     const { mutate: handleCreatePack, isPending: creatingPack } = useMutation({
@@ -90,7 +86,7 @@ export default function BundleManagementPage() {
         }
     };
 
-    const handleEditPack = (pack: StripeProduct) => {
+    const handleEditPack = (pack: ProductWithVariants) => {
         setEditingPack(pack);
         // Determine form type based on pack metadata
         if (pack.metadata?.pack_type === "same_product") {

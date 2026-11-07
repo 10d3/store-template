@@ -6,12 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Archive } from "lucide-react";
-import { StripeProduct } from "@/types/product";
-// import { StripeProduct } from "@/types/stripe";
+import { type ProductWithVariants } from "@/lib/catalog";
 
 interface BundleOnlyListProps {
-  products: StripeProduct[];
-  onEdit: (product: StripeProduct) => void;
+  products: ProductWithVariants[];
+  onEdit: (product: ProductWithVariants) => void;
   onArchive: (id: string) => void;
   isLoading?: boolean;
   title?: string;
@@ -37,16 +36,15 @@ export function BundleOnlyList({
     }
   };
 
-  const formatPrice = (price: any) => {
-    if (!price || typeof price !== "object") return "N/A";
+  const formatPrice = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: price.currency?.toUpperCase() || "USD",
-    }).format((price.unit_amount || 0) / 100);
+      currency: "USD",
+    }).format(cents / 100);
   };
 
   // Filter to show only bundles/packs
-  const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
+  const packProducts = products.filter((p) => p.isBundle);
 
   return (
     <Card className="w-full">
@@ -84,15 +82,15 @@ export function BundleOnlyList({
                       {pack.description}
                     </p>
                   )}
-                  {pack.metadata && pack.metadata.contents && (
+                  {pack.bundleItems.length > 0 && (
                     <p className="text-xs text-muted-foreground w-full max-w-full">
-                      Contains: {pack.metadata.contents.split(",").length}{" "}
+                      Contains: {pack.bundleItems.length}{" "}
                       items
                     </p>
                   )}
-                  {pack.default_price && (
+                  {pack.defaultVariant && (
                     <p className="text-sm font-medium">
-                      {formatPrice(pack.default_price)}
+                      {formatPrice(pack.defaultVariant.price)}
                     </p>
                   )}
                 </div>

@@ -17,7 +17,7 @@ import {
   TrendingUp,
   // Eye,
 } from "lucide-react";
-import { findBlogs } from "@/lib/action";
+import { findBlogs } from "@/lib/actions";
 import PublishButton from "./_components/publish-button";
 import { Metadata } from "next";
 

@@ -2,14 +2,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Percent } from "lucide-react";
-import type { StripeCoupon } from "@/types/product";
+import type { Coupon } from "@/lib/coupons";
 
 interface CouponListProps {
-  coupons: StripeCoupon[];
+  coupons: Coupon[];
 }
 
 export function CouponList({ coupons }: CouponListProps) {
-  const formatDiscount = (coupon: StripeCoupon) => {
+  const formatDiscount = (coupon: Coupon) => {
     if (coupon.percent_off) {
       return `${coupon.percent_off}% off`;
     }

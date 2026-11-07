@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { StripeProduct, StripeCoupon } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
+import type { Coupon } from "@/lib/coupons";
 import { Edit, Archive, Package, ShoppingBag, Percent } from "lucide-react";
 
 interface UnifiedProductListProps {
-  products: StripeProduct[];
-  coupons: StripeCoupon[];
-  onEdit: (item: StripeProduct | StripeCoupon) => void;
+  products: ProductWithVariants[];
+  coupons: Coupon[];
+  onEdit: (item: ProductWithVariants | Coupon) => void;
   onArchive: (id: string) => void;
   isLoading?: boolean;
   title?: string;
@@ -37,15 +38,14 @@ export function UnifiedProductList({
     setArchivingId(null);
   };
 
-  const formatPrice = (price: { unit_amount: number | null; currency: string } | string | null | undefined) => {
-    if (!price || typeof price === 'string' || price === null || price.unit_amount === null) return "N/A";
+  const formatPrice = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: price.currency.toUpperCase(),
-    }).format(price.unit_amount / 100);
+      currency: "USD",
+    }).format(cents / 100);
   };
 
-  const formatDiscount = (coupon: StripeCoupon) => {
+  const formatDiscount = (coupon: Coupon) => {
     if (coupon.percent_off && coupon.percent_off > 0) {
       return `${coupon.percent_off}% off`;
     }
@@ -58,8 +58,8 @@ export function UnifiedProductList({
     return "Special offer";
   };
 
-  const regularProducts = products.filter((p) => p.metadata && p.metadata.type !== "bundle");
-  const packProducts = products.filter((p) => p.metadata && p.metadata.type === "bundle");
+  const regularProducts = products.filter((p) => !p.isBundle);
+  const packProducts = products.filter((p) => p.isBundle);
   // console.log("packProducts", packProducts)
 
   return (
@@ -108,9 +108,9 @@ export function UnifiedProductList({
                         {product.description}
                       </p>
                     )}
-                    {product.default_price && (
+                    {product.defaultVariant && (
                       <p className="text-sm font-medium">
-                        {formatPrice(product.default_price)}
+                        {formatPrice(product.defaultVariant.price)}
                       </p>
                     )}
                   </div>
@@ -164,15 +164,15 @@ export function UnifiedProductList({
                         {pack.description}
                       </p>
                     )}
-                    {pack.metadata && pack.metadata.contents && (
+                    {pack.bundleItems.length > 0 && (
                       <p className="text-xs text-muted-foreground">
-                        Contains: {pack.metadata.contents.split(",").length}{" "}
+                        Contains: {pack.bundleItems.length}{" "}
                         items
                       </p>
                     )}
-                    {pack.default_price && (
+                    {pack.defaultVariant && (
                       <p className="text-sm font-medium">
-                        {formatPrice(pack.default_price)}
+                        {formatPrice(pack.defaultVariant.price)}
                       </p>
                     )}
                   </div>

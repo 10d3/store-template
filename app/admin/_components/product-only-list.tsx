@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Archive, Layers } from "lucide-react";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import { PiRoadHorizon } from "react-icons/pi";
 
 interface ProductOnlyListProps {
-  products: StripeProduct[];
-  onEdit: (product: StripeProduct) => void;
+  products: ProductWithVariants[];
+  onEdit: (product: ProductWithVariants) => void;
   onArchive: (id: string) => void;
   onUnarchive: (id: string) => void;
-  onManageVariants?: (product: StripeProduct) => void;
+  onManageVariants?: (product: ProductWithVariants) => void;
   isLoading?: boolean;
   title?: string;
   description?: string;
@@ -52,16 +52,15 @@ export function ProductOnlyList({
     }
   };
 
-  const formatPrice = (price: any) => {
-    if (!price || typeof price !== "object") return "N/A";
+  const formatPrice = (cents: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: price.currency?.toUpperCase() || "USD",
-    }).format((price.unit_amount || 0) / 100);
+      currency: "USD",
+    }).format(cents / 100);
   };
 
   // Filter to show only regular products (not bundles)
-  const regularProducts = products.filter((p) => p.metadata && p.metadata.type !== "bundle");
+  const regularProducts = products.filter((p) => !p.isBundle);
 
   return (
     <Card>
@@ -95,9 +94,9 @@ export function ProductOnlyList({
                       {product.description}
                     </p>
                   )}
-                  {product.default_price && (
+                  {product.defaultVariant && (
                     <p className="text-sm font-medium">
-                      {formatPrice(product.default_price)}
+                      {formatPrice(product.defaultVariant.price)}
                     </p>
                   )}
                 </div>

@@ -2,36 +2,25 @@
 "use client"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import {
-    createProduct,
-    updateProduct,
     archiveProduct,
     listProducts,
-    listCoupons,
     unarchiveProduct,
     getArchivedProducts,
-} from "@/lib/product/crud"
+} from "@/lib/admin/catalog-admin"
 import { toast } from "sonner"
-import ProductForm from "../../_components/form/product-form"
-import { StripeProduct } from "@/types/product"
-import { ProductFormData } from "@/lib/product/product.schema"
+import { type ProductWithVariants } from "@/lib/catalog"
 import { ProductOnlyList } from "../../_components/product-only-list";
 import ManageVariantsDialog from "../../_components/manage-variants-dialog";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
 
 export default function ProductManagementPage() {
     const queryClient = useQueryClient()
-    const [editingProduct, setEditingProduct] = useState<StripeProduct | null>(null)
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [variantsProduct, setVariantsProduct] = useState<StripeProduct | null>(null)
+    const router = useRouter()
+    const [variantsProduct, setVariantsProduct] = useState<ProductWithVariants | null>(null)
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -40,7 +29,7 @@ export default function ProductManagementPage() {
     })
 
     // Filter out packs to show only regular products
-    const regularProducts = products.filter(p => p.metadata?.type !== 'pack')
+    const regularProducts = products.filter(p => !p.isBundle)
 
     // Archived products query
     const { data: archivedProducts = [], isLoading: archivedLoading } = useQuery({
@@ -49,33 +38,6 @@ export default function ProductManagementPage() {
     })
 
     // Mutations
-    const { mutate: handleCreateProduct, isPending: creatingProduct } = useMutation({
-        mutationFn: createProduct,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] })
-            toast.success("Product created successfully")
-            setIsDialogOpen(false)
-        },
-        onError: (error) => {
-            toast.error("Failed to create product")
-            console.error(error)
-        },
-    })
-
-    const { mutate: handleUpdateProduct, isPending: updatingProduct } = useMutation({
-        mutationFn: ({ id, data }: { id: string; data: Partial<ProductFormData> }) => updateProduct(id, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["products"] })
-            setEditingProduct(null)
-            setIsDialogOpen(false)
-            toast.success("Product updated successfully")
-        },
-        onError: (error) => {
-            toast.error("Failed to update product")
-            console.error(error)
-        },
-    })
-
     const { mutate: handleArchiveProduct } = useMutation({
         mutationFn: archiveProduct,
         onSuccess: () => {
@@ -102,27 +64,8 @@ export default function ProductManagementPage() {
         },
     })
 
-    const onProductSubmit = (data: ProductFormData) => {
-        if (editingProduct) {
-            handleUpdateProduct({ id: editingProduct.id, data })
-        } else {
-            handleCreateProduct(data)
-        }
-    }
-
-    const onEditProduct = (product: StripeProduct) => {
-        setEditingProduct(product)
-        setIsDialogOpen(true)
-    }
-
-    const startCreateProduct = () => {
-        setEditingProduct(null)
-        setIsDialogOpen(true)
-    }
-
-    const onCancelEdit = () => {
-        setEditingProduct(null)
-        setIsDialogOpen(false)
+    const onEditProduct = (product: ProductWithVariants) => {
+        router.push(`/admin/product/${product.id}/edit`)
     }
 
     return (
@@ -140,8 +83,8 @@ export default function ProductManagementPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Product Management</h1>
                     <p className="text-muted-foreground">Create, edit, and manage your products</p>
                 </div>
-                <Button onClick={startCreateProduct}>
-                    Create New Product
+                <Button asChild>
+                    <Link href="/admin/product/new">Create New Product</Link>
                 </Button>
             </div>
 
@@ -152,7 +95,7 @@ export default function ProductManagementPage() {
                     onArchive={handleArchiveProduct}
                     onUnarchive={handleUnarchiveProduct}
                     onManageVariants={setVariantsProduct}
-                    isLoading={creatingProduct || updatingProduct}
+                    isLoading={productsLoading}
                     title="Active Products"
                     description="Manage your individual products here"
                 />
@@ -173,26 +116,11 @@ export default function ProductManagementPage() {
                 <ManageVariantsDialog
                     productId={variantsProduct.id}
                     productName={variantsProduct.name}
-                    trackInventory={variantsProduct.trackInventory ?? false}
+                    trackInventory={variantsProduct.defaultVariant?.trackInventory ?? false}
                     open={!!variantsProduct}
                     onOpenChange={(o) => !o && setVariantsProduct(null)}
                 />
             )}
-
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle>{editingProduct ? "Edit Product" : "Create New Product"}</DialogTitle>
-                    </DialogHeader>
-                    <ProductForm
-                        onSubmit={onProductSubmit}
-                        initialData={editingProduct || undefined}
-                        isLoading={creatingProduct || updatingProduct}
-                        products={products}
-                        embed
-                    />
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

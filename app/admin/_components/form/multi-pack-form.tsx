@@ -19,18 +19,18 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Package, ShoppingCart, Edit, Layers, ImageIcon } from "lucide-react";
 import { packSchema, type PackFormData, type PackSizeConfig } from "@/lib/product/product.schema";
-import type { StripeProduct } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
-import ProductMultiSelect from "@/components/shared/product-muli-select";
+import { BundleComponentPicker } from "../bundle-component-picker";
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
 import { uploadThemes } from "@/lib/theme/upload-theme";
 
 interface MultiPackFormProps {
-    products: StripeProduct[];
+    products: ProductWithVariants[];
     onSubmit: (data: PackFormData) => void;
-    initialData?: StripeProduct;
+    initialData?: ProductWithVariants;
     isLoading?: boolean;
     embed?: boolean;
 }
@@ -71,8 +71,13 @@ export function MultiPackForm({
     // Reset form when initialData changes
     useEffect(() => {
         if (initialData) {
-            const productIds = initialData.metadata?.contents
-                ? initialData.metadata.contents.split(",").map(id => id.trim()).filter(Boolean)
+            // Rehydrate the selected products from the real BundleItem rows
+            // (the single source of truth), ordered by position.
+            const productIds = initialData.bundleItems?.length
+                ? [...initialData.bundleItems]
+                    .sort((a, b) => a.position - b.position)
+                    .map((item) => item.componentProduct.id)
+                    .filter((id, index, arr) => arr.indexOf(id) === index)
                 : [];
 
             // Parse pack sizes from metadata JSON
@@ -84,10 +89,10 @@ export function MultiPackForm({
                     /* eslint-disable @typescript-eslint/no-explicit-any */
                     packSizes = parsedSizes.map((sizeConfig: any) => {
                         if (sizeConfig.enabled && sizeConfig.discountPercent !== undefined && sizeConfig.fixedPrice === undefined) {
-                            const basePrice = products?.find(p => productIds.includes(p.id))?.default_price;
+                            const basePrice = products?.find(p => productIds.includes(p.id))?.defaultVariant?.price;
                             let unitAmount = 0;
-                            if (basePrice && typeof basePrice === 'object' && basePrice.unit_amount) {
-                                unitAmount = basePrice.unit_amount;
+                            if (basePrice) {
+                                unitAmount = basePrice;
                             }
 
                             if (unitAmount > 0) {
@@ -109,11 +114,7 @@ export function MultiPackForm({
                 images: initialData.images || [],
                 productIds,
                 packPrice:
-                    initialData.default_price &&
-                        typeof initialData.default_price === "object" &&
-                        initialData.default_price.unit_amount !== null
-                        ? initialData.default_price.unit_amount
-                        : 0,
+                    initialData.defaultVariant?.price ?? 0,
                 discount: initialData.metadata?.discount
                     ? Number.parseInt(initialData.metadata.discount)
                     : 0,
@@ -158,7 +159,7 @@ export function MultiPackForm({
     const watchedProductIds = form.watch("productIds");
     const selectedProducts = watchedProductIds?.length > 0
         ? watchedProductIds
-        : (initialData?.metadata?.contents?.split(",").filter(Boolean) || []);
+        : (initialData?.bundleItems?.map((item) => item.componentProduct.id) ?? []);
 
     const formatPrice = (amount: number, currency = "usd") => {
         return new Intl.NumberFormat("en-US", {
@@ -170,13 +171,8 @@ export function MultiPackForm({
     const calculateTotalFromIds = (ids: string[]) => {
         return ids.reduce((sum, id) => {
             const product = products.find((p) => p.id === id);
-            if (
-                product &&
-                product.default_price &&
-                typeof product.default_price === "object" &&
-                product.default_price.unit_amount !== null
-            ) {
-                return sum + product.default_price.unit_amount;
+            if (product && product.defaultVariant?.price != null) {
+                return sum + product.defaultVariant.price;
             }
             return sum;
         }, 0);
@@ -359,12 +355,19 @@ export function MultiPackForm({
                                     Select ONE Base Product
                                 </FormLabel>
                                 <FormControl>
-                                    <ProductMultiSelect
+                                    <BundleComponentPicker
                                         products={products}
-                                        selectedIds={field.value || []}
-                                        onSelectionChange={(newIds) => {
+                                        value={(field.value || []).map((productId, index) => ({
+                                            componentProductId: productId,
+                                            componentVariantId: null,
+                                            quantity: 1,
+                                            position: index,
+                                        }))}
+                                        onChange={(next) => {
                                             // Enforce single selection
-                                            const lastSelected = newIds.length > 0 ? [newIds[newIds.length - 1]] : [];
+                                            const lastSelected = next.length > 0
+                                                ? [next[next.length - 1].componentProductId]
+                                                : [];
                                             field.onChange(lastSelected);
 
                                             // Update pack price to match product price initially

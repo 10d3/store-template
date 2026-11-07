@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit } from "lucide-react";
-import { StripeCoupon } from "@/types/product";
+import { type Coupon } from "@/lib/coupons";
 
 interface CouponOnlyListProps {
-  coupons: StripeCoupon[];
-  onEdit: (coupon: StripeCoupon) => void;
+  coupons: Coupon[];
+  onEdit: (coupon: Coupon) => void;
   isLoading?: boolean;
   title?: string;
   description?: string;
@@ -21,7 +21,7 @@ export function CouponOnlyList({
   title = "Coupons",
   description,
 }: CouponOnlyListProps) {
-  const formatDiscount = (coupon: StripeCoupon) => {
+  const formatDiscount = (coupon: Coupon) => {
     if (coupon.percent_off) {
       return `${coupon.percent_off}% off`;
     }

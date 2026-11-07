@@ -9,18 +9,18 @@ import {
     createCoupon,
     updateCoupon,
     createPresetCoupon,
-    listProducts,
     listCoupons,
-} from "@/lib/product/crud"
+} from "@/lib/coupons"
+import { listProducts } from "@/lib/admin/catalog-admin"
 import { toast } from "sonner"
 import { EnhancedCouponForm } from "../../_components/form/coupon-form"
-import { StripeCoupon } from "@/types/product"
+import { type Coupon } from "@/lib/coupons"
 import { CouponFormData } from "@/lib/product/product.schema"
 import { CouponOnlyList } from "../../_components/coupon-only-list";
 
 export default function CouponManagementPage() {
     const queryClient = useQueryClient()
-    const [editingCoupon, setEditingCoupon] = useState<StripeCoupon | null>(null)
+    const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null)
 
     // Queries
     const { data: products = [], isLoading: productsLoading } = useQuery({
@@ -79,7 +79,7 @@ export default function CouponManagementPage() {
         }
     }
 
-    const handleEditCoupon = (coupon: StripeCoupon) => {
+    const handleEditCoupon = (coupon: Coupon) => {
         setEditingCoupon(coupon)
     }
 

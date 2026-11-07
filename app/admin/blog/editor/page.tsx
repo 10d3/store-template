@@ -1,4 +1,4 @@
-import { fsindBlog } from "@/lib/action";
+import { fsindBlog } from "@/lib/actions";
 import BlogEditor from "../_components/blog-editor";
 import { Blog } from "@/lib/generated/prisma";
 

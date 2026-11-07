@@ -26,18 +26,18 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Package, ShoppingCart, Edit, Layers, ImageIcon } from "lucide-react";
 import { packSchema, type PackFormData, type PackSizeConfig } from "@/lib/product/product.schema";
-import type { StripeProduct } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
 import { transformMetadataFromStripe } from "@/lib/metadata/form-utils";
-import ProductMultiSelect from "@/components/shared/product-muli-select";
+import { BundleComponentPicker } from "../bundle-component-picker";
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
 import { uploadThemes } from "@/lib/theme/upload-theme";
 
 interface EnhancedPackFormProps {
-  products: StripeProduct[];
+  products: ProductWithVariants[];
   onSubmit: (data: PackFormData) => void;
-  initialData?: StripeProduct;
+  initialData?: ProductWithVariants;
   isLoading?: boolean;
   embed?: boolean;
 }
@@ -75,8 +75,13 @@ export function EnhancedPackForm({
   // Reset form when initialData changes
   useEffect(() => {
     if (initialData) {
-      const productIds = initialData.metadata?.contents
-        ? initialData.metadata.contents.split(",").map(id => id.trim()).filter(Boolean)
+      // Rehydrate the selected products from the real BundleItem rows
+      // (the single source of truth), ordered by position.
+      const productIds = initialData.bundleItems?.length
+        ? [...initialData.bundleItems]
+            .sort((a, b) => a.position - b.position)
+            .map((item) => item.componentProduct.id)
+            .filter((id, index, arr) => arr.indexOf(id) === index)
         : [];
 
       // Parse pack sizes from metadata JSON
@@ -95,10 +100,10 @@ export function EnhancedPackForm({
               // Since we can't easily access suggestedPrice here without calculation, 
               // and products might not be loaded, we'll try to find the price from products prop
               // However, products prop is available in scope.
-              const basePrice = products?.find(p => productIds.includes(p.id))?.default_price;
+              const basePrice = products?.find(p => productIds.includes(p.id))?.defaultVariant?.price;
               let unitAmount = 0;
-              if (basePrice && typeof basePrice === 'object' && basePrice.unit_amount) {
-                unitAmount = basePrice.unit_amount;
+              if (basePrice) {
+                unitAmount = basePrice;
               }
 
               if (unitAmount > 0) {
@@ -108,13 +113,13 @@ export function EnhancedPackForm({
               }
             }
 
-            // If no image in metadata (stripped to save space), look up from DB prices by stripePriceId
-            if (!enriched.image && enriched.stripePriceId && initialData.prices) {
-              const matchedPrice = (initialData.prices as any[]).find(
-                (p: any) => p.id === enriched.stripePriceId
+            // If no image in metadata (stripped to save space), look up from DB variants by stripePriceId
+            if (!enriched.image && enriched.stripePriceId && initialData.variants) {
+              const matchedVariant = initialData.variants.find(
+                (v) => v.stripePriceId === enriched.stripePriceId
               );
-              if (matchedPrice?.image) {
-                enriched = { ...enriched, image: matchedPrice.image };
+              if (matchedVariant?.image) {
+                enriched = { ...enriched, image: matchedVariant.image };
               }
             }
 
@@ -131,11 +136,7 @@ export function EnhancedPackForm({
         images: initialData.images || [],
         productIds,
         packPrice:
-          initialData.default_price &&
-            typeof initialData.default_price === "object" &&
-            initialData.default_price.unit_amount !== null
-            ? initialData.default_price.unit_amount
-            : 0,
+          initialData.defaultVariant?.price ?? 0,
         discount: initialData.metadata?.discount
           ? Number.parseInt(initialData.metadata.discount)
           : 0,
@@ -172,7 +173,7 @@ export function EnhancedPackForm({
   const watchedProductIds = form.watch("productIds");
   const selectedProducts = watchedProductIds?.length > 0
     ? watchedProductIds
-    : (initialData?.metadata?.contents?.split(",").filter(Boolean) || []);
+    : (initialData?.bundleItems?.map((item) => item.componentProduct.id) ?? []);
   const packPrice = form.watch("packPrice");
   const discount = form.watch("discount");
   const isEditing = !!initialData;
@@ -190,17 +191,11 @@ export function EnhancedPackForm({
       const product = products.find((p) => p.id === id);
       console.log(`Debug: Checking product ${id}`, {
         found: !!product,
-        price: product?.default_price,
-        unit_amount: (product?.default_price as any)?.unit_amount
+        price: product?.defaultVariant?.price,
       });
 
-      if (
-        product &&
-        product.default_price &&
-        typeof product.default_price === "object" &&
-        product.default_price.unit_amount !== null
-      ) {
-        return sum + product.default_price.unit_amount;
+      if (product && product.defaultVariant?.price != null) {
+        return sum + product.defaultVariant.price;
       }
       return sum;
     }, 0);
@@ -372,10 +367,18 @@ export function EnhancedPackForm({
                   Select Products for Pack
                 </FormLabel>
                 <FormControl>
-                  <ProductMultiSelect
+                  <BundleComponentPicker
                     products={products}
-                    selectedIds={field.value || []}
-                    onSelectionChange={(newIds) => {
+                    value={(field.value || []).map((productId, index) => ({
+                      componentProductId: productId,
+                      componentVariantId: null,
+                      quantity: 1,
+                      position: index,
+                    }))}
+                    onChange={(next) => {
+                      const newIds = next.map(
+                        (component) => component.componentProductId,
+                      );
                       field.onChange(newIds);
                       // Auto-calculate pack price based on selection
                       const total = calculateTotalFromIds(newIds);
