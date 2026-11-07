@@ -1,5 +1,3 @@
-import type { JsonValue } from "@prisma/client/runtime/library";
-import { StripeProduct } from "@/types/product";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,8 +14,15 @@ export function invariant(
   }
 }
 
-export const getNestedValue = (obj: any, path: string): string => {
-  return path.split(".").reduce((current, key) => current?.[key], obj) || "";
+export const getNestedValue = (obj: unknown, path: string): string => {
+  return (
+    path.split(".").reduce<unknown>((current, key) => {
+      if (current && typeof current === "object" && key in current) {
+        return (current as Record<string, unknown>)[key];
+      }
+      return undefined;
+    }, obj) as string | undefined
+  ) || "";
 };
 
 export const formatPrice = (price: number) => {
@@ -36,8 +41,9 @@ export function isValidUrl(url: string) {
   return /^https?:\/\/\S+$/.test(url);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function duplicateContent(editor: any) {
-  const { view, state } = editor;
+  const { state } = editor;
   const { selection } = state;
   const { from, to } = selection;
 
@@ -64,7 +70,7 @@ export const getBaseURL = () => {
   }
 
   // Server-side: use environment variable
-  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 };
 
 export function generateReferralCode(length = 8): string {
@@ -77,104 +83,13 @@ export function generateReferralCode(length = 8): string {
 }
 
 export const getStripeLink = (url: string, data: string) => {
-  return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${url}&state=${data}`;
+  const rootDomain =
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    "http://localhost:3000";
+  return `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${rootDomain}/${url}&state=${data}`;
 };
-
-type price = {
-  id: string;
-  unitAmount: number;
-  currency: string;
-  isDefault: boolean;
-  image: string | null;
-  metadata?: JsonValue | null;
-}
-type dbVariant = {
-  id: string;
-  stripePriceId: string | null;
-  sku: string | null;
-  options: JsonValue | null;
-  stock: number;
-  cost: number | null;
-  image: string | null;
-  active: boolean;
-};
-export function transformDbProduct(dbProduct: {
-  id: string;
-  name: string;
-  description: string | null;
-  images: string[];
-  active: boolean;
-  metadata: unknown;
-  slug: string | null;
-  subtitle: string | null;
-  tagline: string | null;
-  source?: string;
-  trackInventory?: boolean;
-  prices: price[];
-  variants?: dbVariant[];
-  nutrition?: { nutrition: string } | null;
-}): StripeProduct {
-  const baseMetadata =
-    (dbProduct.metadata as Record<string, string>) ?? {};
-
-  const metadata = {
-    ...baseMetadata,
-    ...(dbProduct.nutrition?.nutrition && {
-      nutrition: dbProduct.nutrition.nutrition,
-    }),
-  };
-
-  const defaultPrice =
-    dbProduct.prices.find((p) => p.isDefault) ?? dbProduct.prices[0];
-
-  // Resolve each variant's price (unit_amount/currency) from the linked Price row.
-  const priceById = new Map(dbProduct.prices.map((p) => [p.id, p]));
-  const productVariants = (dbProduct.variants ?? []).map((v) => {
-    const linked = v.stripePriceId ? priceById.get(v.stripePriceId) : undefined;
-    return {
-      id: v.id,
-      stripePriceId: v.stripePriceId,
-      sku: v.sku,
-      options: (v.options as Record<string, string>) ?? {},
-      stock: v.stock,
-      cost: v.cost,
-      image: v.image,
-      active: v.active,
-      unit_amount: linked?.unitAmount ?? null,
-      currency: linked?.currency ?? "usd",
-    };
-  });
-
-  return {
-    id: dbProduct.id,
-    name: dbProduct.name,
-    description: dbProduct.description,
-    images: dbProduct.images,
-    active: dbProduct.active,
-    metadata,
-    slug: dbProduct.slug ?? undefined,
-    subtitle: dbProduct.subtitle ?? undefined,
-    tagline: dbProduct.tagline ?? undefined,
-    source: dbProduct.source,
-    trackInventory: dbProduct.trackInventory,
-    default_price: defaultPrice
-      ? {
-        id: defaultPrice.id,
-        unit_amount: defaultPrice.unitAmount,
-        currency: defaultPrice.currency,
-      }
-      : null,
-    prices: dbProduct.prices.map((p) => ({
-      id: p.id,
-      unit_amount: p.unitAmount,
-      currency: p.currency,
-      is_default: p.isDefault,
-      image: p.image ?? null,
-      metadata: (p.metadata as Record<string, string>) ?? {},
-    })),
-    productVariants,
-  };
-}
 
 export function stripMarkdown(text: string): string {
   return text

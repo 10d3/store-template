@@ -106,6 +106,13 @@ export async function deleteProductFromDatabase(productId: string) {
             },
         });
 
+        // Deactivate every variant of this product too (Price is legacy; the
+        // variant row is what checkout and storefront reads rely on).
+        await prisma.productVariant.updateMany({
+            where: { productId },
+            data: { active: false },
+        });
+
 
         return { success: true };
     } catch (error) {
@@ -160,6 +167,37 @@ export async function syncPriceToDatabase(
             },
         });
 
+        // Mirror the price onto ProductVariant — v.price (cents) is the source
+        // of truth for checkout; the Price row above is the legacy mirror.
+        const linkedVariant = await prisma.productVariant.findFirst({
+            where: { stripePriceId: price.id },
+        });
+
+        if (linkedVariant) {
+            await prisma.productVariant.update({
+                where: { id: linkedVariant.id },
+                data: { price: price.unit_amount ?? 0, active: true },
+            });
+        } else {
+            // Only invent a variant when the product has none — otherwise a new
+            // Stripe price must not create a duplicate variant.
+            const variantCount = await prisma.productVariant.count({
+                where: { productId },
+            });
+            if (variantCount === 0) {
+                await prisma.productVariant.create({
+                    data: {
+                        productId,
+                        title: price.nickname ?? "Default",
+                        price: price.unit_amount ?? 0,
+                        stripePriceId: price.id,
+                        active: true,
+                        position: 0,
+                    },
+                });
+            }
+        }
+
 
         return { success: true };
     } catch (error) {
@@ -182,6 +220,13 @@ export async function deletePriceFromDatabase(priceId: string) {
                 active: false,
                 updatedAt: new Date(),
             },
+        });
+
+        // Keep the variant mirror in lockstep: a deleted Stripe price means the
+        // linked variant is no longer purchasable.
+        await prisma.productVariant.updateMany({
+            where: { stripePriceId: priceId },
+            data: { active: false },
         });
 
 

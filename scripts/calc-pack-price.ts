@@ -1,3 +1,8 @@
+/**
+ * ⚠️ ONE-TIME TOOL — targets the pre-variant schema migration. Ad-hoc pack
+ *    pricing calculation against a single legacy Stripe product; not part of
+ *    the steady-state Stripe ↔ DB sync.
+ */
 
 import Stripe from "stripe";
 

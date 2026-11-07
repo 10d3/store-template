@@ -2,29 +2,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface BundlePack {
-  id: string;
+export interface CartItem {
+  id: string;         // Product ID
+  variantId: string;  // Required — must be a real ProductVariant.id
+  sku?: string;
   name: string;
-  price: number;
+  variantTitle?: string;   // e.g. "Default", "3-Pack", "Black / XL"
   image: string;
+  price: number;      // unit price in cents
   quantity: number;
   maxQuantity: number;
-  items: CartItem[];
-  discount: number;
-  originalPrice: number;
-  discountType: "percent" | "fixed";
-}
-export interface CartItem {
-  id: string;
-  variantId?: string; // e.g. "42-red-XL"
-  sku?: string; // optional human sku
-  name: string;
-  image: string;
-  price: number; // unit price in cents
-  quantity: number;
-  maxQuantity: number; // stock limit
-  stripePriceId?: string; // ← NEW: pass to Checkout
-  metadata?: Record<string, any>; // ← NEW: pack_size, group, …
+  metadata?: Record<string, any>;
 }
 
 export interface CartCoupon {
@@ -47,8 +35,6 @@ interface CartStore {
   clearCart: () => void;
 
   addBundle: (items: CartItem[]) => void; // pre-defined bundle
-  addBundleAsPack: (bundle: BundlePack) => void; // pre-defined bundle as pack
-  addVirtualBundle: (stripePriceId: string, qty: number) => void; // virtual
   applyCoupon: (coupon: CartCoupon) => void;
   removeCoupon: () => void;
 
@@ -95,7 +81,13 @@ export const useCartStore = create<CartStore>()(
         }),
 
       addOrUpdateItem: (incoming) => {
-        const { id, variantId = "", quantity = 1 } = incoming;
+        const { id, variantId, quantity = 1 } = incoming;
+        if (!variantId) {
+          console.error(
+            `addOrUpdateItem: rejected item ${id} — variantId (real ProductVariant.id) is required`
+          );
+          return;
+        }
         set((s) => {
           s.isAddingToCart = true;
           const idx = s.cart.findIndex(
@@ -131,7 +123,7 @@ export const useCartStore = create<CartStore>()(
         }
         set((s) => ({
           cart: s.cart.map((i) =>
-            i.id === id && i.variantId === variantId
+            i.id === id && (i.variantId ?? "") === variantId
               ? { ...i, quantity: Math.min(qty, i.maxQuantity) }
               : i
           ),
@@ -141,7 +133,7 @@ export const useCartStore = create<CartStore>()(
       removeItem: (id, variantId = "") =>
         set((s) => ({
           cart: s.cart.filter(
-            (i) => !(i.id === id && i.variantId === variantId)
+            (i) => !(i.id === id && (i.variantId ?? "") === variantId)
           ),
         })),
 
@@ -167,67 +159,6 @@ export const useCartStore = create<CartStore>()(
           return { cart: next };
         }),
 
-      // Add this new action alongside your existing addBundle
-      addBundleAsPack: (bundleData) =>
-        set((s) => {
-          const next = [...s.cart];
-
-          // Create a single cart item for the entire bundle
-          const bundleCartItem: CartItem = {
-            id: bundleData.id, // bundle/pack ID
-            name: bundleData.name,
-            price: bundleData.price, // the discounted bundle price
-            quantity: bundleData.quantity || 1,
-            maxQuantity: bundleData.maxQuantity || 10,
-            image:
-              bundleData.image ||
-              bundleData.items[0]?.image ||
-              "/default-bundle.png",
-            metadata: {
-              type: "bundle", // identifier to distinguish from individual items
-              bundleItems: bundleData.items, // store the individual items for reference
-              discount: bundleData.discount,
-              originalPrice: bundleData.originalPrice,
-              discountType: bundleData.discountType,
-            },
-          };
-
-          // Check if this bundle is already in cart
-          const existingBundleIndex = next.findIndex(
-            (item) =>
-              item.id === bundleData.id && item.metadata?.type === "bundle"
-          );
-
-          if (existingBundleIndex >= 0) {
-            // Update quantity if bundle already exists
-            next[existingBundleIndex].quantity = Math.min(
-              next[existingBundleIndex].quantity + (bundleData.quantity || 1),
-              next[existingBundleIndex].maxQuantity
-            );
-          } else {
-            // Add new bundle to cart
-            next.push(bundleCartItem);
-          }
-
-          return { cart: next };
-        }),
-
-      /* Virtual bundle – single Price ID represents the whole pack */
-      addVirtualBundle: (stripePriceId, qty) => {
-        /* You can map the Price ID to a known virtual bundle item */
-        const virtualItem: CartItem = {
-          id: "test", // virtual placeholder
-          name: "Mystery Coffee 3-Pack",
-          image: "/images/mystery.png",
-          price: 2400, // fetch from Stripe
-          quantity: qty,
-          maxQuantity: 100,
-          stripePriceId,
-          metadata: { type: "virtual_bundle" },
-        };
-        get().addOrUpdateItem(virtualItem);
-      },
-
       applyCoupon: (coupon) => set({ coupon }),
       removeCoupon: () => set({ coupon: null }),
 
@@ -239,7 +170,8 @@ export const useCartStore = create<CartStore>()(
       getItemCountByVariantId: (id, variantId = "") =>
         get().cart.reduce(
           (sum, i) =>
-            sum + (i.id === id && i.variantId === variantId ? i.quantity : 0),
+            sum +
+            (i.id === id && (i.variantId ?? "") === variantId ? i.quantity : 0),
           0
         ),
 

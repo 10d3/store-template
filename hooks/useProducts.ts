@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { StripeProduct } from "@/types/product";
-import { getCachedProducts } from "@/lib/product/cache";
+import type { ProductWithVariants } from "@/lib/catalog";
+import { getCachedProducts, getCachedBundles } from "@/lib/catalog";
 import { validateProduct, validatePack, type ProductDisplay, type PackDisplay } from "@/lib/product/display.schema";
 
 interface UseProductsReturn {
@@ -13,10 +13,10 @@ interface UseProductsReturn {
   refetch: () => Promise<void>;
 }
 
-// Transform Stripe product to ProductDisplay
-function transformProductForDisplay(product: StripeProduct): ProductDisplay | null {
-  const price = typeof product.default_price === 'object' && product.default_price?.unit_amount 
-    ? product.default_price.unit_amount / 100 
+// Transform catalog product to ProductDisplay
+function transformProductForDisplay(product: ProductWithVariants): ProductDisplay | null {
+  const price = product.defaultVariant?.price
+    ? product.defaultVariant.price / 100
     : 0;
   
   const transformed = {
@@ -34,9 +34,9 @@ function transformProductForDisplay(product: StripeProduct): ProductDisplay | nu
 }
 
 // Transform pack products for PackDisplay
-function transformPackForDisplay(packProduct: StripeProduct, allProducts: StripeProduct[]): PackDisplay | null {
-  const productIds = packProduct.metadata.contents?.split(',') || [];
-  const discount = packProduct.metadata.discount ? parseInt(packProduct.metadata.discount) : 0;
+function transformPackForDisplay(packProduct: ProductWithVariants, allProducts: ProductWithVariants[]): PackDisplay | null {
+  const productIds = packProduct.bundleItems.map((item) => item.componentProduct.id);
+  const discount = packProduct.metadata?.discount ? parseInt(packProduct.metadata.discount) : 0;
   
   const products = productIds
     .map(id => {
@@ -68,15 +68,19 @@ export function useProducts(): UseProductsReturn {
       setLoading(true);
       setError(null);
       
-      const allStripeProducts = await getCachedProducts();
+      const [allProducts, bundleProducts] = await Promise.all([
+        getCachedProducts(),
+        getCachedBundles(),
+      ]);
+      const catalogProducts = [...allProducts, ...bundleProducts];
       
       // Separate regular products from packs (bundles)
-      const regularProducts = allStripeProducts.filter(product => 
-        product.metadata.type !== "bundle"
+      const regularProducts = catalogProducts.filter(product => 
+        !product.isBundle
       );
       
-      const packProducts = allStripeProducts.filter(product => 
-        product.metadata.type === "bundle"
+      const packProducts = catalogProducts.filter(product => 
+        product.isBundle
       );
       
       // Transform and validate products
@@ -85,7 +89,7 @@ export function useProducts(): UseProductsReturn {
         .filter((product): product is ProductDisplay => product !== null);
       
       const validPacks = packProducts
-        .map(pack => transformPackForDisplay(pack, allStripeProducts))
+        .map(pack => transformPackForDisplay(pack, catalogProducts))
         .filter((pack): pack is PackDisplay => pack !== null);
       
       setProducts(validProducts);

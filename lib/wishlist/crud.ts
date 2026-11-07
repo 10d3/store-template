@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "../auth";
 import { headers } from "next/headers";
-import { getProductsByProductIds } from "../product/crud";
+import { getProductsByIds } from "../catalog";
 
 export async function addToWishlist(productId: string) {
   try {
@@ -99,7 +99,7 @@ export async function getWishlist() {
       };
     }
 
-    const products = await getProductsByProductIds(wishlist.productId);
+    const products = await getProductsByIds(wishlist.productId);
 
     return {
       wishlist,

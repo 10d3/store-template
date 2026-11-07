@@ -11,8 +11,9 @@ import {
   syncProductToDatabase,
   syncPriceToDatabase,
 } from "../product/product-sync";
-import { markAsSynced } from "../subcription";
-import { revalidateProductCache } from "../product/cache";
+import { revalidateTag } from "next/cache";
+import { markAsSynced } from "../subscription";
+import { CATALOG_TAG } from "../catalog";
 import type { CjProductListQuery, CjProductVariant } from "./types";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { typescript: true });
@@ -167,7 +168,7 @@ export async function importCjProduct(
   await syncProductToDatabase(finalProduct as Stripe.Product);
   await prisma.product.update({
     where: { id: stripeProduct.id },
-    data: { source: "CJ", cjProductId: pid, trackInventory },
+    data: { source: "CJ", cjProductId: pid },
   });
 
   // 5. Sync prices + create variant rows (with best-effort stock).
@@ -194,6 +195,8 @@ export async function importCjProduct(
       where: { stripePriceId: c.priceId },
       create: {
         productId: stripeProduct.id,
+        title: c.v.variantNameEn ?? c.v.variantSku ?? "Default",
+        price: c.price.unit_amount ?? 0, // retail price in cents from Stripe Price
         stripePriceId: c.priceId,
         sku: c.v.variantSku ?? null,
         options: buildOptions(c.v),
@@ -201,12 +204,14 @@ export async function importCjProduct(
         cjSku: c.v.variantSku ?? null,
         cost: c.costCents,
         stock,
+        trackInventory, // moved from Product → ProductVariant in Phase 1 migration
         image: c.v.variantImage ?? null,
         active: true,
       },
       update: {
         cost: c.costCents,
         stock,
+        trackInventory,
         image: c.v.variantImage ?? null,
         options: buildOptions(c.v),
         cjSku: c.v.variantSku ?? null,
@@ -214,7 +219,7 @@ export async function importCjProduct(
     });
   }
 
-  await revalidateProductCache();
+  revalidateTag(CATALOG_TAG, "everything");
   return { productId: stripeProduct.id, slug, variants: created.length };
 }
 

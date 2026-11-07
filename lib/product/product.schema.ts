@@ -42,6 +42,11 @@ export const productSchemaVariant = z.object({
   description: z.string().optional(),
   images: z.array(z.string()).optional(),
   metadata: productMetadataSchema,
+  compareAtPrice: z.number().min(0, "Compare-at price must be positive").optional(),
+  stock: z.number().min(0, "Stock must be positive").optional(),
+  sku: z.string().optional(),
+  active: z.boolean().optional(),
+  position: z.number().optional(),
 });
 
 export const productSchema = z.object({
@@ -53,6 +58,11 @@ export const productSchema = z.object({
   images: z.array(z.string()).optional(),
   metadata: productMetadataSchema,
   variants: z.array(productSchemaVariant).optional(),
+  // Bundle flag transport. The DB `Product.isBundle` column is the single
+  // source of truth for bundle detection; this field exists only so the
+  // product form can carry the toggle through the schema. Optional for
+  // backward compatibility with callers that predate the column.
+  isBundle: z.boolean().optional(),
 });
 
 export const couponSchema = z.object({
@@ -75,12 +85,17 @@ export const packSizeConfigSchema = z.object({
   stripePriceId: z.string().optional(), // ID of the Stripe Price object
 });
 
+// Bundle composition is NOT carried here: the form transports `productIds`,
+// which catalog-admin converts into real `BundleItem` rows (the single source
+// of truth). The metadata keys `pack_sizes`/`discount`/`pack_type` (and the
+// `packSizes`/`packType` fields below) are pack-size/price CONFIGURATION only
+// — there is no DB column for them — so they legitimately remain in metadata.
 export const packSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   productIds: z.array(z.string()).min(1, "At least one product required"),
   packPrice: z.number().min(0, "Pack price must be positive"),
-  discount: z.number().optional(), // Keep for legacy/simple bundles
+  discount: z.number().optional(), // Pack-size price configuration (metadata.discount)
   description: z.string().optional(),
   images: z.array(z.string()).optional(), // Pack images
   metadata: productMetadataSchema, // Packs use product metadata + pack-specific fields
