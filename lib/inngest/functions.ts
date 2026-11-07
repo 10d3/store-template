@@ -1,12 +1,12 @@
 import { sendMoney } from "../affiliation/send-money";
 import { prisma } from "../prisma";
 import { inngest } from "./client";
-import { stripeClient } from "../stripe";
 import { createCjOrder, getCjOrderDetail, confirmCjOrder } from "../cj/orders";
 import { freightCalculate } from "../cj/logistics";
 import { getCjVariantStock } from "../cj/inventory";
 import { sendTrackingUpdate } from "../order/send-tracking";
-import { revalidateProductCache } from "../product/cache";
+import { revalidateTag } from "next/cache";
+import { CATALOG_TAG } from "../catalog";
 
 const PAYMENT_THRESHOLD = 50.0; // Minimum amount required for payout
 
@@ -252,14 +252,25 @@ export const fulfillCjOrder = inngest.createFunction(
   { event: "cj/order.fulfill" },
 
   async ({ event, step }) => {
-    const { orderId, sessionId } = event.data as {
+    const { orderId } = event.data as {
       orderId: string;
       sessionId: string;
     };
 
     // 1. Load the order.
     const order = await step.run("load-order", () =>
-      prisma.order.findUnique({ where: { id: orderId } })
+      prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          orderLineItems: {
+            include: {
+              variant: {
+                select: { id: true, cjVariantId: true, cjSku: true },
+              },
+            },
+          },
+        },
+      })
     );
     if (!order) return { skipped: "order-not-found" };
 
@@ -269,37 +280,19 @@ export const fulfillCjOrder = inngest.createFunction(
     );
     if (existing?.cjOrderId) return { skipped: "already-fulfilled" };
 
-    // 3. Resolve CJ line items from the actual Stripe session line items.
+    // 3. Resolve CJ line items from the persisted order line items.
     const items = await step.run("resolve-cj-items", async () => {
-      const lineItems = await stripeClient.checkout.sessions.listLineItems(
-        sessionId,
-        { limit: 100, expand: ["data.price"] }
-      );
-      const priceIds = lineItems.data
-        .map((li) => (typeof li.price === "object" ? li.price?.id : undefined))
-        .filter((id): id is string => !!id);
-
-      if (priceIds.length === 0) return [];
-
-      const variants = await prisma.productVariant.findMany({
-        where: { stripePriceId: { in: priceIds }, cjVariantId: { not: null } },
-        select: { stripePriceId: true, cjVariantId: true, cjSku: true },
+      return order.orderLineItems.flatMap((li) => {
+        const variant = li.variant;
+        if (!variant?.cjVariantId) return [];
+        return [
+          {
+            vid: variant.cjVariantId,
+            quantity: li.quantity,
+            sku: variant.cjSku ?? li.sku ?? undefined,
+          },
+        ];
       });
-      const byPrice = new Map(variants.map((v) => [v.stripePriceId, v]));
-
-      const out: { vid: string; quantity: number; sku?: string }[] = [];
-      for (const li of lineItems.data) {
-        const pid = typeof li.price === "object" ? li.price?.id : undefined;
-        const v = pid ? byPrice.get(pid) : undefined;
-        if (v?.cjVariantId) {
-          out.push({
-            vid: v.cjVariantId,
-            quantity: li.quantity ?? 1,
-            sku: v.cjSku ?? undefined,
-          });
-        }
-      }
-      return out;
     });
 
     if (items.length === 0) return { skipped: "no-cj-items" };
@@ -564,7 +557,7 @@ export const cjInventorySync = inngest.createFunction(
       }
     }
 
-    if (updated > 0) await revalidateProductCache();
+    if (updated > 0) revalidateTag(CATALOG_TAG, "everything");
 
     return { checked: variants.length, updated };
   }

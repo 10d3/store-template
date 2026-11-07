@@ -147,8 +147,7 @@ export async function sendOwnerOrderNotification(data: {
       from: "Vitanou <noreply@vitanou.com>",
       to: [ownerEmail],
       subject: `🛍️ New Order #${data.orderId} — $${data.orderTotal.toFixed(2)}`,
-      // @ts-ignore
-      react: NewOrderNotificationEmail(data),
+      react: NewOrderNotificationEmail(data as any) as React.ReactElement,
     });
 
     if (error) {

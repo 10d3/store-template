@@ -3,42 +3,30 @@ import { prisma } from "../prisma";
 import type { CartItem } from "../store";
 
 /**
- * Server-side guard against overselling. For every cart item that maps to a
- * ProductVariant (via stripePriceId or variantId) whose product has
- * `trackInventory` enabled, rejects the checkout if requested quantity exceeds
- * available stock.
+ * Server-side guard against overselling. For every cart item that resolves to
+ * a ProductVariant via `variantId` whose `trackInventory` is enabled, rejects
+ * the checkout if requested quantity exceeds available stock.
  *
  * Fail-closed: unexpected DB errors abort checkout instead of silently skipping
  * enforcement (a transient failure must never enable overselling). The only
- * skip is for items genuinely without any resolvable product/variant, and the
+ * skip is for items genuinely without a resolvable variant, and the
  * pre-migration case where the ProductVariant table/columns don't exist yet.
  */
 export async function assertStockAvailable(cart: CartItem[]): Promise<void> {
-  const priceIds = cart
-    .map((i) => i.stripePriceId)
-    .filter((id): id is string => !!id);
   const variantIds = cart
     .map((i) => i.variantId)
     .filter((id): id is string => !!id);
 
-  if (priceIds.length === 0 && variantIds.length === 0) return;
+  if (variantIds.length === 0) return;
 
-  let variants;
+  let variants: { id: string; stock: number; trackInventory: boolean }[] = [];
   try {
     variants = await prisma.productVariant.findMany({
-      where: {
-        OR: [
-          ...(priceIds.length > 0
-            ? [{ stripePriceId: { in: priceIds } }]
-            : []),
-          ...(variantIds.length > 0 ? [{ id: { in: variantIds } }] : []),
-        ],
-      },
+      where: { id: { in: variantIds } },
       select: {
         id: true,
-        stripePriceId: true,
         stock: true,
-        product: { select: { trackInventory: true } },
+        trackInventory: true, // moved from Product → ProductVariant in Phase 1 migration
       },
     });
   } catch (error) {
@@ -56,20 +44,13 @@ export async function assertStockAvailable(cart: CartItem[]): Promise<void> {
     );
   }
 
-  const byPrice = new Map(
-    variants
-      .filter((v): v is typeof v & { stripePriceId: string } => !!v.stripePriceId)
-      .map((v) => [v.stripePriceId, v])
-  );
   const byVariantId = new Map(variants.map((v) => [v.id, v]));
 
   for (const item of cart) {
-    const v =
-      (item.stripePriceId ? byPrice.get(item.stripePriceId) : undefined) ??
-      (item.variantId ? byVariantId.get(item.variantId) : undefined);
-    // Genuinely no resolvable product/variant — nothing to enforce for this item.
+    const v = item.variantId ? byVariantId.get(item.variantId) : undefined;
+    // Genuinely no resolvable variant — nothing to enforce for this item.
     if (!v) continue;
-    if (v.product.trackInventory && v.stock < item.quantity) {
+    if (v.trackInventory && v.stock < item.quantity) {
       throw new Error(
         v.stock <= 0
           ? `${item.name} is out of stock.`

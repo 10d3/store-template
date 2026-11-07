@@ -12,7 +12,7 @@ type CheckoutLineItem = Stripe.Checkout.SessionCreateParams.LineItem;
 
 /**
  * Typed error for checkout failures caused by untrusted/invalid client data
- * (unresolvable prices, invalid coupons). Message is safe to surface to users.
+ * (unresolvable variants, invalid coupons). Message is safe to surface to users.
  */
 class CheckoutError extends Error {
   constructor(message: string) {
@@ -23,8 +23,13 @@ class CheckoutError extends Error {
 
 interface ResolvedItem {
   item: CartItem;
-  /** Server-resolved unit price in CENTS. Never taken from the client cart. */
-  unitAmount: number;
+  /** Server-resolved variant. `price` is the authoritative unit price in CENTS. */
+  variant: {
+    id: string;
+    price: number;
+    title: string;
+    productName: string;
+  };
 }
 
 async function getBaseUrl(): Promise<string> {
@@ -76,82 +81,138 @@ async function getOrCreateStripeCustomer(
 }
 
 /**
- * Retrieves a Stripe Price and returns its authoritative unit_amount (cents).
- * Rejects the item when the price does not exist or has no amount.
+ * Server-side variant resolution for cart items. The client-supplied
+ * `item.price` is NEVER trusted — the authoritative unit price is
+ * `ProductVariant.price` (cents).
+ *
+ * Items whose `variantId` does not resolve to a ProductVariant fall back to
+ * the product's first active variant (ordered by position asc). This tolerates
+ * legacy bundle items, which store either the bundle product id or a Stripe
+ * price id in `variantId`. Unresolvable items are rejected with CheckoutError.
  */
-async function retrieveStripePriceUnitAmount(
-  stripePriceId: string,
-  itemName: string
-): Promise<number> {
-  let price: Stripe.Price;
-  try {
-    price = await stripeClient.prices.retrieve(stripePriceId);
-  } catch (error) {
-    if (error instanceof Stripe.errors.StripeInvalidRequestError) {
-      throw new CheckoutError(
-        `We couldn't verify the price for "${itemName}". Please remove it from your cart and try again.`
-      );
+async function resolveCartPricing(cart: CartItem[]): Promise<ResolvedItem[]> {
+  const ids = cart.map((i) => i.variantId).filter(Boolean);
+
+  const variants = await prisma.productVariant.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      price: true,
+      title: true,
+      product: { select: { id: true, name: true } },
+    },
+  });
+  const variantById = new Map(variants.map((v) => [v.id, v]));
+
+  // Items whose variantId did not resolve — try the product's first active
+  // variant. Legacy bundle items may carry a product id or a Stripe price id
+  // in `variantId`; either way the product id lives on `item.id`.
+  const missingProductIds = Array.from(
+    new Set(cart.filter((i) => !variantById.has(i.variantId)).map((i) => i.id))
+  );
+
+  const products = missingProductIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: missingProductIds } },
+        select: {
+          id: true,
+          name: true,
+          variants: {
+            where: { active: true },
+            orderBy: [{ position: "asc" }],
+            take: 1,
+            select: { id: true, price: true, title: true },
+          },
+        },
+      })
+    : [];
+  const productById = new Map(products.map((p) => [p.id, p]));
+
+  return cart.map((item) => {
+    const direct = variantById.get(item.variantId);
+    if (direct) {
+      return {
+        item,
+        variant: {
+          id: direct.id,
+          price: direct.price,
+          title: direct.title,
+          productName: direct.product.name,
+        },
+      };
     }
-    throw error;
-  }
-  if (typeof price.unit_amount !== "number") {
-    throw new CheckoutError(
-      `The price for "${itemName}" could not be determined. Please contact support.`
-    );
-  }
-  return price.unit_amount;
+
+    const product = productById.get(item.id);
+    const fallback = product?.variants[0];
+    if (product && fallback) {
+      return {
+        item,
+        variant: {
+          id: fallback.id,
+          price: fallback.price,
+          title: fallback.title,
+          productName: product.name,
+        },
+      };
+    }
+
+    throw new CheckoutError(`No variant found for cart item ${item.id}`);
+  });
+}
+
+/** Display name for a resolved variant: "Product — Variant" unless default. */
+function variantDisplayName(variant: ResolvedItem["variant"]): string {
+  return variant.title && variant.title !== "Default"
+    ? `${variant.productName} — ${variant.title}`
+    : variant.productName;
 }
 
 /**
- * Server-side price resolution for a single cart item. The client-supplied
- * `item.price` is NEVER trusted.
- *
- * (a) item.stripePriceId → the real Stripe Price object's unit_amount.
- * (b) no stripePriceId → resolve authoritatively from our DB:
- *     - variant-linked items point at their variant's Stripe price;
- *     - otherwise the product's active Price row (default first).
- * (c) unresolvable → reject with a typed CheckoutError.
+ * Builds a Stripe line item from a server-resolved variant. Always uses
+ * `price_data` (never a Stripe price id) so the authoritative
+ * `ProductVariant.price` is what gets charged. Variant identity is written
+ * into `product_data.metadata` for the webhook to read back.
  */
-async function resolveItemUnitAmount(item: CartItem): Promise<number> {
-  // (a) Real Stripe Price object — trust only what Stripe returns.
-  if (item.stripePriceId) {
-    return retrieveStripePriceUnitAmount(item.stripePriceId, item.name);
-  }
+function buildLineItem(resolved: ResolvedItem, baseUrl: string): CheckoutLineItem {
+  const { item, variant } = resolved;
+  let imageUrl = item.image;
+  if (imageUrl?.startsWith("/")) imageUrl = `${baseUrl}${imageUrl}`;
 
-  // (b1) Variant-linked items resolve through their variant's Stripe price.
-  if (item.variantId) {
-    const variant = await prisma.productVariant.findUnique({
-      where: { id: item.variantId },
-      select: { stripePriceId: true },
-    });
-    if (variant?.stripePriceId) {
-      return retrieveStripePriceUnitAmount(variant.stripePriceId, item.name);
-    }
-  }
-
-  // (b2) Fall back to the product's active price row in our DB.
-  const dbPrice = await prisma.price.findFirst({
-    where: { productId: item.id, active: true },
-    orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
-  });
-  if (dbPrice && typeof dbPrice.unitAmount === "number") {
-    return dbPrice.unitAmount;
-  }
-
-  // (c) Unresolvable — never charge a client-supplied amount.
-  throw new CheckoutError(
-    `We couldn't verify the price for "${item.name}". Please remove it from your cart and try again.`
-  );
+  return {
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: variantDisplayName(variant),
+        ...(imageUrl ? { images: [imageUrl] } : {}),
+        metadata: {
+          productId: item.id,
+          variantId: variant.id,
+          variantTitle: variant.title,
+          image: item.image ?? "",
+        },
+      },
+      unit_amount: variant.price,
+    },
+    quantity: item.quantity,
+  };
 }
 
-/** Resolves every cart item's unit price server-side before any charge. */
-async function resolveCartPricing(cart: CartItem[]): Promise<ResolvedItem[]> {
-  return Promise.all(
-    cart.map(async (item) => ({
-      item,
-      unitAmount: await resolveItemUnitAmount(item),
-    }))
-  );
+/**
+ * Metadata mirror of a line item — built from SERVER-RESOLVED variant prices so
+ * downstream consumers (webhook order totals, affiliate commissions) get
+ * trusted values. `unit_amount` is in cents.
+ */
+function buildMirrorEntry(resolved: ResolvedItem) {
+  const { item, variant } = resolved;
+  return {
+    productId: item.id,
+    variantId: variant.id,
+    variantTitle: variant.title,
+    name: variantDisplayName(variant),
+    image: item.image ?? "",
+    unit_amount: variant.price,
+    quantity: item.quantity,
+  };
 }
 
 /**
@@ -199,37 +260,14 @@ export async function createGuestCheckoutSession(cart: CartItem[], name?: string
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   const baseUrl = await getBaseUrl();
 
-  const line_items_stripe: CheckoutLineItem[] = resolved.map(({ item, unitAmount }) => {
-    if (item.stripePriceId) {
-      return { price: item.stripePriceId, quantity: item.quantity };
-    }
-    let imageUrl = item.image;
-    if (imageUrl?.startsWith("/")) imageUrl = `${baseUrl}${imageUrl}`;
-    return {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.name,
-          images: imageUrl ? [imageUrl] : [],
-          metadata: { productId: item.id, ...item.metadata },
-        },
-        unit_amount: unitAmount,
-      },
-      quantity: item.quantity,
-    };
-  });
+  const line_items_stripe: CheckoutLineItem[] = resolved.map((r) =>
+    buildLineItem(r, baseUrl)
+  );
 
-  // Metadata mirror of the line items — built from SERVER-RESOLVED prices so
-  // downstream consumers (webhook order totals, affiliate commissions) get
-  // trusted values. Same shape/keys as before.
-  const line_items = resolved.map(({ item, unitAmount }) => ({
-    price_data: {
-      currency: "usd",
-      product_data: { name: item.name, images: [item?.image as string] },
-      unit_amount: unitAmount,
-    },
-    quantity: item.quantity,
-  }));
+  // Metadata mirror of the line items — built from SERVER-RESOLVED variant
+  // prices so downstream consumers (webhook order totals, affiliate
+  // commissions) get trusted values.
+  const line_items = resolved.map(buildMirrorEntry);
 
   const sessionStripe = await stripeClient.checkout.sessions.create({
     payment_method_types: ["card", "link"],
@@ -271,34 +309,8 @@ export async function createGuestCheckoutSessionNow(
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   const baseUrl = await getBaseUrl();
 
-  let line_items: CheckoutLineItem;
-
-  if (resolvedProduct.item.stripePriceId) {
-    line_items = {
-      price: resolvedProduct.item.stripePriceId,
-      quantity: resolvedProduct.item.quantity,
-    };
-  } else {
-    let imageUrl = resolvedProduct.item.image;
-    if (imageUrl && imageUrl.startsWith("/")) {
-      imageUrl = `${baseUrl}${imageUrl}`;
-    }
-    
-    line_items = {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: resolvedProduct.item.name,
-          images: imageUrl ? [imageUrl] : [],
-          metadata: {
-            product_id: resolvedProduct.item.id
-          }
-        },
-        unit_amount: resolvedProduct.unitAmount
-      },
-      quantity: resolvedProduct.item.quantity,
-    }
-  }
+  const line_items = buildLineItem(resolvedProduct, baseUrl);
+  const mirror = buildMirrorEntry(resolvedProduct);
 
   try {
     const sessionStripe = await stripeClient.checkout.sessions.create({
@@ -317,7 +329,7 @@ export async function createGuestCheckoutSessionNow(
         // `metadata.userId ?? null` guards cannot be bypassed by "".
         isGuest: "true",
         customerName: name || "",
-        line_items: JSON.stringify([line_items]),
+        line_items: JSON.stringify([mirror]),
         referralCode
       },
     });
@@ -343,50 +355,12 @@ export async function createCheckoutSession(cart: CartItem[], couponCode?: strin
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   const baseUrl = await getBaseUrl();
 
-  // Metadata mirror of the line items — built from SERVER-RESOLVED prices.
-  // Same shape/keys as before.
-  const line_items = resolved.map(({ item, unitAmount }) => ({
-    price_data: {
-      currency: "usd",
-      product_data: {
-        id: item.id,
-        name: item.name,
-        images: [item?.image as string],
-      },
-      unit_amount: unitAmount
-    },
-    quantity: item.quantity,
-  }));
+  // Metadata mirror of the line items — built from SERVER-RESOLVED variant prices.
+  const line_items = resolved.map(buildMirrorEntry);
 
-  const line_items_stripe: CheckoutLineItem[] = resolved.map(({ item, unitAmount }) => {
-    if (item.stripePriceId) {
-      return {
-        price: item.stripePriceId,
-        quantity: item.quantity
-      };
-    } else {
-      let imageUrl = item.image;
-      if (imageUrl && imageUrl.startsWith("/")) {
-        imageUrl = `${baseUrl}${imageUrl}`;
-      }
-
-      return {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.name,
-            images: imageUrl ? [imageUrl] : [],
-            metadata: {
-              productId: item.id,
-              ...item.metadata
-            }
-          },
-          unit_amount: unitAmount
-        },
-        quantity: item.quantity
-      };
-    }
-  });
+  const line_items_stripe: CheckoutLineItem[] = resolved.map((r) =>
+    buildLineItem(r, baseUrl)
+  );
 
 
   const user = await prisma.user.findUnique({
@@ -439,29 +413,8 @@ export async function createCheckoutSessionNow(product: CartItem, couponCode?: s
   const referralCode = cookiesStore.get("referral_code")?.value || null;
   const baseUrl = await getBaseUrl();
 
-  let line_items: CheckoutLineItem;
-
-  if (resolvedProduct.item.stripePriceId) {
-    line_items = {
-      price: resolvedProduct.item.stripePriceId,
-      quantity: resolvedProduct.item.quantity,
-    };
-  } else {
-    line_items = {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: resolvedProduct.item.name,
-          images: [resolvedProduct.item?.image as string],
-          metadata: {
-            product_id: resolvedProduct.item.id
-          }
-        },
-        unit_amount: resolvedProduct.unitAmount
-      },
-      quantity: resolvedProduct.item.quantity,
-    }
-  }
+  const line_items = buildLineItem(resolvedProduct, baseUrl);
+  const mirror = buildMirrorEntry(resolvedProduct);
 
   const user2 = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -488,7 +441,7 @@ export async function createCheckoutSessionNow(product: CartItem, couponCode?: s
     cancel_url: baseUrl,
     metadata: {
       userId: session.user.id,
-      line_items: JSON.stringify([line_items]),
+      line_items: JSON.stringify([mirror]),
       referralCode
     },
   });

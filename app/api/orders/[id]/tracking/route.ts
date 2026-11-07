@@ -43,10 +43,17 @@ export async function POST(
         let localOrderCustomerEmail: string | null = null;
         let localOrderCustomerName: string | null = null;
 
+        let dbOrderLineItems: { productName: string; quantity: number }[] = [];
+
         try {
             const dbOrder = await prisma.order.findUnique({
                 where: { id: paymentIntent.id },
-                select: { orderNumber: true, customerEmail: true, customerName: true }
+                select: {
+                    orderNumber: true,
+                    customerEmail: true,
+                    customerName: true,
+                    orderLineItems: { select: { productName: true, quantity: true } }
+                }
             });
 
             if (dbOrder?.orderNumber) {
@@ -54,6 +61,7 @@ export async function POST(
             }
             localOrderCustomerEmail = dbOrder?.customerEmail ?? null;
             localOrderCustomerName = dbOrder?.customerName ?? null;
+            dbOrderLineItems = dbOrder?.orderLineItems ?? [];
         } catch (dbError) {
             console.error("Failed to fetch order number from DB:", dbError);
         }
@@ -84,13 +92,25 @@ export async function POST(
             );
         }
 
-        let orderItems = [];
-        try {
-            if (paymentIntent.metadata?.line_items) {
-                orderItems = JSON.parse(paymentIntent.metadata.line_items);
+        let orderItems = dbOrderLineItems.map((item) => ({
+            name: item.productName,
+            quantity: item.quantity,
+        }));
+
+        if (orderItems.length === 0) {
+            try {
+                if (paymentIntent.metadata?.line_items) {
+                    const parsed: unknown = JSON.parse(paymentIntent.metadata.line_items);
+                    if (Array.isArray(parsed)) {
+                        orderItems = parsed.map((item: { name?: string; description?: string; quantity?: number }) => ({
+                            name: item.name ?? item.description ?? "Product",
+                            quantity: item.quantity ?? 1,
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to parse line items from metadata", e);
             }
-        } catch (e) {
-            console.error("Failed to parse line items from metadata", e);
         }
 
         await sendTrackingEmail({

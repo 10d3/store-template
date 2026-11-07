@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ReactElement } from "react";
 import { prisma } from "../prisma";
-import { sendEmail } from "../action/send-email";
+import { sendEmail } from "../actions/send-email";
 import { TrackingEmail } from "@/components/mails/tracking-email";
 
 export interface TrackingEmailItem {

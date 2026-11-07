@@ -1,9 +1,85 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { getStripeClient } from "@/lib/stripe";
-import Stripe from "stripe";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/lib/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+
+type JsonObject = { [key: string]: unknown };
+
+/** Narrow unknown JSON (Prisma JsonValue) to a plain object, or null. */
+function asJsonObject(value: unknown): JsonObject | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as JsonObject)
+    : null;
+}
+
+/** Read a string field out of a JSON blob without unsafe casts. */
+function getMetaString(metadata: unknown, key: string): string | null {
+  const value = asJsonObject(metadata)?.[key];
+  return typeof value === "string" ? value : null;
+}
+
+/** Parse the stored shipping address JSON; null when absent or malformed. */
+function parseShippingAddress(raw: string | null): unknown {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/** Fallback description derived from the typed line items. */
+function buildDescription(lineItems: { productName: string }[]): string | null {
+  if (lineItems.length === 0) return null;
+  const [first, ...rest] = lineItems.map((li) => li.productName);
+  return rest.length > 0
+    ? `${first} + ${rest.length} more item${rest.length > 1 ? "s" : ""}`
+    : first;
+}
+
+type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: { orderLineItems: true; fulfillments: true };
+}>;
+
+/** Map a Prisma Order into the admin UI's order shape. */
+function transformOrder(order: OrderWithRelations) {
+  const orderLineItems = order.orderLineItems.map((li) => ({
+    id: li.id,
+    productName: li.productName,
+    variantTitle: li.variantTitle,
+    sku: li.sku,
+    image: li.image,
+    unitPrice: li.unitPrice,
+    quantity: li.quantity,
+    totalPrice: li.totalPrice,
+  }));
+
+  return {
+    id: order.id,
+    amount: order.total, // dollars
+    currency: "usd",
+    status: order.status,
+    fulfillmentStatus:
+      order.fulfillments[0]?.status ??
+      getMetaString(order.metadata, "fulfillment_status") ??
+      "pending",
+    customerEmail: order.customerEmail,
+    customerName: order.customerName,
+    description:
+      getMetaString(order.metadata, "description") ??
+      buildDescription(order.orderLineItems),
+    created: order.createdAt,
+    updated: order.updatedAt,
+    metadata: order.metadata,
+    paymentMethod: getMetaString(order.metadata, "payment_method"),
+    receiptUrl: getMetaString(order.metadata, "receipt_url"),
+    shippingAddress: parseShippingAddress(order.shippingAddress),
+    charges: [],
+    refunds: [],
+    orderLineItems,
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,59 +96,33 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const status = searchParams.get("status");
     const search = searchParams.get("search");
-    
-    const stripe = getStripeClient();
 
-    // Build Stripe query parameters
-    const queryParams: Stripe.PaymentIntentListParams = {
-      limit: Math.min(limit * 2, 100), // Fetch more to account for filtering
-      expand: ["data.charges"]
+    const where: Prisma.OrderWhereInput = {
+      ...(status && status !== "all" ? { status } : {}),
+      ...(search
+        ? {
+            OR: [
+              { customerEmail: { contains: search, mode: "insensitive" } },
+              { customerName: { contains: search, mode: "insensitive" } },
+              { orderNumber: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
     };
 
-    // For pagination, we'll use Stripe's starting_after parameter
-    if (page > 1) {
-      // This is a simplified pagination - in production you'd want to store cursor tokens
-      const skipCount = (page - 1) * limit;
-      if (skipCount > 0) {
-        // Get previous page to find the starting_after cursor
-        const prevPageParams = { ...queryParams, limit: skipCount };
-        const prevResults = await stripe.paymentIntents.list(prevPageParams);
-        if (prevResults.data.length > 0) {
-          queryParams.starting_after = prevResults.data[prevResults.data.length - 1].id;
-          queryParams.limit = limit * 2; // Fetch more for filtering
-        }
-      }
-    }
+    const [orders, totalCount] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        include: { orderLineItems: true, fulfillments: true },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.order.count({ where }),
+    ]);
 
-    // Fetch payment intents from Stripe
-    const paymentIntents = await stripe.paymentIntents.list(queryParams);
-
-    // Transform Stripe data to order format
-    let orders = paymentIntents.data.map(transformPaymentIntentToOrder);
-
-    // Apply status filter if provided
-    if (status && status !== "all") {
-      orders = orders.filter(order => order.status === status);
-    }
-
-    // Apply search filter if provided (search by intent ID, receipt email, or description)
-    if (search) {
-      const searchLower = search.toLowerCase();
-      orders = orders.filter(order => 
-        order.id.toLowerCase().includes(searchLower) ||
-        order.customerEmail?.toLowerCase().includes(searchLower) ||
-        order.description?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Apply pagination to filtered results
-    const startIndex = 0; // Since we're filtering, start from beginning
-    const endIndex = limit;
-    const paginatedOrders = orders.slice(startIndex, endIndex);
-
-    // Calculate pagination info
-    const hasMore = orders.length > limit;
-    const totalCount = orders.length; // This is approximate since we're filtering
+    const paginatedOrders = orders.map(transformOrder);
+    const hasMore = (page - 1) * limit + paginatedOrders.length < totalCount;
 
     return NextResponse.json({
       orders: paginatedOrders,
@@ -80,52 +130,17 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         totalCount,
+        total: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         hasMore
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json(
       { error: "Failed to fetch orders" },
       { status: 500 }
     );
   }
-}
-
-// Helper function to transform Stripe Payment Intent to Order format
-function transformPaymentIntentToOrder(intent: Stripe.PaymentIntent): any {
-  // Type assertion for expanded PaymentIntent with charges
-  const expandedIntent = intent as Stripe.PaymentIntent & {
-    charges?: {
-      data: Stripe.Charge[];
-    };
-  };
-
-  return {
-    id: intent.id,
-    amount: intent.amount / 100, // Convert from cents
-    currency: intent.currency.toUpperCase(),
-    status: intent.status,
-    fulfillmentStatus: intent.metadata?.fulfillment_status || "pending",
-    customerEmail: intent.receipt_email,
-    customerName: intent.shipping?.name || null,
-    description: intent.description,
-    created: new Date(intent.created * 1000),
-    updated: new Date(intent.created * 1000), // Stripe doesn't have updated field
-    metadata: intent.metadata,
-    paymentMethod: intent.payment_method_types?.[0] || "unknown",
-    receiptUrl: expandedIntent.charges?.data?.[0]?.receipt_url,
-    shippingAddress: intent.shipping?.address ? {
-      line1: intent.shipping.address.line1,
-      line2: intent.shipping.address.line2,
-      city: intent.shipping.address.city,
-      state: intent.shipping.address.state,
-      postal_code: intent.shipping.address.postal_code,
-      country: intent.shipping.address.country,
-    } : null,
-    charges: expandedIntent.charges?.data || [],
-    refunds: expandedIntent.charges?.data?.[0]?.refunds?.data || []
-  };
 }

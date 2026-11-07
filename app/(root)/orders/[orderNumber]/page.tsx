@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth";
-import { getOrderByNumberPublic } from "@/lib/order";
+import { getOrderByNumberPublicWithItems } from "../_lib/order-queries";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import OrderDetailClient from "./_components/order-detail-client";
-import { Order } from "@/lib/generated/prisma";
 
 interface OrderDetailPageProps {
   params: Promise<{ orderNumber: string }>;
@@ -23,7 +22,7 @@ export default async function OrderDetailPage({
   const { email: emailParam } = await searchParams;
   const session = await auth.api.getSession({ headers: await headers() });
 
-  const result = await getOrderByNumberPublic(orderNumber, emailParam);
+  const result = await getOrderByNumberPublicWithItems(orderNumber, emailParam);
 
   if (!result.order) {
     if (result.requiresAuth) {
@@ -78,5 +77,5 @@ export default async function OrderDetailPage({
     return notFound();
   }
 
-  return <OrderDetailClient order={result.order as Order} />;
+  return <OrderDetailClient order={result.order} />;
 }

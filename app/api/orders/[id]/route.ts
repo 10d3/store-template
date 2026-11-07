@@ -27,7 +27,7 @@ async function getLocalOrder(stripeId: string) {
     // 1. Try to find by PaymentIntent ID directly (if stored as ID)
     let order = await prisma.order.findUnique({
       where: { id: stripeId },
-      include: { user: true }
+      include: { user: true, orderLineItems: true }
     });
 
     if (order) return order;
@@ -42,7 +42,7 @@ async function getLocalOrder(stripeId: string) {
       const sessionId = sessions.data[0].id;
       order = await prisma.order.findUnique({
         where: { id: sessionId },
-        include: { user: true }
+        include: { user: true, orderLineItems: true }
       });
     }
 
@@ -345,6 +345,16 @@ export async function GET(
       created: new Date(paymentIntent.created * 1000),
       metadata: paymentIntent.metadata,
       lineItems,
+      orderLineItems: (localOrder?.orderLineItems ?? []).map((item) => ({
+        id: item.id,
+        productName: item.productName,
+        variantTitle: item.variantTitle,
+        sku: item.sku,
+        image: item.image,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice
+      })),
       shippingAdress: localOrder?.shippingAddress,
       paymentMethod: paymentIntent.payment_method_types?.[0] || "unknown",
       receiptUrl: expandedPaymentIntent.charges?.data?.[0]?.receipt_url,

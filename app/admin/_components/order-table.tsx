@@ -80,6 +80,39 @@ interface Address {
   name: string;
 }
 
+interface AdminOrderLineItem {
+  id: string;
+  productName: string;
+  variantTitle: string | null;
+  sku: string | null;
+  image: string | null;
+  /** Cents */
+  unitPrice: number;
+  quantity: number;
+  /** Cents */
+  totalPrice: number;
+}
+
+/** Legacy Stripe-shaped line item stored on pre-OrderLineItem orders. */
+interface AdminLegacyLineItem {
+  description?: string | null;
+  quantity?: number;
+  amount_total?: number;
+  price?: {
+    unit_amount?: number | null;
+    product?: { name?: string };
+  } | null;
+}
+
+/** Normalised line item used for admin display (amounts in dollars). */
+interface AdminDisplayLineItem {
+  name: string;
+  variantTitle?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 interface Order {
   id: string;
   /** Amount in cents (e.g. 1999 = $19.99) */
@@ -93,7 +126,8 @@ interface Order {
   created: string;
   paymentMethod: string;
   receiptUrl: string | null;
-  lineItems?: any[];
+  orderLineItems?: AdminOrderLineItem[];
+  lineItems?: AdminLegacyLineItem[];
   charges: any[];
   refunds: any[];
   /** API returns the typo'd key; we normalise both into shippingAddress */
@@ -128,6 +162,33 @@ const formatDate = (dateString: string): string => {
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${month}/${day}/${year} ${hours}:${minutes}`;
 };
+
+function getAdminDisplayLineItems(order: Order): AdminDisplayLineItem[] {
+  if (order.orderLineItems && order.orderLineItems.length > 0) {
+    return order.orderLineItems.map((item) => ({
+      name: item.productName,
+      variantTitle: item.variantTitle ?? undefined,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice / 100,
+      total: item.totalPrice / 100,
+    }));
+  }
+
+  return (order.lineItems ?? []).map((item) => {
+    const quantity = item.quantity ?? 1;
+    const unitAmount = item.price?.unit_amount;
+    const unitPrice = typeof unitAmount === "number" ? unitAmount / 100 : 0;
+    return {
+      name: item.price?.product?.name ?? item.description ?? "Unknown Item",
+      quantity,
+      unitPrice,
+      total:
+        typeof item.amount_total === "number"
+          ? item.amount_total / 100
+          : unitPrice * quantity,
+    };
+  });
+}
 
 /** Debounce hook — returns a debounced version of `value`. */
 function useDebounce<T>(value: T, delay = 400): T {
@@ -820,46 +881,51 @@ export function OrderTable({ className }: OrderTableProps) {
               })()}
 
               {/* Line Items */}
-              {selectedOrder.lineItems && selectedOrder.lineItems.length > 0 && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Items Purchased</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    {selectedOrder.lineItems.map((item: any, index: number) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center p-3 rounded-lg border bg-muted/30"
-                      >
-                        <div>
-                          <p className="font-medium text-sm">
-                            {item.price?.product?.name ?? item.description ?? "Unknown Item"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Qty: {item.quantity}
-                            {item.price?.unit_amount != null && (
-                              <> · {formatCurrency(item.price.unit_amount, selectedOrder.currency)} each</>
+              {(() => {
+                const items = getAdminDisplayLineItems(selectedOrder);
+                if (items.length === 0) return null;
+                return (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Items Purchased</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {items.map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center p-3 rounded-lg border bg-muted/30"
+                        >
+                          <div>
+                            <p className="font-medium text-sm">{item.name}</p>
+                            {item.variantTitle && (
+                              <p className="text-xs text-muted-foreground">
+                                {item.variantTitle}
+                              </p>
                             )}
+                            <p className="text-xs text-muted-foreground">
+                              Qty: {item.quantity}
+                              {item.unitPrice > 0 && (
+                                <> · {formatCurrency(item.unitPrice, selectedOrder.currency)} each</>
+                              )}
+                            </p>
+                          </div>
+                          <p className="font-semibold text-sm tabular-nums">
+                            {formatCurrency(item.total, selectedOrder.currency)}
                           </p>
                         </div>
-                        <p className="font-semibold text-sm tabular-nums">
-                          {/* FIX: was dividing by 100 before passing to formatCurrency
-                               which divides by 100 again — now passes raw cents */}
-                          {formatCurrency(item.amount_total ?? 0, selectedOrder.currency)}
+                      ))}
+
+                      <Separator className="my-2" />
+                      <div className="flex justify-between items-center px-3 py-1">
+                        <p className="text-sm font-medium">Total</p>
+                        <p className="font-bold tabular-nums">
+                          {formatCurrency(selectedOrder.amount, selectedOrder.currency)}
                         </p>
                       </div>
-                    ))}
-
-                    <Separator className="my-2" />
-                    <div className="flex justify-between items-center px-3 py-1">
-                      <p className="text-sm font-medium">Total</p>
-                      <p className="font-bold tabular-nums">
-                        {formatCurrency(selectedOrder.amount, selectedOrder.currency)}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
 
               {/* Payment History */}
               {(selectedOrder.charges.length > 0 || selectedOrder.refunds.length > 0) && (

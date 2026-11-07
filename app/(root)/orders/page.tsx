@@ -1,7 +1,7 @@
 import OrdersClientPage from "./_components/order-client";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getOrders } from "@/lib/order";
+import { getOrdersWithItems } from "./_lib/order-queries";
 
 export const metadata = {
   title: "Order History",
@@ -15,7 +15,7 @@ export default async function OrdersPage() {
     return <div>Please login to view your orders.</div>;
   }
 
-  const orders = await getOrders(session.user.id);
+  const orders = await getOrdersWithItems(session.user.id);
 
   return <OrdersClientPage orders={orders} />;
 }

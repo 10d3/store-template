@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Order } from "@/lib/generated/prisma";
+import type { CustomerOrder } from "../../_lib/types";
 import {
   Package,
   Truck,
@@ -13,9 +13,10 @@ import {
   Mail,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface OrderDetailClientProps {
-  order: Order;
+  order: CustomerOrder;
 }
 
 const statusConfig = {
@@ -56,19 +57,8 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
     statusConfig[order.status as keyof typeof statusConfig] ||
     statusConfig.PROCESSING;
   const StatusIcon = statusInfo.icon;
-  const lineItems = order.lineItems as Array<{
-    price_data?: {
-      product_data?: {
-        name?: string;
-        images?: string[];
-      };
-      unit_amount?: number;
-    };
-    quantity?: number;
-    name?: string;
-    image?: string;
-  }>;
-  
+  const lineItems = order.lineItems;
+
   const shippingAddress = order.shippingAddress
     ? JSON.parse(order.shippingAddress as string)
     : null;
@@ -107,36 +97,36 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 {lineItems.map((item, index) => (
-                  <div key={index}>
+                  <div key={item.id}>
                     <div className="flex items-center gap-4">
                       <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
                         <Image
                           width={200}
                           height={200}
-                          src={
-                            item.price_data?.product_data?.images?.[0] ||
-                            item.image ||
-                            "/placeholder.svg"
-                          }
-                          alt={item.price_data?.product_data?.name || item.name || "Product"}
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.productName}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold truncate">
-                          {item.price_data?.product_data?.name || item.name || "Product"}
+                          {item.productName}
                         </h4>
+                        {item.variantTitle && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {item.variantTitle}
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground mt-1">
-                          Qty: {item.quantity || 1}
+                          Qty: {item.quantity}
+                          {item.unitPrice > 0 && (
+                            <> · ${(item.unitPrice / 100).toFixed(2)} each</>
+                          )}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">
-                          $
-                          {(
-                            ((item.price_data?.unit_amount || 0) / 100) *
-                            (item.quantity || 1)
-                          ).toFixed(2)}
+                          ${(item.totalPrice / 100).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -210,7 +200,7 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
 
           <div className="flex justify-center pt-4">
             <Button variant="outline" asChild>
-              <a href="/orders">View All Orders</a>
+              <Link href="/orders">View All Orders</Link>
             </Button>
           </div>
         </div>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +13,10 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import Image from "next/image";
-import { Order } from "@/lib/generated/prisma";
+import type { CustomerOrder } from "../_lib/types";
 
 interface OrdersClientPageProps {
-  orders: Order[];
+  orders: CustomerOrder[];
 }
 
 const statusConfig = {
@@ -96,7 +95,7 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                   statusConfig[order.status as keyof typeof statusConfig] ||
                   statusConfig.PROCESSING;
                 const StatusIcon = statusInfo.icon;
-                const lineItems = order.lineItems as any[];
+                const lineItems = order.lineItems;
 
                 return (
                   <Card
@@ -107,7 +106,7 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="space-y-3">
                           <CardTitle className="text-2xl font-semibold">
-                            Order #{(order as any).orderNumber || order.id.slice(-8)}
+                            Order #{order.orderNumber || order.id.slice(-8)}
                           </CardTitle>
                           <div className="flex flex-wrap items-center gap-6 text-sm">
                             <div className="flex items-center gap-2">
@@ -148,29 +147,40 @@ export default function OrdersClientPage({ orders }: OrdersClientPageProps) {
                     <CardContent className="pt-0">
                       <div className="space-y-6">
                         <div className="space-y-4">
-                          {lineItems.map((item: any, index: number) => (
-                            <div key={index}>
+                          {lineItems.map((item, index) => (
+                            <div key={item.id}>
                               <div className="flex items-center gap-4">
                                 <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                                   <Image
                                     width={1000}
                                     height={1000}
-                                    src={item.price_data.product_data.images[0] || "/placeholder.svg"}
-                                    alt={item.price_data.product_data.name}
+                                    src={item.image || "/placeholder.svg"}
+                                    alt={item.productName}
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <h4 className="font-semibold truncate">
-                                    {item.price_data.product_data.name}
+                                    {item.productName}
                                   </h4>
+                                  {item.variantTitle && (
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      {item.variantTitle}
+                                    </p>
+                                  )}
                                   <p className="text-sm mt-1">
                                     Quantity: {item.quantity}
+                                    {item.unitPrice > 0 && (
+                                      <span className="text-muted-foreground">
+                                        {" "}
+                                        · ${(item.unitPrice / 100).toFixed(2)} each
+                                      </span>
+                                    )}
                                   </p>
                                 </div>
                                 <div className="text-right">
                                   <p className="font-semibold">
-                                    ${((item.price_data.unit_amount as number / 100) * item.quantity).toFixed(2)}
+                                    ${(item.totalPrice / 100).toFixed(2)}
                                   </p>
                                 </div>
                               </div>
