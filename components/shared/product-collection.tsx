@@ -8,12 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { StripeProduct } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
 
 interface ProductCollectionProps {
     title: string;
     description?: string;
-    products: StripeProduct[];
+    products: ProductWithVariants[];
     collectionSlug?: string;
     showViewAll?: boolean;
     columns?: 2 | 3 | 4;
@@ -38,18 +38,12 @@ export default function ProductCollection({
         }).format(amount / 100);
     };
 
-    const getProductPrice = (product: StripeProduct): number => {
-        if (
-            typeof product.default_price === "object" &&
-            product.default_price?.unit_amount
-        ) {
-            return product.default_price.unit_amount;
-        }
-        return 0;
+    const getProductPrice = (product: ProductWithVariants): number => {
+        return product.defaultVariant?.price ?? product.minPrice;
     };
 
-    const getProductSlug = (product: StripeProduct): string => {
-        return product.metadata?.slug || product.id;
+    const getProductSlug = (product: ProductWithVariants): string => {
+        return product.metadata?.slug || product.slug || product.id;
     };
 
     const gridCols = {

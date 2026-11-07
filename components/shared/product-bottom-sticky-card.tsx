@@ -1,5 +1,5 @@
 import { cn, formatPrice } from "@/lib/utils";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 // import { MainProductImage } from "@/ui/products/main-product-image";
 // import AddToCartButton from "./add-to-cart-button";
 import Image from "next/image";
@@ -9,9 +9,10 @@ export const ProductBottomStickyCard = ({
   product,
   show,
 }: {
-  product: StripeProduct;
+  product: ProductWithVariants;
   show: boolean;
 }) => {
+  const price = product.defaultVariant?.price ?? product.variants?.[0]?.price;
   return (
     <div
       tabIndex={show ? 0 : -1}
@@ -48,12 +49,11 @@ export const ProductBottomStickyCard = ({
               {product.name}
             </h3>
 
-            {typeof product.default_price === "object" &&
-              product.default_price?.unit_amount && (
-                <p className="text-lg sm:text-xl font-bold text-primary leading-none">
-                  {formatPrice(product.default_price.unit_amount)}
-                </p>
-              )}
+            {price != null && (
+              <p className="text-lg sm:text-xl font-bold text-primary leading-none">
+                {formatPrice(price)}
+              </p>
+            )}
           </div>
         </div>
 

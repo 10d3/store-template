@@ -1,11 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import ProductCard from "@/components/shared/product-card";
 
 interface RelatedProductsProps {
-    products: StripeProduct[];
+    products: ProductWithVariants[];
     title?: string;
     className?: string;
 }
@@ -17,18 +17,12 @@ export default function RelatedProducts({
 }: RelatedProductsProps) {
     if (!products || products.length === 0) return null;
 
-    const getProductPrice = (product: StripeProduct): number => {
-        if (
-            typeof product.default_price === "object" &&
-            product.default_price?.unit_amount
-        ) {
-            return product.default_price.unit_amount;
-        }
-        return 0;
+    const getProductPrice = (product: ProductWithVariants): number => {
+        return product.defaultVariant?.price ?? product.variants?.[0]?.price ?? 0;
     };
 
-    const getProductSlug = (product: StripeProduct): string => {
-        return product.metadata?.slug || product.id;
+    const getProductSlug = (product: ProductWithVariants): string => {
+        return product.metadata?.slug || product.slug || product.id;
     };
 
     return (

@@ -11,7 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -19,7 +19,7 @@ import { Check, ChevronsUpDown, Search, ShoppingCart, X } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface ProductSelectProps {
-  products: StripeProduct[];
+  products: ProductWithVariants[];
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
 }
@@ -37,6 +37,9 @@ export default function ProductMultiSelect({
       currency: currency.toUpperCase(),
     }).format(amount / 100);
   };
+
+  const getProductPrice = (product: ProductWithVariants): number | undefined =>
+    product.defaultVariant?.price ?? product.variants?.[0]?.price;
 
   const availableProducts = products.filter(
     (p) => !p.metadata || p.metadata.type !== "bundle"
@@ -98,16 +101,11 @@ export default function ProductMultiSelect({
                     <div className="flex items-center gap-3 w-full">
                       <div className="flex-1">
                         <p className="font-medium text-sm">{product.name}</p>
-                        {product.default_price &&
-                          typeof product.default_price === "object" &&
-                          product.default_price.unit_amount !== null && (
-                            <p className="text-xs text-gray-500">
-                              {formatPrice(
-                                product.default_price.unit_amount,
-                                product.default_price.currency
-                              )}
-                            </p>
-                          )}
+                        {getProductPrice(product) !== undefined && (
+                          <p className="text-xs text-gray-500">
+                            {formatPrice(getProductPrice(product) ?? 0, "USD")}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <Check className="h-4 w-4 opacity-0" />
@@ -149,16 +147,11 @@ export default function ProductMultiSelect({
                     <p className="font-medium text-sm truncate">
                       {product.name}
                     </p>
-                    {product.default_price &&
-                      typeof product.default_price === "object" &&
-                      product.default_price.unit_amount !== null && (
-                        <p className="text-xs">
-                          {formatPrice(
-                            product.default_price.unit_amount,
-                            product.default_price.currency
-                          )}
-                        </p>
-                      )}
+                    {getProductPrice(product) !== undefined && (
+                      <p className="text-xs">
+                        {formatPrice(getProductPrice(product) ?? 0, "USD")}
+                      </p>
+                    )}
                   </div>
                   <Button
                     type="button"

@@ -1,5 +1,5 @@
 // sitemap.ts
-import { findBlogs } from "@/lib/action";
+import { findBlogs } from "@/lib/actions";
 import { getBaseURL } from "@/lib/utils";
 import type { MetadataRoute } from "next";
 

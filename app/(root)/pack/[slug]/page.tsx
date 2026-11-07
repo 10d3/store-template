@@ -1,7 +1,6 @@
 import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
-import { getPackBySlug, transformPacksToProductData } from "@/lib/product/cache";
-import { getRelatedProducts } from "@/lib/product/related-index";
+import { getCachedProduct, getCachedRelatedProducts } from "@/lib/catalog";
 import { getAverageRating, getReviewsByProductId } from "@/lib/review/crud";
 import {
     Card,
@@ -19,16 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
 import StarRating from "@/components/shared/star-rating";
 // import SelectVariant from "@/components/shared/select-variant";
-import QuantityManagement from "@/components/shared/quantity-management";
 // import CarousselVariants from "@/components/shared/caroussel-variants";
-import BuyNowButton from "@/components/shared/buy-now-button";
-import AddToCartButton from "@/components/shared/add-to-cart-button";
 import BadgeTrust from "@/components/shared/badge";
 import CardAnyText from "@/components/shared/card-any-text";
 import { Markdown } from "@/components/shared/markdown";
 import { MarkdownNutrition } from "@/components/shared/nutrition-label";
 import RelatedProductsClient from "@/components/shared/related-product-client";
-import { PackCardNew } from "@/components/shared/product/product-card";
+import ProductPurchaseSection from "@/components/catalog/product-purchase-section";
 import ReviewsClient from "@/components/shared/review-client";
 import { getBaseURL, stripMarkdown } from "@/lib/utils";
 import { Metadata } from "next";
@@ -37,33 +33,33 @@ export async function generateMetadata(props: {
     params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
     const params = await props.params;
-    const variants = await getPackBySlug(params.slug);
+    const product = await getCachedProduct(params.slug);
 
-    if (!variants) {
+    if (!product) {
         return {
             title: "Product Not Found",
         };
     }
 
-    const seoTitle = variants.metadata?.seo_title || variants.name;
+    const seoTitle = product.metadata?.seo_title || product.name;
 
     // Strip markdown from description
-    const rawDescription = variants.metadata?.seo_description || variants.description || `Shop ${variants.name} at our store`;
+    const rawDescription = product.metadata?.seo_description || product.description || `Shop ${product.name} at our store`;
     const seoDescription = stripMarkdown(rawDescription).slice(0, 180);
 
     // Get product image
-    const productImage = variants.images?.[0] || "";
+    const productImage = product.images?.[0] || "";
 
     // Get tags from metadata
-    const tags = variants.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
+    const tags = product.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
 
     // Get price
-    const price = typeof variants.default_price === "object" && variants.default_price?.unit_amount
-        ? `$${(variants.default_price.unit_amount / 100).toFixed(2)}`
+    const price = product.defaultVariant?.price
+        ? `$${(product.defaultVariant.price / 100).toFixed(2)}`
         : "";
 
     // Build OG image URL
-    let ogImageUrl = `${getBaseURL()}/api/og?template=ecommerce-product&title=${encodeURIComponent(variants.name)}&description=${encodeURIComponent(stripMarkdown(rawDescription).slice(0, 100))}`;
+    let ogImageUrl = `${getBaseURL()}/api/og?template=ecommerce-product&title=${encodeURIComponent(product.name)}&description=${encodeURIComponent(stripMarkdown(rawDescription).slice(0, 100))}`;
 
     // Add image
     if (productImage) ogImageUrl += `&image=${encodeURIComponent(productImage)}`;
@@ -86,7 +82,7 @@ export async function generateMetadata(props: {
                     url: ogImageUrl,
                     width: 1200,
                     height: 630,
-                    alt: variants.name,
+                    alt: product.name,
                 },
             ],
         },
@@ -103,26 +99,21 @@ export default async function page(props: {
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await props.params;
-    const pack = await getPackBySlug(slug);
+    const pack = await getCachedProduct(slug);
 
     if (!pack) {
         throw new Error("Pack not found")
     }
 
     const [relatedProducts, reviews, ratingData,] = await Promise.all([
-        getRelatedProducts(pack?.id as string, 4),
-        getReviewsByProductId(pack?.id as string),
-        getAverageRating(pack?.id as string),
-        // packsPromise,
+        getCachedRelatedProducts(pack.id, 4),
+        getReviewsByProductId(pack.id),
+        getAverageRating(pack.id),
     ]);
 
     const { average: averageRating, count: reviewCount } = ratingData;
 
-    // Build the pack pricing/size data so customers can pick a pack size (2/3/6…)
-    // and get the right discounted price + Stripe price at checkout.
-    const [packData] = await transformPacksToProductData([pack]);
-
-    const images = pack?.images?.slice(0, 5) ?? [];
+    const images = pack.images?.slice(0, 5) ?? [];
 
 
     return (
@@ -178,19 +169,7 @@ export default async function page(props: {
                                 </CardHeader>
 
                                 <CardContent className="space-y-6">
-                                    {packData ? (
-                                        <PackCardNew product={packData} defaultPurchaseType="onetime" />
-                                    ) : (
-                                        <>
-                                            <div className="flex-1">
-                                                <QuantityManagement product={pack} />
-                                            </div>
-                                            <div className="grid gap-2">
-                                                <BuyNowButton product={pack} />
-                                                <AddToCartButton product={pack} />
-                                            </div>
-                                        </>
-                                    )}
+                                    <ProductPurchaseSection product={pack} />
                                 </CardContent>
                             </Card>
                         </div>
@@ -205,7 +184,7 @@ export default async function page(props: {
                                         <Markdown source={pack.description || ""} />
                                     </CardAnyText>
                                 </div>
-                                {pack.metadata.nutrition && (
+                                {pack.metadata?.nutrition && (
                                     <div>
                                         <CardAnyText className="m-0 py-2" title="Product Information">
                                             <MarkdownNutrition
@@ -314,19 +293,7 @@ export default async function page(props: {
                                     </CardHeader>
 
                                     <CardContent className="space-y-6">
-                                        {packData ? (
-                                            <PackCardNew product={packData} defaultPurchaseType="onetime" />
-                                        ) : (
-                                            <>
-                                                <div className="flex-1">
-                                                    <QuantityManagement product={pack} />
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <BuyNowButton product={pack} />
-                                                    <AddToCartButton product={pack} />
-                                                </div>
-                                            </>
-                                        )}
+                                        <ProductPurchaseSection product={pack} />
                                     </CardContent>
                                 </Card>
                             </div>

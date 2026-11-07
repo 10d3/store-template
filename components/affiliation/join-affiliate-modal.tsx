@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { joinAffiliateProgram } from "@/lib/action/affiliation";
+import { joinAffiliateProgram } from "@/lib/actions/affiliation";
 
 export function JoinAffiliateModal({
     children,

@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ProductBottomStickyCard } from "./product-bottom-sticky-card";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 
 export const StickyBottom = ({
   children,
   product,
 }: Readonly<{
   children: React.ReactNode;
-  product: StripeProduct;
+  product: ProductWithVariants;
 }>) => {
   const [show, setShow] = useState(false);
   useEffect(() => {

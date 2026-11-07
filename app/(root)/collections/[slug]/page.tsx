@@ -1,4 +1,7 @@
-import { getProductsByCollection, getCollections } from "@/lib/product/crud";
+import {
+    getCachedProductsByCollection,
+    getCachedCollections,
+} from "@/lib/catalog";
 import {
     COLLECTION_NAMES,
     getCollectionDisplay,
@@ -12,7 +15,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
-    const collections = await getCollections();
+    const collections = await getCachedCollections();
     return collections.map((collection) => ({
         slug: collection.slug,
     }));
@@ -50,7 +53,7 @@ export default async function CollectionPage(props: {
     const params = await props.params;
     const slug = params.slug;
 
-    const products = await getProductsByCollection(slug);
+    const products = await getCachedProductsByCollection(slug);
     const collectionDisplay = getCollectionDisplay(slug);
 
     if (!COLLECTION_NAMES[slug] && products.length === 0) {

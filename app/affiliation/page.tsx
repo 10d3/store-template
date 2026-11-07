@@ -9,6 +9,8 @@ import { AlertCircle } from "lucide-react";
 
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Affiliate Dashboard",
   description: "Track your affiliate performance.",

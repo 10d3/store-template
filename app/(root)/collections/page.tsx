@@ -6,7 +6,7 @@ import {
     COLLECTION_NAMES,
     getCollectionDisplay,
 } from "@/lib/product/collection-names";
-import { getCollections } from "@/lib/product/crud";
+import { getCachedCollections } from "@/lib/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CollectionsPage() {
-    const dbCollections = await getCollections();
+    const dbCollections = await getCachedCollections();
 
     // Union of DB-backed slugs and known curated slugs (deduped, stable order)
     const slugs = Array.from(

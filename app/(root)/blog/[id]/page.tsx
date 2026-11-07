@@ -1,4 +1,4 @@
-import { findBlogBySlug, findBlogBySlugWithoutView } from "@/lib/action";
+import { findBlogBySlug, findBlogBySlugWithoutView } from "@/lib/actions";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { Calendar, Eye, User } from "lucide-react";

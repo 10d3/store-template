@@ -3,7 +3,7 @@ import Footer from "@/components/footer";
 import FooterWrapperCta from "@/components/shared/footer-wrapper-cta";
 import Navbar, { Category } from "@/components/shared/nav/navigation-menu";
 import SocialProofProvider from "@/components/shared/social-proof-provider";
-import { getCachedProducts } from "@/lib/product/test-index-product";
+import { getCachedProducts } from "@/lib/catalog";
 import { Metadata } from "next";
 import React from "react";
 import { auth } from "@/lib/auth";
@@ -63,7 +63,7 @@ export default async function Rootlayout({
 
   // First, look for Gender/Target Audience to prioritize them
   products.forEach((product) => {
-    const gender = product.metadata?.gender?.toLowerCase();
+    const gender = product.gender?.toLowerCase();
     if (gender) {
       const slug = gender;
       if (!categoryMap.has(slug)) {
@@ -89,7 +89,7 @@ export default async function Rootlayout({
 
   // Then look for other categories
   products.forEach((product) => {
-    const category = product.metadata?.category;
+    const category = product.category;
     if (category) {
       const slug = category.toLowerCase().replace(/\s+/g, "-");
       // Avoid overwriting gender categories if they clash (unlikely given naming)
@@ -116,7 +116,7 @@ export default async function Rootlayout({
   return (
     <>
       <Navbar shopCategories={shopCategories} isAdmin={isAdmin} isAffiliate={isAffiliate} />
-      <main className="flex-1 flex-col mt-4 md:px-24 px-4">
+      <main className="flex-1 flex-col mt-4 md:px-48 px-4">
         {children}
         <CartModal />
         <SocialProofProvider

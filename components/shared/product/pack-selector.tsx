@@ -1,6 +1,9 @@
 "use client"
 
-import type { PackOption } from "@/types/product"
+interface PackOption {
+  value: string
+  label: string
+}
 
 interface PackSelectorProps {
   options: PackOption[]

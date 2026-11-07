@@ -1,4 +1,4 @@
-import { findBlogs } from "@/lib/action";
+import { findBlogs } from "@/lib/actions";
 import React from "react";
 import { BlogHeader } from "./_components/blog-header";
 import { BlogGrid } from "./_components/blog-grid";

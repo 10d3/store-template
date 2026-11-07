@@ -7,11 +7,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { removeFromWishlist } from "@/lib/wishlist/crud";
 import { toast } from "sonner";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 // import { Product } from "@/lib/generated/prisma";
 
 interface WishlistClientPageProps {
-  wishlistItems: StripeProduct[];
+  wishlistItems: ProductWithVariants[];
 }
 
 export default function WishlistClientPage({ wishlistItems }: WishlistClientPageProps) {
@@ -99,7 +99,7 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                   <CardContent>
                     <div className="flex gap-6">
                       <Link
-                        href={`/product/${item.metadata.slug}`}
+                        href={`/product/${item.metadata?.slug}`}
                         className="block w-32 h-32 rounded-xl overflow-hidden flex-shrink-0"
                       >
                         <Image
@@ -116,10 +116,10 @@ export default function WishlistClientPage({ wishlistItems }: WishlistClientPage
                         </p>
                         <div className="flex items-center justify-between">
                           <p className="font-semibold text-lg">
-                            ${typeof item.default_price === 'object' && item.default_price?.unit_amount ? (item.default_price.unit_amount / 100).toFixed(2) : '0.00'}
+                            ${((item.defaultVariant?.price ?? item.variants?.[0]?.price ?? 0) / 100).toFixed(2)}
                           </p>
                           <Button asChild size="sm">
-                            <Link href={`/${item.metadata.slug ? "product" : "pack"}/${item.slug}`}>
+                            <Link href={`/${item.metadata?.slug ? "product" : "pack"}/${item.slug}`}>
                               View Details
                             </Link>
                           </Button>

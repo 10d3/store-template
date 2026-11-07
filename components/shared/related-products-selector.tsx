@@ -1,12 +1,12 @@
 "use client";
 
 import ProductMultiSelect from "@/components/shared/product-muli-select";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link2 } from "lucide-react";
 
 interface RelatedProductsSelectorProps {
-    products: StripeProduct[];
+    products: ProductWithVariants[];
     value: string; // Comma-separated product IDs
     onChange: (value: string) => void;
     currentProductId?: string; // Exclude current product from options

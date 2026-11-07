@@ -1,29 +1,34 @@
 "use client";
-import React from "react";
 import { Button } from "../ui/button";
 import { useCartStore } from "@/lib/store";
-import { StripeProduct } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
 import { ShoppingCart } from "lucide-react";
 
 export default function AddToCartButton({
   product,
+  variantId,
 }: {
-  product: StripeProduct;
+  product: ProductWithVariants;
+  variantId?: string;
 }) {
   const getPrice = () => {
-    if (
-      typeof product.default_price === "object" &&
-      product.default_price?.unit_amount
-    ) {
-      return product.default_price.unit_amount;
-    }
-    return 0; // fallback if no price available
+    return product.defaultVariant?.price ?? 0;
   };
+
+  // CartItem.variantId must always be a real ProductVariant.id — never fall back to product.id.
+  const resolvedVariantId = variantId ?? product.variants?.[0]?.id ?? undefined;
 
   const { addOrUpdateItem, isAddingToCart, getPendingQuantity, resetPendingQuantity } = useCartStore();
 
   const handleAddToCart = () => {
-    const quantity = getPendingQuantity(product.id);
+    if (!resolvedVariantId) {
+      console.error(
+        "AddToCartButton: cannot add to cart — no ProductVariant.id available for product",
+        product.id
+      );
+      return;
+    }
+    const quantity = getPendingQuantity(product.id) || 1;
     addOrUpdateItem({
       id: product.id,
       name: product.name,
@@ -31,7 +36,7 @@ export default function AddToCartButton({
       price: getPrice(),
       quantity: quantity,
       maxQuantity: 10,
-      variantId: product.id,
+      variantId: resolvedVariantId,
     });
     // Reset the pending quantity after adding to cart
     resetPendingQuantity(product.id);

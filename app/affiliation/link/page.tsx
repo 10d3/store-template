@@ -1,9 +1,11 @@
-import { listProducts } from "@/lib/product/crud"
+import { listActiveProducts } from "@/lib/catalog"
 import Image from "next/image"
 import { CopyLinkButton } from "./_components/copy-link-button"
 import { getBaseURL } from "@/lib/utils"
 import { getRefferalCode } from "@/lib/affiliation/affiliate-data"
 import { Metadata } from "next"
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Affiliate Links",
@@ -12,15 +14,15 @@ export const metadata: Metadata = {
 
 export default async function page() {
   const refferalCode = await getRefferalCode()
-  const products = await listProducts()
+  const products = await listActiveProducts()
   const transformedDataProduct = products
-    .filter((product) => product.metadata?.type !== "bundle")
+    .filter((product) => !product.isBundle)
     .map((product) => ({
       id: product.id,
       name: product.name,
       description: product?.description || "",
       image: product?.images?.[0] as string,
-      metadata: product.metadata,
+      slug: product.slug ?? product.id,
     }))
 
   return (
@@ -47,13 +49,13 @@ export default async function page() {
             <div className="flex items-center gap-2 sm:gap-3 rounded-lg bg-muted px-3 py-2 sm:px-4 sm:py-3 w-full sm:w-auto">
               <div className="flex-1 sm:max-w-xs overflow-hidden">
                 <p className=" truncate text-sm text-muted-foreground">
-                  {`${getBaseURL()}/product/${product.metadata.slug}?ref=${refferalCode}`}
+                  {`${getBaseURL()}/product/${product.slug}?ref=${refferalCode}`}
                 </p>
                 {/* <p className="sm:hidden truncate text-xs text-muted-foreground">Click to copy link</p> */}
               </div>
               <CopyLinkButton
                 productId={product.id}
-                link={`${getBaseURL()}/product/${product.metadata.slug}?ref=${refferalCode}`}
+                link={`${getBaseURL()}/product/${product.slug}?ref=${refferalCode}`}
               />
             </div>
           </div>

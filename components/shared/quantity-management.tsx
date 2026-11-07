@@ -5,12 +5,12 @@ import { Button } from "../ui/button";
 import { Minus, Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { useCartStore } from "@/lib/store";
-import { StripeProduct } from "@/types/product";
+import type { ProductWithVariants } from "@/lib/catalog";
 
 export default function QuantityManagement({
   product,
 }: {
-  product: StripeProduct;
+  product: ProductWithVariants;
 }) {
   const [mounted, setMounted] = React.useState(false);
   const { getPendingQuantity, setPendingQuantity } = useCartStore();

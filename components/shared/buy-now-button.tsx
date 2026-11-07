@@ -1,7 +1,7 @@
 "use client";
 import { createCheckoutSessionNow, createGuestCheckoutSessionNow } from "@/lib/cart/checkout-session";
 import { Button } from "@/components/ui/button";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 import { CreditCard } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,23 +11,27 @@ import { useCartStore } from "@/lib/store";
 export default function BuyNowButton({
   product,
 }: {
-  product: StripeProduct;
+  product: ProductWithVariants;
 }) {
   const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
   const coupon = useCartStore((s) => s.coupon);
 
   const getPrice = () => {
-    if (
-      typeof product.default_price === "object" &&
-      product.default_price?.unit_amount
-    ) {
-      return product.default_price.unit_amount;
-    }
-    return 0;
+    return product.defaultVariant?.price ?? product.variants?.[0]?.price ?? 0;
   };
 
-  function transformProductDatatoCartItem(product: StripeProduct) {
+  function transformProductDatatoCartItem(product: ProductWithVariants) {
+    const resolvedVariantId =
+      product.defaultVariant?.id ?? product.variants?.[0]?.id;
+
+    if (!resolvedVariantId) {
+      console.error(
+        `BuyNowButton: no variant available for product ${product.id}`
+      );
+      return null;
+    }
+
     return {
       id: product.id,
       name: product.name,
@@ -35,18 +39,20 @@ export default function BuyNowButton({
       price: getPrice(),
       quantity: 1,
       maxQuantity: 10,
-      variantId: product.id,
+      variantId: resolvedVariantId,
     };
   }
 
   const generateStripeLink = async () => {
+    const item = transformProductDatatoCartItem(product);
+    if (!item) return;
     try {
       setLoading(true);
       if (session?.user) {
-        const url = await createCheckoutSessionNow(transformProductDatatoCartItem(product), coupon?.id);
+        const url = await createCheckoutSessionNow(item, coupon?.id);
         window.location.href = url as string;
       } else {
-        const url = await createGuestCheckoutSessionNow(transformProductDatatoCartItem(product), undefined, coupon?.id);
+        const url = await createGuestCheckoutSessionNow(item, undefined, coupon?.id);
         window.location.href = url as string;
       }
     } catch (error: any) {

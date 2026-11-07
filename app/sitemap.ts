@@ -1,68 +1,67 @@
-import { getBaseURL } from '@/lib/utils';
-import type { MetadataRoute } from 'next'
+import { getBaseURL } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
+import type { MetadataRoute } from "next";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-   const baseUrl = getBaseURL();
-  return [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = getBaseURL();
+
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}`,
+      url: baseUrl,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es',
-    //       de: 'https://acme.com/de',
-    //     },
-    //   },
+      changeFrequency: "daily",
+      priority: 1.0,
     },
     {
-      url: `${baseUrl}/servicios`,
+      url: `${baseUrl}/collections`,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es/about',
-    //       de: 'https://acme.com/de/about',
-    //     },
-    //   },
+      changeFrequency: "daily",
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es/blog',
-    //       de: 'https://acme.com/de/blog',
-    //     },
-    //   },
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
     {
-      url: `${baseUrl}/sobre-nosotros`,
+      url: `${baseUrl}/contact`,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es/blog',
-    //       de: 'https://acme.com/de/blog',
-    //     },
-    //   },
+      changeFrequency: "monthly",
+      priority: 0.5,
     },
     {
-      url: `${baseUrl}/testimonios`,
+      url: `${baseUrl}/support`,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es/blog',
-    //       de: 'https://acme.com/de/blog',
-    //     },
-    //   },
+      changeFrequency: "monthly",
+      priority: 0.5,
     },
     {
-      url: `${baseUrl}/preguntas-frecuentes`,
+      url: `${baseUrl}/affiliate-program`,
       lastModified: new Date(),
-    //   alternates: {
-    //     languages: {
-    //       es: 'https://acme.com/es/blog',
-    //       de: 'https://acme.com/de/blog',
-    //     },
-    //   },
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
-]
+  ];
+
+  try {
+    const products = await prisma.product.findMany({
+      where: { active: true },
+      select: { slug: true, updatedAt: true },
+    });
+
+    const productRoutes: MetadataRoute.Sitemap = products
+      .filter((p) => p.slug)
+      .map((p) => ({
+        url: `${baseUrl}/product/${p.slug}`,
+        lastModified: p.updatedAt,
+        changeFrequency: "weekly",
+        priority: 0.8,
+      }));
+
+    return [...staticRoutes, ...productRoutes];
+  } catch (err) {
+    console.error("Error generating product sitemap:", err);
+    return staticRoutes;
+  }
 }

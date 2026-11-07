@@ -1,47 +1,32 @@
-import AddToCartButton from "@/components/shared/add-to-cart-button";
-import QuantityManagement from "@/components/shared/quantity-management";
-// import VideoReviewMasonry from "@/components/shared/review-section";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-// import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-// import {
-//   getPack,
-//   getRelatedProducts,
-// } from "@/lib/product/crud";
-import { transformPacksToProductData } from "@/lib/product/cache";
-import { Share2 } from "lucide-react";
 import { getBaseURL } from "@/lib/utils";
-// import RelatedProducts from "@/components/shared/related-products";
-import { Button } from "@/components/ui/button";
-// import MediaGallery from "@/components/shared/media-gallery";
+
+import { MarketingHeroV2 } from "@/components/shared/marketing/MarketingHeroV2";
+import { ScienceTable } from "@/components/shared/marketing/ScienceTable";
+import { SplitFeatureSection } from "@/components/shared/marketing/SplitFeatureSection";
+import { TestimonialCarousel } from "@/components/shared/marketing/TestimonialCarousel";
+import { FAQAccordion } from "@/components/shared/marketing/FAQAccordion";
+import { BottomCTA } from "@/components/shared/marketing/BottomCTA";
+import { FadeIn } from "@/components/shared/animations/fade-in";
+
 import { PackCardNew } from "@/components/shared/product/product-card";
-// import { transformPacksToProductData } from "@/lib/product/pack-transformer";
-import WishlistButton from "@/components/shared/wishlist-button";
-import MediaProductGallery from "@/components/shared/media-product-gallery";
 import { Markdown } from "@/components/shared/markdown";
 import CardAnyText from "@/components/shared/card-any-text";
 import { MarkdownNutrition } from "@/components/shared/nutrition-label";
 import { StickyBottom } from "@/components/shared/sticky-bottom";
 import { getReviewsByProductId, getAverageRating } from "@/lib/review/crud";
 import StarRating from "@/components/shared/star-rating";
-// import ReviewList from "@/components/shared/review-list";
-// import ReviewSection from "@/components/shared/review-section-wrapper";
 import type { Metadata } from "next";
-import BuyNowButton from "@/components/shared/buy-now-button";
-import BadgeTrust from "@/components/shared/badge";
+import { notFound } from "next/navigation";
 import ReviewsClient from "@/components/shared/review-client";
 import RelatedProductsClient from "@/components/shared/related-product-client";
-import { getPack } from "@/lib/product/bundle-index";
-import { getRelatedProducts } from "@/lib/product/related-index";
-import { getCachedProduct } from "@/lib/product/test-index-product";
-import { StripeProduct } from "@/types/product";
+
+// ── NEW: unified catalog ───────────────────────────────────────────────────────
+import {
+  getCachedProduct,
+  getCachedRelatedProducts,
+  getCachedBundlesForProduct,
+} from "@/lib/catalog";
+import ProductPurchaseSection from "@/components/catalog/product-purchase-section";
 
 // Generate metadata for SEO and OG
 // Helper to strip markdown formatting
@@ -66,15 +51,15 @@ export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const variants = await getCachedProduct(params.slug);
+  const rawProduct = await getCachedProduct(params.slug);
 
-  if (!variants || variants.length === 0) {
+  if (!rawProduct) {
     return {
       title: "Product Not Found",
     };
   }
 
-  const product = variants[0];
+  const product = rawProduct;
   const seoTitle = product.metadata?.seo_title || product.name;
 
   // Strip markdown from description
@@ -88,8 +73,8 @@ export async function generateMetadata(props: {
   const tags = product.metadata?.tags?.split(',').map((t: string) => t.trim()) || [];
 
   // Get price
-  const price = typeof product.default_price === "object" && product.default_price?.unit_amount
-    ? `$${(product.default_price.unit_amount / 100).toFixed(2)}`
+  const price = product.defaultVariant?.price
+    ? `$${(product.defaultVariant.price / 100).toFixed(2)}`
     : "";
 
   // Build OG image URL
@@ -129,312 +114,198 @@ export async function generateMetadata(props: {
   };
 }
 
-// interface MediaItem {
-//   id: string;
-//   type: "image" | "video";
-//   src: string;
-//   thumbnail?: string;
-//   alt: string;
-//   title?: string;
-// }
-
 export default async function page(props: {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ variant?: string; image?: string }>;
 }) {
   const params = await props.params;
-  const searchParams = await props.searchParams;
 
-  const variants = await getCachedProduct(params.slug);
-  // console.log("variant form slug", variants);
-  const selectedVariants = variants.filter((variant) =>
-    variant.metadata?.variants?.includes(searchParams.variant as string)
-  );
-  // const selectedVariant = selectedVariants[0];
-
-  let packsPromise: Promise<StripeProduct[]> = Promise.resolve([]);
-
-  if (variants[0].metadata?.packs) {
-    packsPromise = getPack(variants[0].id);
+  const rawProduct = await getCachedProduct(params.slug);
+  if (!rawProduct) {
+    notFound();
   }
 
-  const [relatedProducts, reviews, ratingData, packs] = await Promise.all([
-    getRelatedProducts(variants[0].id, 4),
-    getReviewsByProductId(variants[0].id),
-    getAverageRating(variants[0].id),
-    packsPromise, // This is now guaranteed to be a Promise<StripeProduct[]>
+  const product = rawProduct;
+
+  const [relatedRaw, reviews, ratingData, bundleProducts] = await Promise.all([
+    getCachedRelatedProducts(rawProduct.id, 4),
+    getReviewsByProductId(rawProduct.id),
+    getAverageRating(rawProduct.id),
+    getCachedBundlesForProduct(rawProduct.id),
   ]);
 
-  // 2. Now 'packs' is always an array, so .length is safe
-  const packProductData =
-    packs.length > 0 ? await transformPacksToProductData(packs) : [];
-
+  const relatedProducts = relatedRaw;
 
   const { average: averageRating, count: reviewCount } = ratingData;
+  const images = product.images?.slice(0, 5) ?? [];
 
-  // console.log("packs from slug", packs);
-  // const mediaItems: MediaItem[] = [
-  //   {
-  //     id: "1",
-  //     type: "image",
-  //     src: (variants[0]?.images?.[0] as string) || "",
-  //     alt: "Product image 1",
-  //     title: "Main product view",
-  //   },
-  //   {
-  //     id: "2",
-  //     type: "image",
-  //     src: (variants[0].images?.[1] as string) || "",
-  //     thumbnail: (variants[0].images?.[1] as string) || "",
-  //     alt: "Product demo video",
-  //     title: "Product demonstration",
-  //   },
-  //   {
-  //     id: "3",
-  //     type: "image",
-  //     src: (variants[0]?.images?.[2] as string) || "",
-  //     alt: "Product image 2",
-  //     title: "Detail view",
-  //   },
-  //   {
-  //     id: "4",
-  //     type: "image",
-  //     src: (variants[0]?.images?.[3] as string) || "",
-  //     alt: "Product image 4",
-  //     title: "Usage example",
-  //   },
-  //   {
-  //     id: "5",
-  //     type: "image",
-  //     src: (variants[0]?.images?.[4] as string) || "",
-  //     alt: "product image 5",
-  //     title: " benefit"
-  //   }
-  // ];
+  const defaultPrice = product.defaultVariant?.price ?? product.variants[0]?.price;
 
-  const images = variants[0].images?.slice(0, 5) ?? [];
+  // Helper to parse JSON from metadata
+  const parseJson = (str: string | undefined, def: any = []) => {
+    try { return str ? JSON.parse(str) : def; } catch (e) { return def; }
+  };
 
-  // const getGridPosition = (index: number) => {
-  //   const positions = [
-  //     "md:col-span-2 md:row-span-3 col-span-7 row-span-2",
-  //     "md:col-span-2 md:row-span-2 col-span-4 row-span-2",
-  //     "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
-  //     "md:col-span-1 md:row-span-1 col-span-3 row-span-1",
-  //   ];
-  //   return positions[index] || "col-span-1 row-span-1";
-  // };
+  // Default mock data tailored to the new design
+  const defaultIngredients = [
+    { name: "Vitamin D3", amount: "25 (1,000 I.E.)", function: "Supports bone density and calcium absorption" },
+    { name: "Vitamin B12", amount: "250 µg", function: "Supports nerve and muscle function" },
+    { name: "Vitamin C", amount: "125 mg", function: "Strengthens collagen and tissue repair" },
+    { name: "Magnesium", amount: "125 mg", function: "Promotes muscle relaxation and flexibility" },
+    { name: "Omega-3", amount: "250 mg", function: "Reduces inflammation and supports joints" },
+  ];
+
+  const defaultTestimonials = [
+    { quote: "I spend long hours at a desk, and my back used to ache constantly. After a few weeks, my posture feels stronger and I have more energy.", name: "Lina R.", rating: 5, avatar: "" },
+    { quote: "You can actually feel the difference—better flexibility, less stiffness. It has become an essential part of my routine.", name: "Daniel S.", rating: 5, avatar: "" },
+    { quote: "I've struggled with lower back stiffness for years, but after a month I feel noticeably more flexible and comfortable.", name: "Thomas L.", rating: 5, avatar: "" }
+  ];
+
+  const defaultFAQs = [
+    { question: "How long until I notice results?", answer: "Most customers feel improvements in posture, flexibility, or energy within 3–4 weeks of consistent use." },
+    { question: "Can I take it with other supplements?", answer: "Yes, our formula is designed to complement most daily regimens. Please consult your healthcare provider if you have specific concerns." },
+    { question: "Is it suitable for vegetarians?", answer: "Yes, our capsules use plant-based ingredients." },
+    { question: "Where is it made?", answer: "All our products are manufactured in Germany under strict GMP standards." }
+  ];
+
+  const defaultWhyChoose = {
+    title: "Why Choose Vlyora Core?",
+    bullets: [
+      "Supports bone and spinal strength",
+      "Promotes better posture and flexibility",
+      "Reduces inflammation and stiffness",
+      "Boosts daily energy and vitality",
+      "Enhances recovery from stress and strain",
+    ],
+    imagePosition: "right" as const,
+  };
+
+  const defaultHowToUse = {
+    title: "How to Use",
+    content: "Take 2 capsules daily with a glass of water, preferably with a meal. Each bottle contains 60 capsules, providing a full 30 day supply.",
+    imagePosition: "left" as const,
+  };
+
+  const whyChoose = parseJson(product.metadata?.marketing_why_choose, defaultWhyChoose);
+  const howToUse = parseJson(product.metadata?.marketing_how_to_use, defaultHowToUse);
+
+  // Action Panel Component - powered by unified ProductPurchaseSection
+  const ActionPanel = () => (
+    <div className="space-y-4 w-full">
+      <ProductPurchaseSection product={rawProduct} />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen">
-      <StickyBottom product={variants[0]}>
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Media Gallery */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="relative">
-              <MediaProductGallery
-                // variant="default"
-                // images={mediaItems.map((item) => item.src)}
-                images={images}
-              // mediaItems={mediaItems}
-              // getGridPosition={getGridPosition}
-              />
-            </div>
-            <div className="md:hidden">
-              <Card className="border-0 shadow-xl bg-card">
-                <CardHeader className="pb-6">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <Badge variant="secondary" className="w-fit">
-                        New Arrival
-                      </Badge>
-                      <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
-                        {/* {params.slug
-                          .replace(/-/g, " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())} */}
-                        {variants[0].name}
-                      </CardTitle>
-                    </div>
-                    <div className="flex gap-2">
-                      <WishlistButton productId={variants[0].id} />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="rounded-full"
-                      >
-                        <Share2 className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </div>
-                  {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
-                    {variants[0].description}
-                  </CardDescription> */}
-                  <a href="#reviews" className="flex items-center gap-4 pt-2 cursor-pointer hover:opacity-80 transition-opacity">
-                    <StarRating rating={averageRating} size="sm" />
-                    <span className="text-sm text-muted-foreground">
-                      {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-                    </span>
-                  </a>
-                  <CardDescription className="text-base font-semibold">
-                    {variants[0].subtitle}
-                  </CardDescription>
-                  <Badge variant="secondary" className="w-fit">
-                    {variants[0].tagline}
-                  </Badge>
-                </CardHeader>
+    <div className="min-h-screen bg-background px-4 md:px-32">
+      <StickyBottom product={product}>
 
-                <CardContent className="space-y-6">
-                  <div className="flex-1">
-                    <QuantityManagement product={variants[0]} />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="mt-6 md:hidden grid gap-2">
-              <BuyNowButton product={variants[0]} />
-              <AddToCartButton product={variants[0]} />
-            </div>
-            <BadgeTrust className="md:hidden" />
+        <div className="w-full">
+          <FadeIn>
+            <MarketingHeroV2
+              product={product}
+              averageRating={averageRating}
+              reviewCount={reviewCount}
+              actionPanel={<ActionPanel />}
+              images={images}
+            />
+          </FadeIn>
+        </div>
 
-            {/* Product Description */}
-            <div className="space-y-6">
-              <div className="prose prose-gray max-w-none flex flex-col gap-4">
-                {/* <h2 className="text-2xl font-semibold mb-4">Description</h2> */}
-                <div className="prose text-secondary-foreground">
-                  <CardAnyText className="m-0 py-2" title="Product Description">
-                    <Markdown source={variants[0].description || ""} />
-                  </CardAnyText>
-                </div>
-                {variants[0].metadata.nutrition && (
-                  <div>
-                    <CardAnyText className="m-0 py-2" title="Product Information">
-                      <MarkdownNutrition
-                        source={variants[0].metadata.nutrition}
-                      />
-                    </CardAnyText>
-                  </div>
-                )}
-              </div>
+        <FadeIn delay={0.1}>
+          <ScienceTable
+            title="The Science Behind the Strength"
+            subtitle="Each capsule combines nature's finest nutrients in clinically balanced doses for optimal spine and back support."
+            ingredients={parseJson(product.metadata?.ingredients, defaultIngredients)}
+          />
+        </FadeIn>
 
-              {relatedProducts.length > 0 && <Separator className="my-8" />}
+        <FadeIn delay={0.1}>
+          <SplitFeatureSection
+            title={whyChoose.title ?? defaultWhyChoose.title}
+            bullets={whyChoose.bullets}
+            imageSrc={whyChoose.imageSrc || images[0] || "/placeholder.jpg"}
+            imagePosition={whyChoose.imagePosition ?? "right"}
+          />
+        </FadeIn>
 
-              {/* Related Products Section */}
-              {relatedProducts.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold">You May Also Like</h2>
-                  {/* <RelatedProducts
-                    products={relatedProducts}
-                    title=""
-                    className="py-0"
-                  /> */}
-                  <RelatedProductsClient products={relatedProducts} />
-                </div>
-              )}
+        <FadeIn delay={0.1}>
+          <SplitFeatureSection
+            title={howToUse.title ?? defaultHowToUse.title}
+            content={howToUse.content}
+            imageSrc={howToUse.imageSrc || images[1] || images[0] || "/placeholder.jpg"}
+            imagePosition={howToUse.imagePosition ?? "left"}
+          />
+        </FadeIn>
 
-              {/* Bundle Offers Section */}
-              {packProductData.length > 0 && (
-                <>
-                  <Separator className="my-8" />
-                  <div className="space-y-4">
-                    <h2 className="text-2xl font-semibold">Bundle Offers</h2>
-                    <p className="text-muted-foreground">Save more when you buy together</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {packProductData.map((packData) => (
-                        <PackCardNew
-                          key={packData.id}
-                          product={packData}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
+        <FadeIn delay={0.1}>
+          <TestimonialCarousel
+            title="Chosen by Those Who Prioritize Inner Strength"
+            testimonials={defaultTestimonials}
+          />
+        </FadeIn>
 
-              <Separator className="my-8" />
+        <FadeIn delay={0.1}>
+          <FAQAccordion
+            title="Frequently Asked Questions"
+            faqs={defaultFAQs}
+          />
+        </FadeIn>
 
-              {/* Reviews Section */}
-              <div id="reviews" className="space-y-6 scroll-mt-24">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold">Customer Reviews</h2>
-                  <div className="flex items-center gap-2">
-                    <StarRating rating={averageRating} size="md" />
-                    <span className="text-sm text-gray-600">
-                      ({averageRating.toFixed(1)} out of 5 · {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
-                    </span>
-                  </div>
-                </div>
-
-                <ReviewsClient productId={variants[0]?.id as string} reviews={reviews} />
-
-                {/* <ReviewSection productId={variants[0]?.id as string} />
-
-                <ReviewList reviews={reviews} /> */}
-              </div>
-            </div>
+        {/* E-Commerce Standard Content */}
+        <div className="w-full py-8 space-y-10">
+          <div className="space-y-6">
+            <CardAnyText className="m-0 py-2" title="Product Description" defaultOpen>
+              <Markdown source={product.description || ""} />
+            </CardAnyText>
+            {(product.nutrition ?? product.metadata?.nutrition) && (
+              <CardAnyText className="m-0 py-2" title="Product Information">
+                <MarkdownNutrition source={product.nutrition ?? product.metadata?.nutrition ?? ""} />
+              </CardAnyText>
+            )}
           </div>
 
-          {/* Product Information */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="sticky top-20">
-              <div className="hidden md:block">
-                <Card className="border-0 shadow-xl bg-card">
-                  <CardHeader className="pb-6">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <Badge variant="secondary" className="w-fit">
-                          New Arrival
-                        </Badge>
-                        <CardTitle className="text-3xl lg:text-4xl font-bold leading-tight">
-                          {/* {params.slug
-                          .replace(/-/g, " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())} */}
-                          {variants[0].name}
-                        </CardTitle>
-                      </div>
-                      <div className="flex gap-2">
-                        <WishlistButton productId={variants[0].id} />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="rounded-full"
-                        >
-                          <Share2 className="w-5 h-5" />
-                        </Button>
-                      </div>
-                    </div>
-                    {/* <CardDescription className="text-base leading-relaxed line-clamp-3">
-                    {variants[0].description}
-                  </CardDescription> */}
-                    <a href="#reviews" className="flex items-center gap-4 pt-2 cursor-pointer hover:opacity-80 transition-opacity">
-                      <StarRating rating={averageRating} size="sm" />
-                      <span className="text-sm text-muted-foreground">
-                        {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'}
-                      </span>
-                    </a>
-                    <CardDescription className="text-base font-semibold">
-                      {variants[0].subtitle}
-                    </CardDescription>
-                    <Badge variant="secondary" className="w-fit">
-                      {variants[0].tagline}
-                    </Badge>
-                  </CardHeader>
-
-                  <CardContent className="space-y-6">
-                  <div className="flex-1">
-                    <QuantityManagement product={variants[0]} />
-                  </div>
-                </CardContent>
-                </Card>
+          {bundleProducts.length > 0 && (
+            <div className="space-y-6">
+              <h2 className="text-3xl font-serif">Bundle Offers</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {bundleProducts.map((bundle) => (
+                  <PackCardNew key={bundle.id} product={bundle} />
+                ))}
               </div>
-
-              {/* Add to Cart */}
-              <div className="mt-6 hidden md:grid grid-cols-2 gap-4">
-                <BuyNowButton product={variants[0]} />
-                <AddToCartButton product={variants[0]} />
-              </div>
-              <BadgeTrust className="hidden md:block" />
             </div>
+          )}
+
+          {relatedProducts.length > 0 && (
+            <div className="space-y-6">
+              <h2 className="text-3xl font-serif">You May Also Like</h2>
+              <RelatedProductsClient products={relatedProducts} />
+            </div>
+          )}
+
+          <div id="reviews" className="space-y-6 scroll-mt-24">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-3xl font-serif">Customer Reviews</h2>
+              <div className="flex items-center gap-2">
+                <StarRating rating={averageRating} size="md" />
+                <span className="text-sm font-medium text-muted-foreground">
+                  ({averageRating.toFixed(1)} / 5 · {reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                </span>
+              </div>
+            </div>
+            <ReviewsClient productId={product.id} reviews={reviews} />
           </div>
         </div>
+
+        <FadeIn delay={0.1}>
+          <BottomCTA
+            title="Support Your Spine from the Inside Out"
+            description="Vlyora's Blog brings you practical knowledge to help you live with strength and balance."
+            price={defaultPrice || 3299}
+            imageSrc={images[0] || "/placeholder.jpg"}
+          />
+        </FadeIn>
+
       </StickyBottom>
     </div>
   );

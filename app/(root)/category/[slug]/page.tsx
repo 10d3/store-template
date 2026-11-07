@@ -1,5 +1,5 @@
 import ProductCard from "@/components/shared/product-card";
-import { getProductByCategory } from "@/lib/product/cache";
+import { getCachedProductsByCategory } from "@/lib/catalog";
 import type { Metadata } from "next";
 import React from "react";
 
@@ -32,22 +32,17 @@ export default async function categoryPage(props: {
   params: Promise<{ slug: string }>;
 }) {
   const params = await props.params;
-  const products = await getProductByCategory(params.slug);
+  const products = await getCachedProductsByCategory(params.slug);
 
   // Format category name for display
   const title = params.slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   // Transform products for ProductCard
   const transformedProducts = products.map((product) => {
-    const defaultPrice =
-      typeof product.default_price === "object" && product.default_price
-        ? product.default_price
-        : null;
-
     return {
       id: product.id,
       name: product.name,
-      price: defaultPrice?.unit_amount || 0,
+      price: product.defaultVariant?.price ?? 0,
       originalPrice: product.metadata?.original_price
         ? parseInt(product.metadata.original_price)
         : undefined,
@@ -61,7 +56,7 @@ export default async function categoryPage(props: {
           src: product.images[1],
         }
         : undefined,
-      slug: product.metadata?.slug,
+      slug: product.slug ?? product.id,
     };
   });
 

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mail, MessageSquare, Send, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { submitSupportRequest } from "@/lib/action/support";
+import { submitSupportRequest } from "@/lib/actions/support";
 
 interface SupportFormData {
     name: string;

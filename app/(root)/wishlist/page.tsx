@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getWishlist } from "@/lib/wishlist/crud";
 import WishlistClientPage from "./_components/wishlist-client";
-import { StripeProduct } from "@/types/product";
+import { type ProductWithVariants } from "@/lib/catalog";
 
 export const metadata = {
   title: "Wishlist",
@@ -18,5 +18,5 @@ export default async function WishlistPage() {
 
   const wishlistItems = await getWishlist();
 
-  return <WishlistClientPage wishlistItems={wishlistItems?.products as StripeProduct[]} />;
+  return <WishlistClientPage wishlistItems={wishlistItems?.products as ProductWithVariants[]} />;
 }

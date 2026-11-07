@@ -1,4 +1,7 @@
-import type { TrustIndicator } from "@/types/product"
+interface TrustIndicator {
+  value: string
+  label: string
+}
 
 interface TrustIndicatorsProps {
   indicators: TrustIndicator[]
