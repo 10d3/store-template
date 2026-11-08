@@ -37,6 +37,12 @@ export default async function AccountPage() {
             Orders
           </Link>
           <Link
+            href="/account/addresses"
+            className="block rounded-md px-3 py-2 text-muted-foreground hover:text-foreground"
+          >
+            Addresses
+          </Link>
+          <Link
             href="/orders"
             className="block rounded-md px-3 py-2 text-muted-foreground hover:text-foreground"
           >

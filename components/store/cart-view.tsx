@@ -10,9 +10,28 @@ import { useCartStore, cartSubtotal } from "@/lib/cart/store";
 import { createCheckoutSession } from "@/lib/checkout";
 import { formatMoney } from "@/lib/money";
 
-export function CartView() {
+export interface SavedAddress {
+  id: string;
+  label: string | null;
+  name: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  state: string | null;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+}
+
+export function CartView({ addresses }: { addresses: SavedAddress[] }) {
   const [mounted, setMounted] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [addressId, setAddressId] = useState(
+    () =>
+      addresses.find((address) => address.isDefault)?.id ??
+      addresses[0]?.id ??
+      ""
+  );
   const items = useCartStore((state) => state.items);
   const setQuantity = useCartStore((state) => state.setQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
@@ -27,7 +46,8 @@ export function CartView() {
         items.map((item) => ({
           variantId: item.variantId,
           quantity: item.quantity,
-        }))
+        })),
+        addressId || undefined
       );
       if ("url" in result) {
         window.location.href = result.url;
@@ -148,6 +168,36 @@ export function CartView() {
             <span>{formatMoney(subtotal)}</span>
           </div>
         </div>
+
+        {addresses.length > 0 && (
+          <div className="mt-5 space-y-2">
+            <label
+              htmlFor="saved-address"
+              className="text-xs font-medium text-muted-foreground"
+            >
+              Shipping address
+            </label>
+            <select
+              id="saved-address"
+              value={addressId}
+              onChange={(event) => setAddressId(event.target.value)}
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            >
+              {addresses.map((address) => (
+                <option key={address.id} value={address.id}>
+                  {address.label || address.name} — {address.line1}, {address.city}
+                </option>
+              ))}
+            </select>
+            <Link
+              href="/account/addresses"
+              className="inline-block text-xs underline underline-offset-4"
+            >
+              Manage addresses
+            </Link>
+          </div>
+        )}
+
         <Button
           type="button"
           size="lg"

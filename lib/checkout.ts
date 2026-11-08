@@ -21,7 +21,8 @@ async function getBaseUrl() {
 }
 
 export async function createCheckoutSession(
-  rawItems: CheckoutItem[]
+  rawItems: CheckoutItem[],
+  addressId?: string
 ): Promise<{ url: string } | { error: string }> {
   if (!Array.isArray(rawItems) || rawItems.length === 0) {
     return { error: "Your cart is empty." };
@@ -116,9 +117,56 @@ export async function createCheckoutSession(
 
   const session = await getSession();
   const baseUrl = await getBaseUrl();
+  const stripe = getStripe();
+  let stripeCustomerId: string | undefined;
+
+  if (session) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { stripeCustomerId: true },
+    });
+    stripeCustomerId = user?.stripeCustomerId ?? undefined;
+
+    if (!stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: session.user.email,
+        name: session.user.name,
+        metadata: { userId: session.user.id },
+      });
+      stripeCustomerId = customer.id;
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { stripeCustomerId },
+      });
+    }
+
+    if (addressId) {
+      const address = await prisma.address.findFirst({
+        where: { id: addressId, userId: session.user.id },
+      });
+      if (!address) {
+        return { error: "That shipping address could not be found." };
+      }
+
+      await stripe.customers.update(stripeCustomerId, {
+        shipping: {
+          name: address.name,
+          phone: address.phone ?? undefined,
+          address: {
+            line1: address.line1,
+            line2: address.line2 ?? undefined,
+            city: address.city,
+            state: address.state ?? undefined,
+            postal_code: address.postalCode,
+            country: address.country,
+          },
+        },
+      });
+    }
+  }
 
   try {
-    const checkout = await getStripe().checkout.sessions.create({
+    const checkout = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
       allow_promotion_codes: true,
@@ -128,7 +176,9 @@ export async function createCheckoutSession(
         allowed_countries: ["US", "CA", "GB", "AU", "DE", "FR"],
       },
       shipping_options: shippingOptions,
-      customer_email: session?.user.email,
+      customer: stripeCustomerId,
+      customer_email: stripeCustomerId ? undefined : session?.user.email,
+      customer_update: stripeCustomerId ? { shipping: "auto" } : undefined,
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/cart`,
       metadata: {
