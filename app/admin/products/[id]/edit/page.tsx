@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { ProductForm } from "@/components/admin/product-form";
 import {
-  ProductForm,
   variantToForm,
   type AdminProductFormData,
-} from "@/components/admin/product-form";
+} from "@/lib/admin/product-form";
 
 export const metadata = { title: "Edit product" };
 
