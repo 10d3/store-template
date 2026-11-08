@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useActionState, useState } from "react";
 import { upsertProduct, type ActionState } from "@/lib/admin/actions";
+import { ImageUploader } from "@/components/admin/image-uploader";
 import type {
   AdminImage,
   AdminProductFormData,
@@ -50,6 +52,16 @@ export function ProductForm({
     setImages((current) =>
       current.map((image, i) => (i === index ? { ...image, ...patch } : image))
     );
+  }
+
+  function moveImage(index: number, direction: -1 | 1) {
+    setImages((current) => {
+      const target = index + direction;
+      if (target < 0 || target >= current.length) return current;
+      const next = [...current];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   }
 
   return (
@@ -163,14 +175,21 @@ export function ProductForm({
       </section>
 
       <section className="space-y-4 rounded-xl border border-border/60 bg-background p-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-medium">Images</h2>
+        <div className="flex items-center gap-2">
+          <ImageUploader
+            onUploaded={(urls) =>
+              setImages((current) => [
+                ...current,
+                ...urls.map((url) => ({ url, alt: "" })),
+              ])
+            }
+          />
           <button
             type="button"
             onClick={() => setImages((current) => [...current, { url: "", alt: "" }])}
             className="rounded-md border border-border px-3 py-1.5 text-xs"
           >
-            Add image
+            Add URL
           </button>
         </div>
         {images.length === 0 && (
@@ -178,26 +197,63 @@ export function ProductForm({
         )}
         <div className="space-y-3">
           {images.map((image, index) => (
-            <div key={index} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-              <input
-                value={image.url}
-                onChange={(event) => updateImage(index, { url: event.target.value })}
-                placeholder="https://…"
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <input
-                value={image.alt}
-                onChange={(event) => updateImage(index, { alt: event.target.value })}
-                placeholder="Alt text"
-                className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-              />
-              <button
-                type="button"
-                onClick={() => setImages((current) => current.filter((_, i) => i !== index))}
-                className="rounded-md border border-destructive/40 px-3 py-2 text-xs text-destructive"
-              >
-                Remove
-              </button>
+            <div
+              key={`${image.url}-${index}`}
+              className="grid gap-3 rounded-lg border border-border/60 p-3 sm:grid-cols-[auto_1fr_auto]"
+            >
+              {image.url ? (
+                <Image
+                  src={image.url}
+                  alt={image.alt || "Product image"}
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="h-16 w-16 rounded-md object-cover"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-md border border-dashed border-border" />
+              )}
+              <div className="space-y-2">
+                <input
+                  value={image.url}
+                  onChange={(event) => updateImage(index, { url: event.target.value })}
+                  placeholder="Image URL or upload"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+                <input
+                  value={image.alt}
+                  onChange={(event) => updateImage(index, { alt: event.target.value })}
+                  placeholder="Alt text"
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div className="flex items-start gap-1 sm:flex-col">
+                <button
+                  type="button"
+                  onClick={() => moveImage(index, -1)}
+                  disabled={index === 0}
+                  aria-label="Move image up"
+                  className="rounded-md border border-border px-2 py-1 text-xs disabled:opacity-40"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveImage(index, 1)}
+                  disabled={index === images.length - 1}
+                  aria-label="Move image down"
+                  className="rounded-md border border-border px-2 py-1 text-xs disabled:opacity-40"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImages((current) => current.filter((_, i) => i !== index))}
+                  className="rounded-md border border-destructive/40 px-2 py-1 text-xs text-destructive"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           ))}
         </div>
