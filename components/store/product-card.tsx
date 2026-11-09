@@ -17,15 +17,21 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     );
 
   return (
-    <Link href={`/product/${product.slug}`} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
+    <Link
+      href={`/product/${product.slug}`}
+      className="group relative block overflow-hidden rounded-3xl bg-card shadow-sm transition duration-300 hover:shadow-lg"
+    >
+      <div className="relative aspect-square overflow-hidden bg-white">
         {image ? (
           <Image
             src={image}
             alt={product.images[0]?.alt ?? product.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            className={cn(
+              "object-cover transition duration-500 group-hover:scale-105",
+              soldOut && "opacity-60"
+            )}
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -38,13 +44,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </span>
         )}
         {!soldOut && compareAt && compareAt > price && (
-          <span className="absolute left-3 top-3 rounded-full bg-foreground px-2.5 py-1 text-xs font-medium text-background">
+          <span className="absolute left-3 top-3 rounded-full bg-destructive px-2.5 py-1 text-xs font-medium text-white">
             Sale
           </span>
         )}
       </div>
-      <div className="mt-3 space-y-1">
-        <h3 className="text-sm font-medium leading-snug">{product.name}</h3>
+
+      <div className="space-y-1.5 p-4">
+        <h3 className="line-clamp-2 font-serif text-lg font-light leading-snug">
+          {product.name}
+        </h3>
         {product.reviewCount > 0 && (
           <StarRating rating={product.rating ?? 0} count={product.reviewCount} />
         )}

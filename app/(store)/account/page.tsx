@@ -17,10 +17,10 @@ export default async function AccountPage() {
   });
 
   return (
-    <Container className="py-10">
+    <Container className="py-12 md:py-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-4xl">Account</h1>
+          <h1 className="font-serif text-5xl font-light tracking-tight">Account</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {session.user.name} · {session.user.email}
           </p>
@@ -29,7 +29,7 @@ export default async function AccountPage() {
       </div>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[240px_1fr]">
-        <nav className="h-fit rounded-xl border border-border/60 p-2 text-sm">
+        <nav className="h-fit rounded-2xl border bg-card p-2 text-sm shadow-sm">
           <Link
             href="/account"
             className="block rounded-md bg-muted px-3 py-2 font-medium"
@@ -59,7 +59,7 @@ export default async function AccountPage() {
           </div>
 
           {orders.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-10 text-center">
+            <div className="rounded-3xl border border-dashed bg-card p-10 text-center">
               <p className="font-medium">No orders yet</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Your orders will show up here after checkout.
@@ -69,7 +69,7 @@ export default async function AccountPage() {
               </Button>
             </div>
           ) : (
-            <div className="divide-y divide-border/60 rounded-xl border border-border/60">
+            <div className="divide-y divide-border/60 rounded-2xl border bg-card shadow-sm">
               {orders.map((order) => (
                 <Link
                   key={order.id}

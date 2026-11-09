@@ -49,25 +49,30 @@ export default async function ShopPage({
   };
 
   return (
-    <Container className="py-10">
-      <div className="mb-8 max-w-2xl">
-        <h1 className="font-serif text-4xl">Shop</h1>
-        <p className="mt-2 text-muted-foreground">
+    <Container className="py-12 md:py-16">
+      <div className="mb-10 max-w-2xl">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          The shop
+        </p>
+        <h1 className="mt-3 font-serif text-5xl font-light tracking-tight md:text-6xl">
+          Shop
+        </h1>
+        <p className="mt-3 text-muted-foreground">
           Everyday essentials, organized simply.
         </p>
       </div>
 
-      <form className="mb-8 grid gap-3 rounded-xl border border-border/60 p-4 sm:grid-cols-2 lg:grid-cols-5">
+      <form className="mb-10 grid gap-3 rounded-3xl border bg-card p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-5">
         <input
           name="q"
           defaultValue={params.q ?? ""}
           placeholder="Search products"
-          className="h-9 rounded-md border border-border bg-background px-3 text-sm lg:col-span-2"
+          className="h-11 rounded-full border border-border bg-background px-5 text-sm lg:col-span-2"
         />
         <select
           name="category"
           defaultValue={params.category ?? ""}
-          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          className="h-11 rounded-full border border-border bg-background px-4 text-sm"
         >
           <option value="">All categories</option>
           {categories.map((category) => (
@@ -79,7 +84,7 @@ export default async function ShopPage({
         <select
           name="collection"
           defaultValue={params.collection ?? ""}
-          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          className="h-11 rounded-full border border-border bg-background px-4 text-sm"
         >
           <option value="">All collections</option>
           {collections.map((collection) => (
@@ -91,17 +96,17 @@ export default async function ShopPage({
         <select
           name="sort"
           defaultValue={params.sort ?? "newest"}
-          className="h-9 rounded-md border border-border bg-background px-3 text-sm"
+          className="h-11 rounded-full border border-border bg-background px-4 text-sm"
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
           <option value="name">Name A–Z</option>
         </select>
         <div className="flex gap-2 sm:col-span-2 lg:col-span-5">
-          <Button type="submit" size="sm">
+          <Button type="submit" size="sm" className="rounded-full px-5">
             Apply filters
           </Button>
-          <Button asChild size="sm" variant="ghost">
+          <Button asChild size="sm" variant="ghost" className="rounded-full px-5">
             <Link href="/shop">Reset</Link>
           </Button>
         </div>
@@ -117,14 +122,14 @@ export default async function ShopPage({
       </div>
 
       {result.products.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center">
+        <div className="rounded-3xl border border-dashed bg-card p-12 text-center">
           <p className="font-medium">No products found</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Try a different search or clear the filters.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
           {result.products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -134,7 +139,7 @@ export default async function ShopPage({
       {result.pageCount > 1 && (
         <div className="mt-10 flex items-center justify-center gap-2">
           {result.page > 1 && (
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm" className="rounded-full px-5">
               <Link href={pageHref(result.page - 1)}>Previous</Link>
             </Button>
           )}
@@ -142,7 +147,7 @@ export default async function ShopPage({
             {result.page} / {result.pageCount}
           </span>
           {result.page < result.pageCount && (
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm" className="rounded-full px-5">
               <Link href={pageHref(result.page + 1)}>Next</Link>
             </Button>
           )}

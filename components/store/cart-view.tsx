@@ -63,7 +63,7 @@ export function CartView({ addresses }: { addresses: SavedAddress[] }) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-12 text-center">
+      <div className="rounded-3xl border border-dashed bg-card p-12 text-center">
         <p className="font-medium">Your cart is empty</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Add a product to get started.
@@ -82,7 +82,7 @@ export function CartView({ addresses }: { addresses: SavedAddress[] }) {
           <div key={item.variantId} className="flex gap-4 py-5 first:pt-0">
             <Link
               href={`/product/${item.productSlug}`}
-              className="relative size-24 shrink-0 overflow-hidden rounded-lg bg-muted"
+              className="relative size-24 shrink-0 overflow-hidden rounded-2xl bg-muted"
             >
               {item.image ? (
                 <Image
@@ -152,8 +152,8 @@ export function CartView({ addresses }: { addresses: SavedAddress[] }) {
         ))}
       </div>
 
-      <aside className="h-fit rounded-xl border border-border/60 p-6">
-        <h2 className="font-serif text-xl">Order summary</h2>
+      <aside className="h-fit rounded-3xl border bg-card p-6 shadow-sm">
+        <h2 className="font-serif text-2xl font-light">Order summary</h2>
         <div className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotal</span>

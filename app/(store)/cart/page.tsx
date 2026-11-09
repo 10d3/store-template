@@ -27,8 +27,8 @@ export default async function CartPage() {
     : [];
 
   return (
-    <Container className="py-10">
-      <h1 className="mb-8 font-serif text-4xl">Your cart</h1>
+    <Container className="py-12 md:py-16">
+      <h1 className="mb-8 font-serif text-5xl font-light tracking-tight">Your cart</h1>
       <CartView addresses={addresses} />
     </Container>
   );

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, useTransition } from "react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ShieldCheck, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "@/components/store/star-rating";
@@ -88,9 +88,9 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
   }
 
   return (
-    <div className="grid gap-10 md:grid-cols-2">
-      <div className="space-y-3">
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
+    <div className="grid gap-10 md:grid-cols-2 md:gap-14">
+      <div className="space-y-4">
+        <div className="relative aspect-square overflow-hidden rounded-3xl bg-white shadow-sm">
           {selectedImage ? (
             <Image
               src={selectedImage}
@@ -107,15 +107,15 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
           )}
         </div>
         {product.images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="flex gap-3 overflow-x-auto">
             {product.images.map((image) => (
               <button
                 key={image.url}
                 type="button"
                 onClick={() => setSelectedImage(image.url)}
-                className={`relative size-16 shrink-0 overflow-hidden rounded-md border ${
+                className={`relative size-20 shrink-0 overflow-hidden rounded-xl border-2 ${
                   selectedImage === image.url
-                    ? "border-foreground"
+                    ? "border-brand"
                     : "border-transparent"
                 }`}
               >
@@ -123,7 +123,7 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
                   src={image.url}
                   alt={image.alt ?? product.name}
                   fill
-                  sizes="64px"
+                  sizes="80px"
                   className="object-cover"
                 />
               </button>
@@ -132,21 +132,21 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
         )}
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-7 self-start md:sticky md:top-28">
         <div>
-          <h1 className="font-serif text-3xl leading-tight sm:text-4xl">
+          <h1 className="font-serif text-4xl font-light leading-tight sm:text-5xl">
             {product.name}
           </h1>
           {product.reviewCount > 0 && (
             <StarRating
               rating={product.rating ?? 0}
               count={product.reviewCount}
-              className="mt-2"
+              className="mt-3"
             />
           )}
           {variant && (
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-xl font-medium">
+            <div className="mt-4 flex items-center gap-3">
+              <span className="text-2xl font-medium text-brand">
                 {formatMoney(variant.price)}
               </span>
               {variant.compareAtPrice &&
@@ -161,14 +161,17 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
 
         {product.variants.length > 1 && (
           <div className="space-y-2">
-            <label htmlFor="variant" className="text-sm font-medium">
+            <label
+              htmlFor="variant"
+              className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground"
+            >
               Option
             </label>
             <select
               id="variant"
               value={variantId}
               onChange={(event) => setVariantId(event.target.value)}
-              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="h-11 w-full rounded-xl border border-border bg-card px-3 text-sm"
             >
               {product.variants.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -180,14 +183,17 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
         )}
 
         <div className="space-y-2">
-          <label htmlFor="quantity" className="text-sm font-medium">
+          <label
+            htmlFor="quantity"
+            className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground"
+          >
             Quantity
           </label>
           <select
             id="quantity"
             value={quantity}
             onChange={(event) => setQuantity(Number(event.target.value))}
-            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+            className="h-11 w-full rounded-xl border border-border bg-card px-3 text-sm"
             disabled={soldOut}
           >
             {Array.from({ length: maxQuantity }, (_, index) => index + 1).map(
@@ -213,7 +219,7 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
           <Button
             type="button"
             size="lg"
-            className="flex-1 rounded-full"
+            className="h-12 flex-1 rounded-full"
             onClick={addToCart}
             disabled={soldOut}
           >
@@ -224,7 +230,7 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
             type="button"
             size="lg"
             variant="outline"
-            className="flex-1 rounded-full"
+            className="h-12 flex-1 rounded-full"
             onClick={buyNow}
             disabled={soldOut || pending}
           >
@@ -232,9 +238,19 @@ export function ProductPurchase({ product }: { product: PurchaseProduct }) {
           </Button>
         </div>
 
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Free shipping over $50. Secure checkout with Stripe. 30-day returns.
-        </p>
+        <div className="grid gap-3 rounded-2xl border bg-card p-5 text-sm">
+          <p className="flex items-center gap-3">
+            <Truck className="size-4 text-brand" />
+            Free shipping over $50
+          </p>
+          <p className="flex items-center gap-3">
+            <ShieldCheck className="size-4 text-brand" />
+            Secure checkout with Stripe
+          </p>
+          <p className="flex items-center gap-3 text-muted-foreground">
+            30-day returns. Questions? We are happy to help.
+          </p>
+        </div>
       </div>
     </div>
   );
