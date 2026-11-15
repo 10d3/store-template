@@ -71,14 +71,14 @@ export default async function HomePage() {
               </Button>
             </div>
 
-            <div className="relative min-h-[260px] bg-white md:min-h-[460px]">
+            <div className="relative aspect-[4/5] bg-white md:aspect-auto md:min-h-[460px]">
               <Image
                 src="/banner@3x.png"
                 alt="Vitanou supplement range"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 55vw"
-                className="hidden object-cover object-right md:block"
+                className="hidden object-contain object-center md:block"
               />
               <Image
                 src="/banner_stand@3x.png"
@@ -86,7 +86,7 @@ export default async function HomePage() {
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover object-bottom md:hidden"
+                className="object-contain object-center md:hidden"
               />
             </div>
           </div>
